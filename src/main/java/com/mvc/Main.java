@@ -2,15 +2,19 @@ package com.mvc;
 
 import com.mvc.controlador.ControladorDocente;
 import com.mvc.controlador.ControladorEstudiante;
+import com.mvc.controlador.ControladorGrupo;
 import com.mvc.controlador.ControladorMateria;
 import com.mvc.dao.DocenteDao;
 import com.mvc.dao.EstudianteDao;
+import com.mvc.dao.GrupoDao;
 import com.mvc.dao.MateriaDao;
 import com.mvc.servicios.DocenteService;
 import com.mvc.servicios.EstudianteService;
+import com.mvc.servicios.GrupoService;
 import com.mvc.servicios.MateriaService;
 import com.mvc.vista.VistaDocente;
 import com.mvc.vista.VistaEstudiante;
+import com.mvc.vista.VistaGrupo;
 import com.mvc.vista.VistaMateria;
 
 public class Main {
@@ -88,5 +92,28 @@ public class Main {
         // Flujo de eliminación de una materia por ID
         controladorMateria.eliminarMateria();
         controladorMateria.mostrarTodasLasMaterias();
+
+        // ── GRUPO ───────────────────────────────────────
+        VistaGrupo vistaGrupo = new VistaGrupo();
+        GrupoDao grupoDao = new GrupoDao();
+        GrupoService grupoService = new GrupoService(grupoDao);
+        ControladorGrupo controladorGrupo = new ControladorGrupo(vistaGrupo, grupoService, materiaService, docenteService);
+
+        // Flujo de registro de un grupo
+        controladorGrupo.mostrarTodosLosGrupos();
+        controladorGrupo.registrarGrupo();
+        controladorGrupo.mostrarTodosLosGrupos();
+
+        // Flujo de consulta de un grupo por ID
+        int idGrupo = vistaGrupo.solicitarIdGrupo();
+        controladorGrupo.mostrarDetallesGrupo(idGrupo);
+
+        // Flujo de actualización de un grupo por ID
+        controladorGrupo.actualizarGrupo();
+        controladorGrupo.mostrarTodosLosGrupos();
+
+        // Flujo de eliminación de un grupo por ID
+        controladorGrupo.eliminarGrupo();
+        controladorGrupo.mostrarTodosLosGrupos();
     }
 }
