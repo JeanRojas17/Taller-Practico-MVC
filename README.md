@@ -1,4 +1,4 @@
-# TALLER PRÁCTICO MVC + DAO + SERVICE (POSTGRESQL / MYSQL)
+# TALLER PRÁCTICO MVC + DAO + SERVICE + DB (POSTGRESQL)
 
 ## Objetivo
 Replicar el ecosistema académico propuesto en el diagrama Mermaid, siguiendo los estándares de arquitectura en capas (Entidad, DAO, Service, Controller, Vista).
