@@ -3,18 +3,22 @@ package com.mvc;
 import com.mvc.controlador.ControladorDocente;
 import com.mvc.controlador.ControladorEstudiante;
 import com.mvc.controlador.ControladorGrupo;
+import com.mvc.controlador.ControladorInscripcionCurso;
 import com.mvc.controlador.ControladorMateria;
 import com.mvc.dao.DocenteDao;
 import com.mvc.dao.EstudianteDao;
 import com.mvc.dao.GrupoDao;
+import com.mvc.dao.InscripcionCursoDao;
 import com.mvc.dao.MateriaDao;
 import com.mvc.servicios.DocenteService;
 import com.mvc.servicios.EstudianteService;
 import com.mvc.servicios.GrupoService;
+import com.mvc.servicios.InscripcionCursoService;
 import com.mvc.servicios.MateriaService;
 import com.mvc.vista.VistaDocente;
 import com.mvc.vista.VistaEstudiante;
 import com.mvc.vista.VistaGrupo;
+import com.mvc.vista.VistaInscripcionCurso;
 import com.mvc.vista.VistaMateria;
 
 public class Main {
@@ -115,5 +119,28 @@ public class Main {
         // Flujo de eliminación de un grupo por ID
         controladorGrupo.eliminarGrupo();
         controladorGrupo.mostrarTodosLosGrupos();
+
+        // ── INSCRIPCION CURSO ────────────────────────────
+        VistaInscripcionCurso vistaInscripcion = new VistaInscripcionCurso();
+        InscripcionCursoDao inscripcionDao = new InscripcionCursoDao();
+        InscripcionCursoService inscripcionService = new InscripcionCursoService(inscripcionDao);
+        ControladorInscripcionCurso controladorInscripcion = new ControladorInscripcionCurso(vistaInscripcion, inscripcionService, estudianteService, grupoService);
+
+        // Flujo de registro de una inscripción
+        controladorInscripcion.mostrarTodasLasInscripciones();
+        controladorInscripcion.registrarInscripcion();
+        controladorInscripcion.mostrarTodasLasInscripciones();
+
+        // Flujo de consulta de una inscripción por ID
+        int idInscripcion = vistaInscripcion.solicitarIdInscripcion();
+        controladorInscripcion.mostrarDetallesInscripcion(idInscripcion);
+
+        // Flujo de actualización de una inscripción por ID
+        controladorInscripcion.actualizarInscripcion();
+        controladorInscripcion.mostrarTodasLasInscripciones();
+
+        // Flujo de eliminación de una inscripción por ID
+        controladorInscripcion.eliminarInscripcion();
+        controladorInscripcion.mostrarTodasLasInscripciones();
     }
 }
