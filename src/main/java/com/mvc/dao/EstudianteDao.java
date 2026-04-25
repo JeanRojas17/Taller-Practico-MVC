@@ -18,7 +18,7 @@ public class EstudianteDao {
     // guardarEstudiante(Estudiante estudiante)
     // INSERT INTO "practica-mvc".estudiantes (name, lastname, email) VALUES ('Gabriel', 'Perez', 'pepito@email.com');
     public void guardarEstudiante(Estudiante estudiante) {
-        String sql = "INSERT INTO \"practica-mvc\".estudiantes (name, lastname, email) VALUES (?, ?, ?);";
+        String sql = "INSERT INTO \"practica-mvc\".estudiante (nombre, apellido, email) VALUES (?, ?, ?);";
 
         try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -38,7 +38,7 @@ public class EstudianteDao {
     public List<Estudiante> obtenerTodosLosEstudiantes() {
         List<Estudiante> estudiantes = new ArrayList<Estudiante>();
         
-        String sql = "SELECT id, name, lastname, email FROM \"practica-mvc\".estudiantes ORDER BY id;";
+        String sql = "SELECT id_estudiante, nombre, apellido, email FROM \"practica-mvc\".estudiante ORDER BY id_estudiante;";
 
         try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
@@ -46,9 +46,9 @@ public class EstudianteDao {
             while(rs.next()) {
                 Estudiante estudiante = new Estudiante();
 
-                estudiante.setId(rs.getInt("id"));
-                estudiante.setNombre(rs.getString("name"));
-                estudiante.setApellido(rs.getString("lastname"));
+                estudiante.setId(rs.getInt("id_estudiante"));
+                estudiante.setNombre(rs.getString("nombre"));
+                estudiante.setApellido(rs.getString("apellido"));
                 estudiante.setCorreo(rs.getString("email"));
 
                 estudiantes.add(estudiante);
@@ -66,18 +66,18 @@ public class EstudianteDao {
     public Estudiante obtenerEstudiantePorId(int id) {
         Estudiante estudiante = null;
         
-        String sql = "SELECT id, name, lastname, email FROM \"practica-mvc\".estudiantes WHERE id = ?;";
+        String sql = "SELECT id_estudiante, nombre, apellido, email FROM \"practica-mvc\".estudiante WHERE id_estudiante = ?;";
 
         try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
 
-            while(rs.next()) {
+            if(rs.next()) {
                 estudiante = new Estudiante();
 
-                estudiante.setId(rs.getInt("id"));
-                estudiante.setNombre(rs.getString("name"));
-                estudiante.setApellido(rs.getString("lastname"));
+                estudiante.setId(rs.getInt("id_estudiante"));
+                estudiante.setNombre(rs.getString("nombre"));
+                estudiante.setApellido(rs.getString("apellido"));
                 estudiante.setCorreo(rs.getString("email"));
             }
 
@@ -93,7 +93,7 @@ public class EstudianteDao {
     // SET email = 'emailactualizado@example.com', lastname = 'nuevoapellido'
     // WHERE id = 2;
     public void actualizarEstudiante(Estudiante estudiante) {
-        String sql = "UPDATE \"practica-mvc\".estudiantes SET name = ?, lastname = ?, email = ? WHERE id = ?;";
+        String sql = "UPDATE \"practica-mvc\".estudiante SET nombre = ?, apellido = ?, email = ? WHERE id_estudiante = ?;";
 
         try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, estudiante.getNombre());
@@ -109,9 +109,9 @@ public class EstudianteDao {
     }
     
     // eliminarEstudiante(int id)
-    // DELETE FROM "practica-mvc".estudiantes WHERE id = 1;
+    // DELETE FROM "practica-mvc".estudiante WHERE id = 1;
     public void eliminarEstudiante(int id) {
-        String sql = "DELETE FROM \"practica-mvc\".estudiantes WHERE id = ?;";
+        String sql = "DELETE FROM \"practica-mvc\".estudiante WHERE id_estudiante = ?;";
 
         try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
