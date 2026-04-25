@@ -1,5 +1,10 @@
 # TALLER PRÁCTICO MVC + DAO + SERVICE + DB (POSTGRESQL)
 
+### Integrantes:
+
+- **Jean Paul Rojas Herrera**
+- **Michael Dowglas Lenis Chaguendo**
+
 ## Objetivo
 Replicar el ecosistema académico propuesto en el diagrama Mermaid, siguiendo los estándares de arquitectura en capas (Entidad, DAO, Service, Controller, Vista).
 
