@@ -1,11 +1,7 @@
 package com.mvc;
 
-import java.sql.Connection;
-
-import com.mvc.config.ConexionPostgresDatabase;
 import com.mvc.controlador.ControladorEstudiante;
 import com.mvc.dao.EstudianteDao;
-import com.mvc.modelo.Estudiante;
 import com.mvc.servicios.EstudianteService;
 import com.mvc.vista.VistaEstudiante;
 
