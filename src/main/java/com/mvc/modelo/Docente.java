@@ -1,12 +1,26 @@
 package com.mvc.modelo;
 
 public class Docente {
-    String nombre;
-    int edad;
+    
+    private Integer id;
+    private String nombre;
+    private String especialidad;
 
-    public Docente(String nombre, int edad) {
+    public Docente() {
+    }
+
+    public Docente(Integer id, String nombre, String especialidad) {
+        this.id = id;
         this.nombre = nombre;
-        this.edad = edad;
+        this.especialidad = especialidad;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -17,11 +31,11 @@ public class Docente {
         this.nombre = nombre;
     }
 
-    public int getEdad() {
-        return edad;
+    public String getEspecialidad() {
+        return especialidad;
     }
 
-    public void setEdad(int edad) {
-        this.edad = edad;
-    }
+    public void setEspecialidad(String especialidad) {
+        this.especialidad = especialidad;
+    } 
 }
