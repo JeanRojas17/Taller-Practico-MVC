@@ -1,5 +1,7 @@
 package com.mvc.controlador;
 
+import java.util.List;
+
 import com.mvc.modelo.Estudiante;
 import com.mvc.modelo.Grupo;
 import com.mvc.modelo.InscripcionCurso;
@@ -114,5 +116,31 @@ public class ControladorInscripcionCurso {
         int id = vistaInscripcion.solicitarIdInscripcionParaEliminar();
         inscripcionService.eliminarInscripcion(id);
         vistaInscripcion.mostrarMensaje("Inscripción eliminada exitosamente.");
+    }
+
+    public void mostrarNotasPorEstudiante() {
+        int idEstudiante = vistaInscripcion.solicitarIdEstudianteParaConsulta();
+        Estudiante estudiante = estudianteService.obtenerEstudiantePorId(idEstudiante);
+
+        if(estudiante == null) {
+            vistaInscripcion.mostrarMensaje("No se encontró un estudiante con el ID proporcionado.");
+            return;
+        }
+
+        List<InscripcionCurso> inscripciones = inscripcionService.obtenerInscripcionesPorEstudiante(idEstudiante);
+        vistaInscripcion.mostrarNotasPorEstudiante(inscripciones);
+    }
+
+    public void mostrarNotasPorGrupo() {
+        int idGrupo = vistaInscripcion.solicitarIdGrupoParaConsulta();
+        Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
+
+        if(grupo == null) {
+            vistaInscripcion.mostrarMensaje("No se encontró un grupo con el ID proporcionado.");
+            return;
+        }
+
+        List<InscripcionCurso> inscripciones = inscripcionService.obtenerInscripcionesPorGrupo(idGrupo);
+        vistaInscripcion.mostrarNotasPorGrupo(inscripciones);
     }
 }

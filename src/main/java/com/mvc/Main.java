@@ -142,5 +142,9 @@ public class Main {
         // Flujo de eliminación de una inscripción por ID
         controladorInscripcion.eliminarInscripcion();
         controladorInscripcion.mostrarTodasLasInscripciones();
+
+        // Consultas adicionales de notas por estudiante y grupo
+        controladorInscripcion.mostrarNotasPorEstudiante();
+        controladorInscripcion.mostrarNotasPorGrupo();
     }
 }

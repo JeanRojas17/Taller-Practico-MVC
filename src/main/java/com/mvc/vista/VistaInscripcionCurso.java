@@ -126,4 +126,49 @@ public class VistaInscripcionCurso {
     public void mostrarMensaje(String mensaje) {
         System.out.println(mensaje);
     }
+
+    public int solicitarIdEstudianteParaConsulta() {
+        System.out.print("\nIngrese el ID del estudiante para consultar sus notas: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        return id;
+    }
+
+    public int solicitarIdGrupoParaConsulta() {
+        System.out.print("\nIngrese el ID del grupo para consultar sus notas: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        return id;
+    }
+
+    public void mostrarNotasPorEstudiante(List<InscripcionCurso> inscripciones) {
+        if(inscripciones.isEmpty()) {
+            System.out.println("El estudiante no tiene inscripciones registradas.");
+            return;
+        }
+
+        System.out.println("\n--- Notas del estudiante: " +inscripciones.get(0).getEstudiante().getNombre()+ " " +inscripciones.get(0).getEstudiante().getApellido()+ " ---");
+        
+        for(InscripcionCurso ic : inscripciones) {
+            System.out.println("Materia: " +ic.getGrupo().getMateria().getNombreMateria());
+            System.out.println("Grupo: " +ic.getGrupo().getId()+ " | Aula: " +ic.getGrupo().getAula()+ " | Horario: " +ic.getGrupo().getHorario());
+            System.out.println("Nota: " +(ic.getNotaFinal() != null ? ic.getNotaFinal() : "Sin nota"));
+            System.out.println("Estado: " +ic.getEstado());
+            System.out.println("-------------------");
+        }
+    }
+
+    public void mostrarNotasPorGrupo(List<InscripcionCurso> inscripciones) {
+        if(inscripciones.isEmpty()) {
+            System.out.println("El grupo no tiene estudiantes inscritos.");
+            return;
+        }
+
+        System.out.println("\n--- Notas del grupo: " +inscripciones.get(0).getGrupo().getId()+ " - " +inscripciones.get(0).getGrupo().getMateria().getNombreMateria()+ " ---");
+
+        for(InscripcionCurso ic : inscripciones) {
+            System.out.println("Estudiante: " +ic.getEstudiante().getNombre()+ " " +ic.getEstudiante().getApellido());
+            System.out.println("Nota: " +(ic.getNotaFinal() != null ? ic.getNotaFinal() : "Sin nota"));
+            System.out.println("Estado: " +ic.getEstado());
+            System.out.println("-------------------");
+        }
+    }
 }
