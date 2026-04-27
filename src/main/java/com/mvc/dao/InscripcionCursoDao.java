@@ -186,4 +186,48 @@ public class InscripcionCursoDao {
             error.printStackTrace();
         }
     }
+
+    // SELECT por estudiante
+    public List<InscripcionCurso> obtenerInscripcionesPorEstudiante(int idEstudiante) {
+        List<InscripcionCurso> inscripciones = new ArrayList<>();
+
+        String sql = SQL_SELECT + "WHERE ic.id_estudiante = ? ORDER BY ic.id_inscripcion;";
+
+        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idEstudiante);
+            ResultSet rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                inscripciones.add(mapearInscripcion(rs));
+            }
+
+        } catch(SQLException error) {
+            error.printStackTrace();
+        }
+
+        return inscripciones;
+    }
+
+    // SELECT por grupo
+    public List<InscripcionCurso> obtenerInscripcionesPorGrupo(int idGrupo) {
+        List<InscripcionCurso> inscripciones = new ArrayList<>();
+
+        String sql = SQL_SELECT + "WHERE ic.id_grupo = ? ORDER BY ic.id_inscripcion;";
+
+        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idGrupo);
+            ResultSet rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                inscripciones.add(mapearInscripcion(rs));
+            }
+
+        } catch(SQLException error) {
+            error.printStackTrace();
+        }
+
+        return inscripciones;
+    }
 }
