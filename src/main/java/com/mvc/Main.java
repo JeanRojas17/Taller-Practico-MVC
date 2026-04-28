@@ -1,25 +1,9 @@
 package com.mvc;
 
-import com.mvc.controlador.ControladorDocente;
-import com.mvc.controlador.ControladorEstudiante;
-import com.mvc.controlador.ControladorGrupo;
-import com.mvc.controlador.ControladorInscripcionCurso;
-import com.mvc.controlador.ControladorMateria;
-import com.mvc.dao.DocenteDao;
-import com.mvc.dao.EstudianteDao;
-import com.mvc.dao.GrupoDao;
-import com.mvc.dao.InscripcionCursoDao;
-import com.mvc.dao.MateriaDao;
-import com.mvc.servicios.DocenteService;
-import com.mvc.servicios.EstudianteService;
-import com.mvc.servicios.GrupoService;
-import com.mvc.servicios.InscripcionCursoService;
-import com.mvc.servicios.MateriaService;
-import com.mvc.vista.VistaDocente;
-import com.mvc.vista.VistaEstudiante;
-import com.mvc.vista.VistaGrupo;
-import com.mvc.vista.VistaInscripcionCurso;
-import com.mvc.vista.VistaMateria;
+import com.mvc.controlador.*;
+import com.mvc.dao.*;
+import com.mvc.servicios.*;
+import com.mvc.vista.*;
 
 public class Main {
 
