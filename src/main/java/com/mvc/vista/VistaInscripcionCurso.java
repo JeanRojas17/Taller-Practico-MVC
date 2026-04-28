@@ -171,4 +171,16 @@ public class VistaInscripcionCurso {
             System.out.println("-------------------");
         }
     }
+
+    public int[] solicitarDatosParaEliminarEstudianteDeGrupo() {
+        System.out.println("\nEliminando estudiante de un grupo...");
+        
+        System.out.print("Ingrese el ID del estudiante: ");
+        int idEstudiante = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Ingrese el ID del grupo: ");
+        int idGrupo = Integer.parseInt(scanner.nextLine());
+
+        return new int[]{idEstudiante, idGrupo};
+    }
 }

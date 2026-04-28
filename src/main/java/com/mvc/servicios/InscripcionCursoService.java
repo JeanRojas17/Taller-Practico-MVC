@@ -50,4 +50,8 @@ public class InscripcionCursoService {
     public List<InscripcionCurso> obtenerInscripcionesPorGrupo(int idGrupo) {
         return inscripcionCursoDao.obtenerInscripcionesPorGrupo(idGrupo);
     }
+
+    public void eliminarEstudianteDeGrupo(int idEstudiante, int idGrupo) {
+        inscripcionCursoDao.eliminarInscripcionPorEstudianteYGrupo(idEstudiante, idGrupo);
+    }
 }

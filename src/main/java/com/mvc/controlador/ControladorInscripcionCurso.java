@@ -143,4 +143,26 @@ public class ControladorInscripcionCurso {
         List<InscripcionCurso> inscripciones = inscripcionService.obtenerInscripcionesPorGrupo(idGrupo);
         vistaInscripcion.mostrarNotasPorGrupo(inscripciones);
     }
+
+    public void eliminarEstudianteDeGrupo() {
+        int[] datos = vistaInscripcion.solicitarDatosParaEliminarEstudianteDeGrupo();
+
+        int idEstudiante = datos[0];
+        int idGrupo = datos[1];
+
+        Estudiante estudiante = estudianteService.obtenerEstudiantePorId(idEstudiante);
+        Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
+
+        if(estudiante == null) {
+            vistaInscripcion.mostrarMensaje("No se encontró un estudiante con el ID proporcionado.");
+            return;
+        }
+        if(grupo == null) {
+            vistaInscripcion.mostrarMensaje("No se encontró un grupo con el ID proporcionado.");
+            return;
+        }
+
+        inscripcionService.eliminarEstudianteDeGrupo(idEstudiante, idGrupo);
+        vistaInscripcion.mostrarMensaje("Estudiante " +estudiante.getNombre()+ " " +estudiante.getApellido()+ " eliminado del grupo " +grupo.getId()+ " - " +grupo.getMateria().getNombreMateria()+ " exitosamente.");
+    }
 }

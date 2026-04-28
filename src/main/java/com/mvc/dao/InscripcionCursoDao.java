@@ -230,4 +230,19 @@ public class InscripcionCursoDao {
 
         return inscripciones;
     }
+
+    // DELETE por estudiante y grupo
+    public void eliminarInscripcionPorEstudianteYGrupo(int idEstudiante, int idGrupo) {
+        String sql = "DELETE FROM \"practica-mvc\".inscripcion_curso WHERE id_estudiante = ? AND id_grupo = ?;";
+
+        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idEstudiante);
+            pstmt.setInt(2, idGrupo);
+            pstmt.executeUpdate();
+
+        } catch(SQLException error) {
+            error.printStackTrace();
+        }
+    }
 }
