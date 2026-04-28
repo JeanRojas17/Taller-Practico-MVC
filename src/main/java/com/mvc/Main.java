@@ -130,5 +130,9 @@ public class Main {
         // Consultas adicionales de notas por estudiante y grupo
         controladorInscripcion.mostrarNotasPorEstudiante();
         controladorInscripcion.mostrarNotasPorGrupo();
+
+        // Eliminar estudiante de un grupo
+        controladorInscripcion.eliminarEstudianteDeGrupo();
+        controladorInscripcion.mostrarTodasLasInscripciones();
     }
 }
