@@ -37,7 +37,7 @@ public class VistaDocenteSwing extends JPanel {
 
     private static final String[] COLUMNAS = {"ID", "Nombre", "Especialidad"};
 
-    private static final String PLACEHOLDER_BUSCAR = "Buscar docente...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar docente...";
 
     public VistaDocenteSwing() {
         initComponents();
@@ -86,10 +86,10 @@ public class VistaDocenteSwing extends JPanel {
     }
 
     private JPanel buildPanelEncabezado() {
-        JLabel lblTitulo = new JLabel("Gestion de Docentes");
+        JLabel lblTitulo = new JLabel("Gestión de Docentes");
         lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 20));
 
-        JLabel lblSubtitulo = new JLabel("Administra el registro, actualizacion y eliminacion de docentes");
+        JLabel lblSubtitulo = new JLabel("Administra el registro, actualización y eliminación de docentes");
         lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 12));
         lblSubtitulo.setForeground(Color.GRAY);
 
@@ -187,7 +187,7 @@ public class VistaDocenteSwing extends JPanel {
                 if(texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
                     sorter.setRowFilter(null);
                 } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto));
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" +texto));
                 }
             }
         });
@@ -256,7 +256,7 @@ public class VistaDocenteSwing extends JPanel {
     }
 
     public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Sistema Academico UNIAJC", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, mensaje, "Sistema Académico UNIAJC", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void mostrarError(String mensaje) {

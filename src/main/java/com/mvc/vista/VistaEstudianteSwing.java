@@ -191,7 +191,7 @@ public class VistaEstudianteSwing extends JPanel {
                 if(texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
                     sorter.setRowFilter(null);
                 } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto));
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" +texto));
                 }
             }
         });
