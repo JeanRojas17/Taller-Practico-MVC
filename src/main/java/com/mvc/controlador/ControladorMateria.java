@@ -2,55 +2,118 @@ package com.mvc.controlador;
 
 import com.mvc.modelo.Materia;
 import com.mvc.servicios.MateriaService;
-import com.mvc.vista.VistaMateria;
+import com.mvc.vista.VistaMateriaSwing;
+
+import java.util.List;
 
 public class ControladorMateria {
 
-    private VistaMateria vistaMateria;
-    private MateriaService materiaService;
+    private final VistaMateriaSwing vista;
+    private final MateriaService service;
 
-    public ControladorMateria(VistaMateria vistaMateria, MateriaService materiaService) {
-        this.vistaMateria = vistaMateria;
-        this.materiaService = materiaService;
+    public ControladorMateria(VistaMateriaSwing vista, MateriaService service) {
+        this.vista = vista;
+        this.service = service;
+
+        vista.setOnRegistrar(this::registrar);
+        vista.setOnActualizar(this::actualizar);
+        vista.setOnEliminar(this::eliminar);
+        vista.setOnRefrescar(this::refrescar);
+
+        refrescar();
     }
 
-    public void registrarMateria() {
-        Materia nuevaMateria = vistaMateria.solicitarDatosMateria();
+    private void registrar() {
+        String nombreMateria = vista.getNombreMateria();
+        String creditosTexto = vista.getCreditosTexto();
 
-        materiaService.registrarMateria(nuevaMateria);
-        vistaMateria.mostrarMensaje("Materia registrada exitosamente.");
-    }
+        if(nombreMateria.isEmpty() || creditosTexto.isEmpty()) {
+            vista.mostrarError("Los campos Nombre y Créditos son obligatorios.");
+            return;
+        }
 
-    public void mostrarTodasLasMaterias() {
-        vistaMateria.mostrarTodasLasMaterias(materiaService.mostrarTodasLasMaterias());
-    }
+        try {
+            Integer creditos = Integer.parseInt(creditosTexto);
+            Materia nueva = new Materia(0, nombreMateria, creditos);
 
-    public void mostrarDetallesMateria(int id) {
-        Materia materia = materiaService.obtenerMateriaPorId(id);
-
-        if(materia != null) {
-            vistaMateria.mostrarDetallesMateria(materia);
-        } else {
-            vistaMateria.mostrarMensaje("No se encontró una materia con el ID proporcionado.");
+            service.registrarMateria(nueva);
+            vista.mostrarMensaje("Materia registrada exitosamente.");
+            vista.limpiarCampos();
+            refrescar();
+        } catch(NumberFormatException ex) {
+            vista.mostrarError("El campo Créditos debe ser un número entero.");
+        } catch(IllegalArgumentException ex) {
+            vista.mostrarError(ex.getMessage());
+        } catch(Exception ex) {
+            vista.mostrarError("Error al registrar: " +ex.getMessage());
         }
     }
 
-    public void actualizarMateria() {
-        int id = vistaMateria.solicitarIdMateria();
-        Materia materiaExistente = materiaService.obtenerMateriaPorId(id);
+    private void actualizar() {
+        int id = vista.getIdSeleccionado();
 
-        if(materiaExistente != null) {
-            Materia materiaActualizada = vistaMateria.solicitarDatosMateriaActualizados(materiaExistente);
-            materiaService.actualizarMateria(materiaActualizada);
-            vistaMateria.mostrarMensaje("Materia actualizada exitosamente.");
-        } else {
-            vistaMateria.mostrarMensaje("No se encontró una materia con el ID proporcionado.");
+        if(id < 0) {
+            vista.mostrarError("Selecciona una materia de la tabla para actualizar.");
+            return;
+        }
+
+        String nombreMateria = vista.getNombreMateria();
+        String creditosTexto = vista.getCreditosTexto();
+
+        if(nombreMateria.isEmpty() || creditosTexto.isEmpty()) {
+            vista.mostrarError("Los campos Nombre y Créditos son obligatorios.");
+            return;
+        }
+
+        try {
+            Integer creditos = Integer.parseInt(creditosTexto);
+            Materia actualizada = new Materia(id, nombreMateria, creditos);
+
+            service.actualizarMateria(actualizada);
+            vista.mostrarMensaje("Materia actualizada exitosamente.");
+            vista.limpiarCampos();
+            refrescar();
+        } catch(NumberFormatException ex) {
+            vista.mostrarError("El campo Créditos debe ser un número entero.");
+        } catch(Exception ex) {
+            vista.mostrarError("Error al actualizar: " +ex.getMessage());
         }
     }
 
-    public void eliminarMateria() {
-        int id = vistaMateria.solicitarIdMateriaParaEliminar();
-        materiaService.eliminarMateria(id);
-        vistaMateria.mostrarMensaje("Materia eliminada exitosamente.");
+    private void eliminar() {
+        int id = vista.getIdSeleccionado();
+
+        if(id < 0) {
+            vista.mostrarError("Selecciona una materia de la tabla para eliminar.");
+            return;
+        }
+
+        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
+            vista,
+            "Estás seguro de que deseas eliminar la materia con ID " +id+ "?",
+            "Confirmar eliminación",
+            javax.swing.JOptionPane.YES_NO_OPTION,
+            javax.swing.JOptionPane.WARNING_MESSAGE
+        );
+
+        if(confirmacion != javax.swing.JOptionPane.YES_OPTION) return;
+
+        try {
+            service.eliminarMateria(id);
+            vista.mostrarMensaje("Materia eliminada exitosamente.");
+            vista.limpiarCampos();
+            refrescar();
+        } catch(Exception ex) {
+            vista.mostrarError("Error al eliminar: " +ex.getMessage());
+        }
+    }
+
+    private void refrescar() {
+        try {
+            List<Materia> materias = service.mostrarTodasLasMaterias();
+            vista.cargarMaterias(materias);
+        } catch(Exception ex) {
+            vista.mostrarError("Error al cargar materias: " +ex.getMessage());
+        }
     }
 }

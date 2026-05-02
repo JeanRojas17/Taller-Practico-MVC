@@ -5,134 +5,188 @@ import com.mvc.dao.*;
 import com.mvc.servicios.*;
 import com.mvc.vista.*;
 
-public class Main {
+import javax.swing.*;
+import java.awt.*;
 
-    public static void main(String[] args) {
-        System.out.println("------------------------------");
-        System.out.println("Práctica MVC - Sistema Académico UNIAJC");
-        System.out.println("------------------------------");
+public class Main extends JFrame {
 
-        // ── ESTUDIANTE ──────────────────────────────────
-        VistaEstudiante vistaEstudiante = new VistaEstudiante();
+    private JPanel panelContenido;
+    private CardLayout cardLayout;
+
+    private JButton btnActivo;
+
+    public static final String CARD_ESTUDIANTES = "Estudiantes";
+    public static final String CARD_DOCENTES = "Docentes";
+    public static final String CARD_MATERIAS = "Materias";
+    public static final String CARD_GRUPOS = "Grupos";
+    public static final String CARD_INSCRIPCIONES = "Inscripciones";
+
+    public Main() {
+        super("Sistema Académico UNIAJC");
+        initComponents();
+    }
+
+    private void initComponents() {
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1000, 650);
+        setMinimumSize(new Dimension(800, 550));
+        setLocationRelativeTo(null);
+
+        cardLayout = new CardLayout();
+        panelContenido = new JPanel(cardLayout);
+
+        JPanel sidebar = buildSidebar();
+
+        registrarPaneles();
+
+        setLayout(new BorderLayout());
+        add(sidebar, BorderLayout.WEST);
+        add(panelContenido, BorderLayout.CENTER);
+
+        cardLayout.show(panelContenido, CARD_ESTUDIANTES);
+    }
+
+    private JPanel buildSidebar() {
+        JPanel sidebar = new JPanel(new BorderLayout());
+        sidebar.setPreferredSize(new Dimension(190, 0));
+        sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
+
+        sidebar.add(buildSidebarHeader(), BorderLayout.NORTH);
+        sidebar.add(buildSidebarNav(), BorderLayout.CENTER);
+        sidebar.add(buildSidebarFooter(), BorderLayout.SOUTH);
+
+        return sidebar;
+    }
+
+    private JPanel buildSidebarHeader() {
+        JLabel lblTitulo = new JLabel(
+                "<html><center>Sistema Académico<br>UNIAJC</center></html>",
+                SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+        JPanel panelTitulo = new JPanel(new BorderLayout());
+        panelTitulo.setBorder(BorderFactory.createEmptyBorder(20, 10, 16, 10));
+        panelTitulo.add(lblTitulo, BorderLayout.CENTER);
+
+        JSeparator separador = new JSeparator();
+        separador.setForeground(Color.LIGHT_GRAY);
+
+        JPanel header = new JPanel(new BorderLayout());
+        header.add(panelTitulo, BorderLayout.CENTER);
+        header.add(separador,   BorderLayout.SOUTH);
+
+        return header;
+    }
+
+    private JPanel buildSidebarNav() {
+        JPanel nav = new JPanel();
+        nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
+        nav.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+
+        String[] entidades = {
+            CARD_ESTUDIANTES,
+            CARD_DOCENTES,
+            CARD_MATERIAS,
+            CARD_GRUPOS,
+            CARD_INSCRIPCIONES
+        };
+
+        for(String entidad : entidades) {
+            JButton btn = buildBotonNav(entidad);
+            nav.add(btn);
+
+            if(entidad.equals(CARD_ESTUDIANTES)) {
+                marcarActivo(btn);
+            }
+        }
+
+        return nav;
+    }
+
+    private JPanel buildSidebarFooter() {
+        JLabel lblVersion = new JLabel("v1.0.0", SwingConstants.CENTER);
+        lblVersion.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        lblVersion.setForeground(Color.GRAY);
+
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBorder(BorderFactory.createEmptyBorder(10, 0, 14, 0));
+        footer.add(lblVersion, BorderLayout.CENTER);
+
+        return footer;
+    }
+
+    private JButton buildBotonNav(String texto) {
+        JButton btn = new JButton(texto);
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        btn.setHorizontalAlignment(SwingConstants.LEFT);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        btn.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
+
+        btn.addActionListener(e -> {
+            marcarActivo(btn);
+            cardLayout.show(panelContenido, texto);
+        });
+
+        return btn;
+    }
+
+    private void marcarActivo(JButton btn) {
+        if(btnActivo != null) {
+            btnActivo.setBackground(UIManager.getColor("Panel.background"));
+            btnActivo.setOpaque(false);
+            btnActivo.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        }
+
+        btnActivo = btn;
+        btnActivo.setOpaque(true);
+        btnActivo.setBackground(new Color(220, 220, 235));
+        btnActivo.setFont(new Font("SansSerif", Font.BOLD, 13));
+    }
+
+    private void registrarPaneles() {
         EstudianteDao estudianteDao = new EstudianteDao();
         EstudianteService estudianteService = new EstudianteService(estudianteDao);
-        ControladorEstudiante controladorEstudiante = new ControladorEstudiante(vistaEstudiante, estudianteService);
+        VistaEstudianteSwing vistaEstudiante = new VistaEstudianteSwing();
+        new ControladorEstudiante(vistaEstudiante, estudianteService);
 
-        // Flujo de registro de un estudiante
-        controladorEstudiante.mostrarTodosLosEstudiantes();
-        controladorEstudiante.registrarEstudiante();
-        controladorEstudiante.mostrarTodosLosEstudiantes();
-
-        // Flujo de consulta de un estudiante por ID
-        int idEstudiante = vistaEstudiante.solicitarIdEstudiante();
-        controladorEstudiante.mostrarDetallesEstudiante(idEstudiante);
-
-        // Flujo de actualización de un estudiante por ID
-        controladorEstudiante.actualizarEstudiante();
-        controladorEstudiante.mostrarTodosLosEstudiantes();
-
-        // Flujo de eliminación de un estudiante por ID
-        controladorEstudiante.eliminarEstudiante();
-        controladorEstudiante.mostrarTodosLosEstudiantes();
-
-        // ── DOCENTE ─────────────────────────────────────
-        VistaDocente vistaDocente = new VistaDocente();
         DocenteDao docenteDao = new DocenteDao();
         DocenteService docenteService = new DocenteService(docenteDao);
-        ControladorDocente controladorDocente = new ControladorDocente(vistaDocente, docenteService);
+        VistaDocenteSwing vistaDocente = new VistaDocenteSwing();
+        new ControladorDocente(vistaDocente, docenteService);
 
-        // Flujo de registro de un docente
-        controladorDocente.mostrarTodosLosDocentes();
-        controladorDocente.registrarDocente();
-        controladorDocente.mostrarTodosLosDocentes();
-
-        // Flujo de consulta de un docente por ID
-        int idDocente = vistaDocente.solicitarIdDocente();
-        controladorDocente.mostrarDetallesDocente(idDocente);
-
-        // Flujo de actualización de un docente por ID
-        controladorDocente.actualizarDocente();
-        controladorDocente.mostrarTodosLosDocentes();
-
-        // Flujo de eliminación de un docente por ID
-        controladorDocente.eliminarDocente();
-        controladorDocente.mostrarTodosLosDocentes();
-
-        // ── MATERIA ─────────────────────────────────────
-        VistaMateria vistaMateria = new VistaMateria();
         MateriaDao materiaDao = new MateriaDao();
         MateriaService materiaService = new MateriaService(materiaDao);
-        ControladorMateria controladorMateria = new ControladorMateria(vistaMateria, materiaService);
+        VistaMateriaSwing vistaMateria = new VistaMateriaSwing();
+        new ControladorMateria(vistaMateria, materiaService);
 
-        // Flujo de registro de una materia
-        controladorMateria.mostrarTodasLasMaterias();
-        controladorMateria.registrarMateria();
-        controladorMateria.mostrarTodasLasMaterias();
-
-        // Flujo de consulta de una materia por ID
-        int idMateria = vistaMateria.solicitarIdMateria();
-        controladorMateria.mostrarDetallesMateria(idMateria);
-
-        // Flujo de actualización de una materia por ID
-        controladorMateria.actualizarMateria();
-        controladorMateria.mostrarTodasLasMaterias();
-
-        // Flujo de eliminación de una materia por ID
-        controladorMateria.eliminarMateria();
-        controladorMateria.mostrarTodasLasMaterias();
-
-        // ── GRUPO ───────────────────────────────────────
-        VistaGrupo vistaGrupo = new VistaGrupo();
         GrupoDao grupoDao = new GrupoDao();
         GrupoService grupoService = new GrupoService(grupoDao);
-        ControladorGrupo controladorGrupo = new ControladorGrupo(vistaGrupo, grupoService, materiaService, docenteService);
+        VistaGrupoSwing vistaGrupo = new VistaGrupoSwing();
+        new ControladorGrupo(vistaGrupo, grupoService, materiaService, docenteService);
 
-        // Flujo de registro de un grupo
-        controladorGrupo.mostrarTodosLosGrupos();
-        controladorGrupo.registrarGrupo();
-        controladorGrupo.mostrarTodosLosGrupos();
+        InscripcionCursoDao inscripcionCursoDao = new InscripcionCursoDao();
+        InscripcionCursoService inscripcionCursoService = new InscripcionCursoService(inscripcionCursoDao);
+        VistaInscripcionCursoSwing vistaInscripcionCurso = new VistaInscripcionCursoSwing();
+        new ControladorInscripcionCurso(vistaInscripcionCurso, inscripcionCursoService, estudianteService, grupoService);
 
-        // Flujo de consulta de un grupo por ID
-        int idGrupo = vistaGrupo.solicitarIdGrupo();
-        controladorGrupo.mostrarDetallesGrupo(idGrupo);
+        panelContenido.add(vistaEstudiante, CARD_ESTUDIANTES);
+        panelContenido.add(vistaDocente, CARD_DOCENTES);
+        panelContenido.add(vistaMateria, CARD_MATERIAS);
+        panelContenido.add(vistaGrupo, CARD_GRUPOS);
+        panelContenido.add(vistaInscripcionCurso, CARD_INSCRIPCIONES);
+    }
 
-        // Flujo de actualización de un grupo por ID
-        controladorGrupo.actualizarGrupo();
-        controladorGrupo.mostrarTodosLosGrupos();
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception ignored) {}
 
-        // Flujo de eliminación de un grupo por ID
-        controladorGrupo.eliminarGrupo();
-        controladorGrupo.mostrarTodosLosGrupos();
-
-        // ── INSCRIPCION CURSO ────────────────────────────
-        VistaInscripcionCurso vistaInscripcion = new VistaInscripcionCurso();
-        InscripcionCursoDao inscripcionDao = new InscripcionCursoDao();
-        InscripcionCursoService inscripcionService = new InscripcionCursoService(inscripcionDao);
-        ControladorInscripcionCurso controladorInscripcion = new ControladorInscripcionCurso(vistaInscripcion, inscripcionService, estudianteService, grupoService);
-
-        // Flujo de registro de una inscripción
-        controladorInscripcion.mostrarTodasLasInscripciones();
-        controladorInscripcion.registrarInscripcion();
-        controladorInscripcion.mostrarTodasLasInscripciones();
-
-        // Flujo de consulta de una inscripción por ID
-        int idInscripcion = vistaInscripcion.solicitarIdInscripcion();
-        controladorInscripcion.mostrarDetallesInscripcion(idInscripcion);
-
-        // Flujo de actualización de una inscripción por ID
-        controladorInscripcion.actualizarInscripcion();
-        controladorInscripcion.mostrarTodasLasInscripciones();
-
-        // Flujo de eliminación de una inscripción por ID
-        controladorInscripcion.eliminarInscripcion();
-        controladorInscripcion.mostrarTodasLasInscripciones();
-
-        // Consultas adicionales de notas por estudiante y grupo
-        controladorInscripcion.mostrarNotasPorEstudiante();
-        controladorInscripcion.mostrarNotasPorGrupo();
-
-        // Eliminar estudiante de un grupo
-        controladorInscripcion.eliminarEstudianteDeGrupo();
-        controladorInscripcion.mostrarTodasLasInscripciones();
+            new Main().setVisible(true);
+        });
     }
 }

@@ -1,0 +1,311 @@
+package com.mvc.vista;
+
+import com.mvc.modelo.Grupo;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+
+import java.util.List;
+
+public class VistaGrupoSwing extends JPanel {
+
+    private DefaultTableModel modeloTabla;
+    private JTable tabla;
+    private TableRowSorter<DefaultTableModel> sorter;
+
+    private JTextField txtBuscar;
+
+    private JTextField txtIdMateria;
+    private JTextField txtIdDocente;
+    private JTextField txtAula;
+    private JTextField txtHorario;
+
+    private JButton btnRegistrar;
+    private JButton btnActualizar;
+    private JButton btnEliminar;
+    private JButton btnRefrescar;
+
+    private Runnable onRegistrar;
+    private Runnable onActualizar;
+    private Runnable onEliminar;
+    private Runnable onRefrescar;
+
+    private static final String[] COLUMNAS = {
+        "ID", "ID Materia", "Materia", "ID Docente", "Docente", "Aula", "Horario"
+    };
+
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar grupo...";
+
+    public VistaGrupoSwing() {
+        initComponents();
+    }
+
+    private void initComponents() {
+
+        setLayout(new BorderLayout(0, 0));
+        setBorder(BorderFactory.createEmptyBorder(24, 28, 20, 28));
+
+        modeloTabla = new DefaultTableModel(COLUMNAS, 0) {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                return false;
+            }
+        };
+
+        tabla = new JTable(modeloTabla);
+        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabla.setRowHeight(26);
+        tabla.getTableHeader().setReorderingAllowed(false);
+        tabla.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
+        tabla.getColumnModel().getColumn(0).setMaxWidth(70);
+        tabla.getColumnModel().getColumn(1).setPreferredWidth(75);
+        tabla.getColumnModel().getColumn(1).setMaxWidth(95);
+        tabla.getColumnModel().getColumn(3).setPreferredWidth(75);
+        tabla.getColumnModel().getColumn(3).setMaxWidth(95);
+
+        sorter = new TableRowSorter<>(modeloTabla);
+        tabla.setRowSorter(sorter);
+
+        txtBuscar = new JTextField(18);
+        txtBuscar.setForeground(Color.GRAY);
+        txtBuscar.setText(PLACEHOLDER_BUSCAR);
+
+        txtIdMateria = new JTextField(8);
+        txtIdDocente = new JTextField(8);
+        txtAula = new JTextField(12);
+        txtHorario = new JTextField(16);
+
+        btnRegistrar = new JButton("Registrar");
+        btnActualizar = new JButton("Actualizar");
+        btnEliminar = new JButton("Eliminar");
+        btnRefrescar = new JButton("Refrescar");
+
+        add(buildPanelEncabezado(), BorderLayout.NORTH);
+        add(buildPanelTabla(), BorderLayout.CENTER);
+        add(buildPanelAcciones(), BorderLayout.SOUTH);
+
+        initEventos();
+    }
+
+    private JPanel buildPanelEncabezado() {
+        JLabel lblTitulo = new JLabel("Gestión de Grupos");
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 20));
+
+        JLabel lblSubtitulo = new JLabel("Administra el registro, la actualización y la eliminación de grupos.");
+        lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        lblSubtitulo.setForeground(Color.GRAY);
+
+        JPanel panelTitulo = new JPanel();
+        panelTitulo.setLayout(new BoxLayout(panelTitulo, BoxLayout.Y_AXIS));
+        panelTitulo.add(lblTitulo);
+        panelTitulo.add(Box.createVerticalStrut(3));
+        panelTitulo.add(lblSubtitulo);
+
+        JPanel panelBuscar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        panelBuscar.add(txtBuscar);
+
+        JPanel encabezado = new JPanel(new BorderLayout());
+        encabezado.add(panelTitulo, BorderLayout.WEST);
+        encabezado.add(panelBuscar, BorderLayout.EAST);
+        encabezado.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
+
+        return encabezado;
+    }
+
+    private JScrollPane buildPanelTabla() {
+        JScrollPane scroll = new JScrollPane(tabla);
+        scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        return scroll;
+    }
+
+    private JPanel buildPanelAcciones() {
+        JPanel panel = new JPanel(new BorderLayout(0, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(14, 0, 0, 0));
+
+        JPanel formulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        formulario.add(new JLabel("ID Materia:"));
+        formulario.add(txtIdMateria);
+        formulario.add(new JLabel("ID Docente:"));
+        formulario.add(txtIdDocente);
+        formulario.add(new JLabel("Aula:"));
+        formulario.add(txtAula);
+        formulario.add(new JLabel("Horario:"));
+        formulario.add(txtHorario);
+
+        JPanel botonesIzq = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        botonesIzq.add(btnRegistrar);
+        botonesIzq.add(btnActualizar);
+        botonesIzq.add(btnEliminar);
+
+        JPanel botonesDer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        botonesDer.add(btnRefrescar);
+
+        JPanel panelBotones = new JPanel(new BorderLayout());
+        panelBotones.add(botonesIzq, BorderLayout.WEST);
+        panelBotones.add(botonesDer, BorderLayout.EAST);
+
+        JSeparator separador = new JSeparator();
+        separador.setForeground(new Color(200, 200, 200));
+
+        panel.add(separador, BorderLayout.NORTH);
+        panel.add(formulario, BorderLayout.CENTER);
+        panel.add(panelBotones, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void initEventos() {
+
+        txtBuscar.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if(txtBuscar.getText().equals(PLACEHOLDER_BUSCAR)) {
+                    txtBuscar.setText("");
+                    txtBuscar.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if(txtBuscar.getText().isEmpty()) {
+                    txtBuscar.setForeground(Color.GRAY);
+                    txtBuscar.setText(PLACEHOLDER_BUSCAR);
+                }
+            }
+        });
+
+        txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent e) {
+                filtrar();
+            }
+
+            @Override public void removeUpdate(DocumentEvent e) {
+                filtrar();
+            }
+
+            @Override public void changedUpdate(DocumentEvent e) {
+                filtrar();
+            }
+
+            private void filtrar() {
+                String texto = txtBuscar.getText().trim();
+
+                if(texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
+                    sorter.setRowFilter(null);
+                } else {
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" +texto));
+                }
+            }
+        });
+
+        tabla.getSelectionModel().addListSelectionListener(e -> {
+            if(!e.getValueIsAdjusting()) precargarCamposDesdeSeleccion();
+        });
+
+        btnRegistrar.addActionListener(e -> {
+            if(onRegistrar != null) onRegistrar.run();
+        });
+
+        btnActualizar.addActionListener(e -> {
+            if(onActualizar != null) onActualizar.run();
+        });
+
+        btnEliminar.addActionListener(e -> {
+            if(onEliminar != null) onEliminar.run();
+        });
+
+        btnRefrescar.addActionListener(e -> {
+            if(onRefrescar != null) onRefrescar.run();
+        });
+    }
+
+    private void precargarCamposDesdeSeleccion() {
+        int filaVista = tabla.getSelectedRow();
+        if(filaVista < 0) return;
+        int fila = tabla.convertRowIndexToModel(filaVista);
+
+        txtIdMateria.setText(String.valueOf(modeloTabla.getValueAt(fila, 1)));
+        txtIdDocente.setText(String.valueOf(modeloTabla.getValueAt(fila, 3)));
+        txtAula.setText((String) modeloTabla.getValueAt(fila, 5));
+        txtHorario.setText((String) modeloTabla.getValueAt(fila, 6));
+    }
+
+    public void cargarGrupos(List<Grupo> grupos) {
+        modeloTabla.setRowCount(0);
+
+        for(Grupo g : grupos) {
+            modeloTabla.addRow(new Object[]{
+                g.getId(),
+                g.getMateria().getId(),
+                g.getMateria().getNombreMateria(),
+                g.getDocente().getId(),
+                g.getDocente().getNombre(),
+                g.getAula(),
+                g.getHorario()
+            });
+        }
+    }
+
+    public int getIdSeleccionado() {
+        int filaVista = tabla.getSelectedRow();
+        if(filaVista < 0) return -1;
+        int fila = tabla.convertRowIndexToModel(filaVista);
+        return (int) modeloTabla.getValueAt(fila, 0);
+    }
+
+    public String getIdMateriaTexto() {
+        return txtIdMateria.getText().trim();
+    }
+
+    public String getIdDocenteTexto() {
+        return txtIdDocente.getText().trim();
+    }
+
+    public String getAula() {
+        return txtAula.getText().trim();
+    }
+
+    public String getHorario() {
+        return txtHorario.getText().trim();
+    }
+
+    public void limpiarCampos() {
+        txtIdMateria.setText("");
+        txtIdDocente.setText("");
+        txtAula.setText("");
+        txtHorario.setText("");
+        tabla.clearSelection();
+    }
+
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Sistema Académico UNIAJC", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void setOnRegistrar(Runnable r) {
+        this.onRegistrar = r;
+    }
+
+    public void setOnActualizar(Runnable r) {
+        this.onActualizar = r;
+    }
+
+    public void setOnEliminar(Runnable r) {
+        this.onEliminar = r;
+    }
+
+    public void setOnRefrescar(Runnable r) {
+        this.onRefrescar = r;
+    }
+}

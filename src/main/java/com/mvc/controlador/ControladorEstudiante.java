@@ -2,61 +2,114 @@ package com.mvc.controlador;
 
 import com.mvc.modelo.Estudiante;
 import com.mvc.servicios.EstudianteService;
-import com.mvc.vista.VistaEstudiante;
+import com.mvc.vista.VistaEstudianteSwing;
+
+import java.util.List;
 
 public class ControladorEstudiante {
 
-    private VistaEstudiante vistaEstudiante;
-    private EstudianteService estudianteService;
+    private final VistaEstudianteSwing vista;
+    private final EstudianteService service;
 
-    public ControladorEstudiante(VistaEstudiante vistaEstudiante, EstudianteService estudianteService) {
-        this.vistaEstudiante = vistaEstudiante;
-        this.estudianteService = estudianteService;
+    public ControladorEstudiante(VistaEstudianteSwing vista, EstudianteService service) {
+        this.vista = vista;
+        this.service = service;
+
+        vista.setOnRegistrar(this::registrar);
+        vista.setOnActualizar(this::actualizar);
+        vista.setOnEliminar(this::eliminar);
+        vista.setOnRefrescar(this::refrescar);
+
+        refrescar();
     }
 
-    public void registrarEstudiante() {
-        // Lógica para registrar un estudiante
+    private void registrar() {
+        String nombre = vista.getNombre();
+        String apellido = vista.getApellido();
+        String correo = vista.getCorreo();
 
-        Estudiante nuevoEstudiante = vistaEstudiante.solicitarDatosEstudiante();
+        if(nombre.isEmpty() || apellido.isEmpty()) {
+            vista.mostrarError("Los campos Nombre y Apellido son obligatorios.");
+            return;
+        }
 
-        estudianteService.registrarEstudiante(nuevoEstudiante);
-        vistaEstudiante.mostrarMensaje("Estudiante registrado exitosamente.");
-    }
+        try {
+            Estudiante nuevo = new Estudiante(0, nombre, apellido, correo);
 
-    public void mostrarTodosLosEstudiantes() {
-        // Lógica para mostrar todos los estudiantes
-        vistaEstudiante.mostrarTodosLosEstudiantes(estudianteService.mostrarTodosLosEstudiantes());
-    }
-
-    public void mostrarDetallesEstudiante(int id) {
-        // Lógica para mostrar los detalles de un estudiante específico
-        Estudiante estudiante = estudianteService.obtenerEstudiantePorId(id);
-
-        if(estudiante != null) {
-            vistaEstudiante.mostrarDetallesEstudiante(estudiante);
-        } else {
-            vistaEstudiante.mostrarMensaje("No se encontró un estudiante con el ID proporcionado.");
+            service.registrarEstudiante(nuevo);
+            vista.mostrarMensaje("Estudiante registrado exitosamente.");
+            vista.limpiarCampos();
+            refrescar();
+        } catch(IllegalArgumentException ex) {
+            vista.mostrarError(ex.getMessage());
+        } catch(Exception ex) {
+            vista.mostrarError("Error al registrar: " +ex.getMessage());
         }
     }
 
-    public void actualizarEstudiante() {
-        // Lógica para actualizar un estudiante
-        int id = vistaEstudiante.solicitarIdEstudiante();
-        Estudiante estudianteExistente = estudianteService.obtenerEstudiantePorId(id);
+    private void actualizar() {
+        int id = vista.getIdSeleccionado();
 
-        if(estudianteExistente != null) {
-            Estudiante estudianteActualizado = vistaEstudiante.solicitarDatosEstudianteActualizados(estudianteExistente);
-            estudianteService.actualizarEstudiante(estudianteActualizado);
-            vistaEstudiante.mostrarMensaje("Estudiante actualizado exitosamente.");
-        } else {
-            vistaEstudiante.mostrarMensaje("No se encontró un estudiante con el ID proporcionado.");
+        if(id < 0) {
+            vista.mostrarError("Selecciona un estudiante de la tabla para actualizar.");
+            return;
+        }
+
+        String nombre = vista.getNombre();
+        String apellido = vista.getApellido();
+        String correo = vista.getCorreo();
+
+        if(nombre.isEmpty() || apellido.isEmpty()) {
+            vista.mostrarError("Los campos Nombre y Apellido son obligatorios.");
+            return;
+        }
+
+        try {
+            Estudiante actualizado = new Estudiante(id, nombre, apellido, correo);
+
+            service.actualizarEstudiante(actualizado);
+            vista.mostrarMensaje("Estudiante actualizado exitosamente.");
+            vista.limpiarCampos();
+            refrescar();
+        } catch(Exception ex) {
+            vista.mostrarError("Error al actualizar: " +ex.getMessage());
         }
     }
 
-    public void eliminarEstudiante() {
-        // Lógica para eliminar un estudiante
-        int id = vistaEstudiante.solicitarIdEstudianteParaEliminar();
-        estudianteService.eliminarEstudiante(id);
-        vistaEstudiante.mostrarMensaje("Estudiante eliminado exitosamente.");
+    private void eliminar() {
+        int id = vista.getIdSeleccionado();
+
+        if(id < 0) {
+            vista.mostrarError("Selecciona un estudiante de la tabla para eliminar.");
+            return;
+        }
+
+        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
+            vista,
+            "¿Estás seguro de que deseas eliminar el estudiante con ID " +id+ "?",
+            "Confirmar eliminación",
+            javax.swing.JOptionPane.YES_NO_OPTION,
+            javax.swing.JOptionPane.WARNING_MESSAGE
+        );
+
+        if(confirmacion != javax.swing.JOptionPane.YES_OPTION) return;
+
+        try {
+            service.eliminarEstudiante(id);
+            vista.mostrarMensaje("Estudiante eliminado exitosamente.");
+            vista.limpiarCampos();
+            refrescar();
+        } catch (Exception ex) {
+            vista.mostrarError("Error al eliminar: " +ex.getMessage());
+        }
+    }
+
+    private void refrescar() {
+        try {
+            List<Estudiante> estudiantes = service.mostrarTodosLosEstudiantes();
+            vista.cargarEstudiantes(estudiantes);
+        } catch(Exception ex) {
+            vista.mostrarError("Error al cargar estudiantes: " +ex.getMessage());
+        }
     }
 }
