@@ -84,7 +84,7 @@ public class ControladorDocente {
 
         int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
             vista,
-            "Estas seguro de que deseas eliminar el docente con ID " +id+ "?",
+            "Estás seguro de que deseas eliminar el docente con ID " +id+ "?",
             "Confirmar eliminación",
             javax.swing.JOptionPane.YES_NO_OPTION,
             javax.swing.JOptionPane.WARNING_MESSAGE

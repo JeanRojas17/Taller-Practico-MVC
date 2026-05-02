@@ -2,15 +2,19 @@ package com.mvc;
 
 import com.mvc.controlador.ControladorEstudiante;
 import com.mvc.controlador.ControladorDocente;
+import com.mvc.controlador.ControladorGrupo;
 import com.mvc.controlador.ControladorMateria;
 import com.mvc.dao.DocenteDao;
 import com.mvc.dao.EstudianteDao;
+import com.mvc.dao.GrupoDao;
 import com.mvc.dao.MateriaDao;
 import com.mvc.servicios.DocenteService;
 import com.mvc.servicios.EstudianteService;
+import com.mvc.servicios.GrupoService;
 import com.mvc.servicios.MateriaService;
 import com.mvc.vista.VistaDocenteSwing;
 import com.mvc.vista.VistaEstudianteSwing;
+import com.mvc.vista.VistaGrupoSwing;
 import com.mvc.vista.VistaMateriaSwing;
 
 import javax.swing.*;
@@ -171,11 +175,16 @@ public class Main extends JFrame {
         VistaMateriaSwing vistaMateria = new VistaMateriaSwing();
         new ControladorMateria(vistaMateria, materiaService);
 
+        GrupoDao grupoDao = new GrupoDao();
+        GrupoService grupoService = new GrupoService(grupoDao);
+        VistaGrupoSwing vistaGrupo = new VistaGrupoSwing();
+        new ControladorGrupo(vistaGrupo, grupoService, materiaService, docenteService);
+
         panelContenido.add(vistaEstudiante, CARD_ESTUDIANTES);
         panelContenido.add(vistaDocente, CARD_DOCENTES);
         panelContenido.add(vistaMateria, CARD_MATERIAS);
+        panelContenido.add(vistaGrupo, CARD_GRUPOS);
 
-        panelContenido.add(buildPlaceholder(CARD_GRUPOS), CARD_GRUPOS);
         panelContenido.add(buildPlaceholder(CARD_INSCRIPCIONES), CARD_INSCRIPCIONES);
     }
 

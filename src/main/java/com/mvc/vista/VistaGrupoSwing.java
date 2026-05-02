@@ -1,6 +1,6 @@
 package com.mvc.vista;
 
-import com.mvc.modelo.Estudiante;
+import com.mvc.modelo.Grupo;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,7 +14,7 @@ import java.awt.event.FocusEvent;
 
 import java.util.List;
 
-public class VistaEstudianteSwing extends JPanel {
+public class VistaGrupoSwing extends JPanel {
 
     private DefaultTableModel modeloTabla;
     private JTable tabla;
@@ -22,9 +22,10 @@ public class VistaEstudianteSwing extends JPanel {
 
     private JTextField txtBuscar;
 
-    private JTextField txtNombre;
-    private JTextField txtApellido;
-    private JTextField txtCorreo;
+    private JTextField txtIdMateria;
+    private JTextField txtIdDocente;
+    private JTextField txtAula;
+    private JTextField txtHorario;
 
     private JButton btnRegistrar;
     private JButton btnActualizar;
@@ -36,11 +37,13 @@ public class VistaEstudianteSwing extends JPanel {
     private Runnable onEliminar;
     private Runnable onRefrescar;
 
-    private static final String[] COLUMNAS = {"ID", "Nombre", "Apellido", "Correo"};
+    private static final String[] COLUMNAS = {
+        "ID", "ID Materia", "Materia", "ID Docente", "Docente", "Aula", "Horario"
+    };
 
-    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar estudiante...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar grupo...";
 
-    public VistaEstudianteSwing() {
+    public VistaGrupoSwing() {
         initComponents();
     }
 
@@ -63,6 +66,10 @@ public class VistaEstudianteSwing extends JPanel {
         tabla.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
         tabla.getColumnModel().getColumn(0).setMaxWidth(70);
+        tabla.getColumnModel().getColumn(1).setPreferredWidth(75);
+        tabla.getColumnModel().getColumn(1).setMaxWidth(95);
+        tabla.getColumnModel().getColumn(3).setPreferredWidth(75);
+        tabla.getColumnModel().getColumn(3).setMaxWidth(95);
 
         sorter = new TableRowSorter<>(modeloTabla);
         tabla.setRowSorter(sorter);
@@ -71,9 +78,10 @@ public class VistaEstudianteSwing extends JPanel {
         txtBuscar.setForeground(Color.GRAY);
         txtBuscar.setText(PLACEHOLDER_BUSCAR);
 
-        txtNombre  = new JTextField(14);
-        txtApellido = new JTextField(14);
-        txtCorreo = new JTextField(16);
+        txtIdMateria = new JTextField(8);
+        txtIdDocente = new JTextField(8);
+        txtAula = new JTextField(12);
+        txtHorario = new JTextField(16);
 
         btnRegistrar = new JButton("Registrar");
         btnActualizar = new JButton("Actualizar");
@@ -88,10 +96,10 @@ public class VistaEstudianteSwing extends JPanel {
     }
 
     private JPanel buildPanelEncabezado() {
-        JLabel lblTitulo = new JLabel("Gestión de Estudiantes");
+        JLabel lblTitulo = new JLabel("Gestión de Grupos");
         lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 20));
 
-        JLabel lblSubtitulo = new JLabel("Administra el registro, actualización y eliminación de estudiantes");
+        JLabel lblSubtitulo = new JLabel("Administra el registro, la actualización y la eliminación de grupos.");
         lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 12));
         lblSubtitulo.setForeground(Color.GRAY);
 
@@ -123,12 +131,14 @@ public class VistaEstudianteSwing extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(14, 0, 0, 0));
 
         JPanel formulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        formulario.add(new JLabel("Nombre:"));
-        formulario.add(txtNombre);
-        formulario.add(new JLabel("Apellido:"));
-        formulario.add(txtApellido);
-        formulario.add(new JLabel("Correo:"));
-        formulario.add(txtCorreo);
+        formulario.add(new JLabel("ID Materia:"));
+        formulario.add(txtIdMateria);
+        formulario.add(new JLabel("ID Docente:"));
+        formulario.add(txtIdDocente);
+        formulario.add(new JLabel("Aula:"));
+        formulario.add(txtAula);
+        formulario.add(new JLabel("Horario:"));
+        formulario.add(txtHorario);
 
         JPanel botonesIzq = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         botonesIzq.add(btnRegistrar);
@@ -173,11 +183,11 @@ public class VistaEstudianteSwing extends JPanel {
         });
 
         txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e)  {
+            @Override public void insertUpdate(DocumentEvent e) {
                 filtrar();
             }
 
-            @Override public void removeUpdate(DocumentEvent e)  {
+            @Override public void removeUpdate(DocumentEvent e) {
                 filtrar();
             }
 
@@ -222,20 +232,24 @@ public class VistaEstudianteSwing extends JPanel {
         if(filaVista < 0) return;
         int fila = tabla.convertRowIndexToModel(filaVista);
 
-        txtNombre.setText((String) modeloTabla.getValueAt(fila, 1));
-        txtApellido.setText((String) modeloTabla.getValueAt(fila, 2));
-        txtCorreo.setText((String) modeloTabla.getValueAt(fila, 3));
+        txtIdMateria.setText(String.valueOf(modeloTabla.getValueAt(fila, 1)));
+        txtIdDocente.setText(String.valueOf(modeloTabla.getValueAt(fila, 3)));
+        txtAula.setText((String) modeloTabla.getValueAt(fila, 5));
+        txtHorario.setText((String) modeloTabla.getValueAt(fila, 6));
     }
 
-    public void cargarEstudiantes(List<Estudiante> estudiantes) {
+    public void cargarGrupos(List<Grupo> grupos) {
         modeloTabla.setRowCount(0);
 
-        for(Estudiante e : estudiantes) {
+        for(Grupo g : grupos) {
             modeloTabla.addRow(new Object[]{
-                e.getId(),
-                e.getNombre(),
-                e.getApellido(),
-                e.getCorreo()
+                g.getId(),
+                g.getMateria().getId(),
+                g.getMateria().getNombreMateria(),
+                g.getDocente().getId(),
+                g.getDocente().getNombre(),
+                g.getAula(),
+                g.getHorario()
             });
         }
     }
@@ -247,22 +261,27 @@ public class VistaEstudianteSwing extends JPanel {
         return (int) modeloTabla.getValueAt(fila, 0);
     }
 
-    public String getNombre() {
-        return txtNombre.getText().trim();
+    public String getIdMateriaTexto() {
+        return txtIdMateria.getText().trim();
     }
 
-    public String getApellido() {
-        return txtApellido.getText().trim();
+    public String getIdDocenteTexto() {
+        return txtIdDocente.getText().trim();
     }
 
-    public String getCorreo()   {
-        return txtCorreo.getText().trim();
+    public String getAula() {
+        return txtAula.getText().trim();
+    }
+
+    public String getHorario() {
+        return txtHorario.getText().trim();
     }
 
     public void limpiarCampos() {
-        txtNombre.setText("");
-        txtApellido.setText("");
-        txtCorreo.setText("");
+        txtIdMateria.setText("");
+        txtIdDocente.setText("");
+        txtAula.setText("");
+        txtHorario.setText("");
         tabla.clearSelection();
     }
 
