@@ -1,21 +1,9 @@
 package com.mvc;
 
-import com.mvc.controlador.ControladorEstudiante;
-import com.mvc.controlador.ControladorDocente;
-import com.mvc.controlador.ControladorGrupo;
-import com.mvc.controlador.ControladorMateria;
-import com.mvc.dao.DocenteDao;
-import com.mvc.dao.EstudianteDao;
-import com.mvc.dao.GrupoDao;
-import com.mvc.dao.MateriaDao;
-import com.mvc.servicios.DocenteService;
-import com.mvc.servicios.EstudianteService;
-import com.mvc.servicios.GrupoService;
-import com.mvc.servicios.MateriaService;
-import com.mvc.vista.VistaDocenteSwing;
-import com.mvc.vista.VistaEstudianteSwing;
-import com.mvc.vista.VistaGrupoSwing;
-import com.mvc.vista.VistaMateriaSwing;
+import com.mvc.controlador.*;
+import com.mvc.dao.*;
+import com.mvc.servicios.*;
+import com.mvc.vista.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -180,21 +168,16 @@ public class Main extends JFrame {
         VistaGrupoSwing vistaGrupo = new VistaGrupoSwing();
         new ControladorGrupo(vistaGrupo, grupoService, materiaService, docenteService);
 
+        InscripcionCursoDao inscripcionCursoDao = new InscripcionCursoDao();
+        InscripcionCursoService inscripcionCursoService = new InscripcionCursoService(inscripcionCursoDao);
+        VistaInscripcionCursoSwing vistaInscripcionCurso = new VistaInscripcionCursoSwing();
+        new ControladorInscripcionCurso(vistaInscripcionCurso, inscripcionCursoService, estudianteService, grupoService);
+
         panelContenido.add(vistaEstudiante, CARD_ESTUDIANTES);
         panelContenido.add(vistaDocente, CARD_DOCENTES);
         panelContenido.add(vistaMateria, CARD_MATERIAS);
         panelContenido.add(vistaGrupo, CARD_GRUPOS);
-
-        panelContenido.add(buildPlaceholder(CARD_INSCRIPCIONES), CARD_INSCRIPCIONES);
-    }
-
-    private JPanel buildPlaceholder(String nombre) {
-        JPanel p = new JPanel(new BorderLayout());
-        JLabel lbl = new JLabel("Sección \"" + nombre + "\" — próximamente", SwingConstants.CENTER);
-        lbl.setFont(new Font("SansSerif", Font.ITALIC, 16));
-        lbl.setForeground(Color.GRAY);
-        p.add(lbl, BorderLayout.CENTER);
-        return p;
+        panelContenido.add(vistaInscripcionCurso, CARD_INSCRIPCIONES);
     }
 
     public static void main(String[] args) {
