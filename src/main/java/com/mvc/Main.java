@@ -2,12 +2,16 @@ package com.mvc;
 
 import com.mvc.controlador.ControladorEstudiante;
 import com.mvc.controlador.ControladorDocente;
+import com.mvc.controlador.ControladorMateria;
 import com.mvc.dao.DocenteDao;
 import com.mvc.dao.EstudianteDao;
+import com.mvc.dao.MateriaDao;
 import com.mvc.servicios.DocenteService;
 import com.mvc.servicios.EstudianteService;
+import com.mvc.servicios.MateriaService;
 import com.mvc.vista.VistaDocenteSwing;
 import com.mvc.vista.VistaEstudianteSwing;
+import com.mvc.vista.VistaMateriaSwing;
 
 import javax.swing.*;
 import java.awt.*;
@@ -162,10 +166,15 @@ public class Main extends JFrame {
         VistaDocenteSwing vistaDocente = new VistaDocenteSwing();
         new ControladorDocente(vistaDocente, docenteService);
 
+        MateriaDao materiaDao = new MateriaDao();
+        MateriaService materiaService = new MateriaService(materiaDao);
+        VistaMateriaSwing vistaMateria = new VistaMateriaSwing();
+        new ControladorMateria(vistaMateria, materiaService);
+
         panelContenido.add(vistaEstudiante, CARD_ESTUDIANTES);
         panelContenido.add(vistaDocente, CARD_DOCENTES);
+        panelContenido.add(vistaMateria, CARD_MATERIAS);
 
-        panelContenido.add(buildPlaceholder(CARD_MATERIAS), CARD_MATERIAS);
         panelContenido.add(buildPlaceholder(CARD_GRUPOS), CARD_GRUPOS);
         panelContenido.add(buildPlaceholder(CARD_INSCRIPCIONES), CARD_INSCRIPCIONES);
     }
