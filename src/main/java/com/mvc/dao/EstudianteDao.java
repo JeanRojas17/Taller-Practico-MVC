@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgresDatabase;
-import com.mvc.modelo.Estudiante;
+import com.mvc.models.Estudiante;
 
 public class EstudianteDao {
 

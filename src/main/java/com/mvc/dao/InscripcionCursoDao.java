@@ -9,11 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgresDatabase;
-import com.mvc.modelo.Docente;
-import com.mvc.modelo.Estudiante;
-import com.mvc.modelo.Grupo;
-import com.mvc.modelo.InscripcionCurso;
-import com.mvc.modelo.Materia;
+import com.mvc.models.*;
 
 public class InscripcionCursoDao {
 

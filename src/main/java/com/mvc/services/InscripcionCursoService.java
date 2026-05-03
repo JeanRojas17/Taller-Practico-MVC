@@ -1,9 +1,9 @@
-package com.mvc.servicios;
+package com.mvc.services;
 
 import java.util.List;
 
 import com.mvc.dao.InscripcionCursoDao;
-import com.mvc.modelo.InscripcionCurso;
+import com.mvc.models.InscripcionCurso;
 
 public class InscripcionCursoService {
 

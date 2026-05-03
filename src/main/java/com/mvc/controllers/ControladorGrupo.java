@@ -1,12 +1,12 @@
-package com.mvc.controlador;
+package com.mvc.controllers;
 
-import com.mvc.modelo.Docente;
-import com.mvc.modelo.Grupo;
-import com.mvc.modelo.Materia;
-import com.mvc.servicios.DocenteService;
-import com.mvc.servicios.GrupoService;
-import com.mvc.servicios.MateriaService;
-import com.mvc.vista.VistaGrupoSwing;
+import com.mvc.models.Docente;
+import com.mvc.models.Grupo;
+import com.mvc.models.Materia;
+import com.mvc.services.DocenteService;
+import com.mvc.services.GrupoService;
+import com.mvc.services.MateriaService;
+import com.mvc.views.VistaGrupoSwing;
 
 import java.util.List;
 

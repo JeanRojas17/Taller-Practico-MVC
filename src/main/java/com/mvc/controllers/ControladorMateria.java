@@ -1,8 +1,8 @@
-package com.mvc.controlador;
+package com.mvc.controllers;
 
-import com.mvc.modelo.Materia;
-import com.mvc.servicios.MateriaService;
-import com.mvc.vista.VistaMateriaSwing;
+import com.mvc.models.Materia;
+import com.mvc.services.MateriaService;
+import com.mvc.views.VistaMateriaSwing;
 
 import java.util.List;
 

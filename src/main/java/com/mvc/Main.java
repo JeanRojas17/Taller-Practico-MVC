@@ -1,9 +1,9 @@
 package com.mvc;
 
-import com.mvc.controlador.*;
+import com.mvc.controllers.*;
 import com.mvc.dao.*;
-import com.mvc.servicios.*;
-import com.mvc.vista.*;
+import com.mvc.services.*;
+import com.mvc.views.*;
 
 import javax.swing.*;
 import java.awt.*;

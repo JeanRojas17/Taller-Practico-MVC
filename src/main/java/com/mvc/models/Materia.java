@@ -1,4 +1,4 @@
-package com.mvc.modelo;
+package com.mvc.models;
 
 public class Materia {
 

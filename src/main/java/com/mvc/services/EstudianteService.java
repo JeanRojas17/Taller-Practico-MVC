@@ -1,9 +1,9 @@
-package com.mvc.servicios;
+package com.mvc.services;
 
 import java.util.List;
 
 import com.mvc.dao.EstudianteDao;
-import com.mvc.modelo.Estudiante;
+import com.mvc.models.Estudiante;
 
 public class EstudianteService {
 

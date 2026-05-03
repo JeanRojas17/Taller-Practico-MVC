@@ -1,9 +1,9 @@
-package com.mvc.servicios;
+package com.mvc.services;
 
 import java.util.List;
 
 import com.mvc.dao.GrupoDao;
-import com.mvc.modelo.Grupo;
+import com.mvc.models.Grupo;
 
 public class GrupoService {
 

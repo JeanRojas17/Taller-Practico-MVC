@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgresDatabase;
-import com.mvc.modelo.Materia;
+import com.mvc.models.Materia;
 
 public class MateriaDao {
 

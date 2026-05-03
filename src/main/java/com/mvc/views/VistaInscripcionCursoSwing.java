@@ -1,6 +1,6 @@
-package com.mvc.vista;
+package com.mvc.views;
 
-import com.mvc.modelo.Estudiante;
+import com.mvc.models.InscripcionCurso;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,7 +14,7 @@ import java.awt.event.FocusEvent;
 
 import java.util.List;
 
-public class VistaEstudianteSwing extends JPanel {
+public class VistaInscripcionCursoSwing extends JPanel {
 
     private DefaultTableModel modeloTabla;
     private JTable tabla;
@@ -22,25 +22,35 @@ public class VistaEstudianteSwing extends JPanel {
 
     private JTextField txtBuscar;
 
-    private JTextField txtNombre;
-    private JTextField txtApellido;
-    private JTextField txtCorreo;
+    private JTextField txtIdEstudiante;
+    private JTextField txtIdGrupo;
+    private JTextField txtNotaFinal;
+    private JComboBox<String> cmbEstado;
 
     private JButton btnRegistrar;
     private JButton btnActualizar;
     private JButton btnEliminar;
     private JButton btnRefrescar;
+    private JButton btnNotasEstudiante;
+    private JButton btnNotasGrupo;
+    private JButton btnEliminarEstudianteGrupo;
 
     private Runnable onRegistrar;
     private Runnable onActualizar;
     private Runnable onEliminar;
     private Runnable onRefrescar;
+    private Runnable onNotasEstudiante;
+    private Runnable onNotasGrupo;
+    private Runnable onEliminarEstudianteGrupo;
 
-    private static final String[] COLUMNAS = {"ID", "Nombre", "Apellido", "Correo"};
+    private static final String[] COLUMNAS = {
+        "ID", "ID Estudiante", "Estudiante", "ID Grupo", "Materia", "Docente", "Aula", "Horario", "Nota Final", "Estado"
+    };
 
-    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar estudiante...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar inscripción...";
+    private static final String SIN_NOTA = "Sin nota";
 
-    public VistaEstudianteSwing() {
+    public VistaInscripcionCursoSwing() {
         initComponents();
     }
 
@@ -63,6 +73,10 @@ public class VistaEstudianteSwing extends JPanel {
         tabla.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
         tabla.getColumnModel().getColumn(0).setMaxWidth(70);
+        tabla.getColumnModel().getColumn(1).setPreferredWidth(95);
+        tabla.getColumnModel().getColumn(1).setMaxWidth(115);
+        tabla.getColumnModel().getColumn(3).setPreferredWidth(75);
+        tabla.getColumnModel().getColumn(3).setMaxWidth(95);
 
         sorter = new TableRowSorter<>(modeloTabla);
         tabla.setRowSorter(sorter);
@@ -71,14 +85,18 @@ public class VistaEstudianteSwing extends JPanel {
         txtBuscar.setForeground(Color.GRAY);
         txtBuscar.setText(PLACEHOLDER_BUSCAR);
 
-        txtNombre  = new JTextField(14);
-        txtApellido = new JTextField(14);
-        txtCorreo = new JTextField(16);
+        txtIdEstudiante = new JTextField(8);
+        txtIdGrupo = new JTextField(8);
+        txtNotaFinal = new JTextField(8);
+        cmbEstado = new JComboBox<>(new String[]{"Inscrito", "En curso", "Retirado"});
 
         btnRegistrar = new JButton("Registrar");
         btnActualizar = new JButton("Actualizar");
         btnEliminar = new JButton("Eliminar");
         btnRefrescar = new JButton("Refrescar");
+        btnNotasEstudiante = new JButton("Notas estudiante");
+        btnNotasGrupo = new JButton("Notas grupo");
+        btnEliminarEstudianteGrupo = new JButton("Quitar estudiante");
 
         add(buildPanelEncabezado(), BorderLayout.NORTH);
         add(buildPanelTabla(), BorderLayout.CENTER);
@@ -88,10 +106,10 @@ public class VistaEstudianteSwing extends JPanel {
     }
 
     private JPanel buildPanelEncabezado() {
-        JLabel lblTitulo = new JLabel("Gestión de Estudiantes");
+        JLabel lblTitulo = new JLabel("Gestión de Inscripciones");
         lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 20));
 
-        JLabel lblSubtitulo = new JLabel("Administra el registro, actualización y eliminación de estudiantes");
+        JLabel lblSubtitulo = new JLabel("Administra estudiantes inscritos en grupos, notas y estados");
         lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 12));
         lblSubtitulo.setForeground(Color.GRAY);
 
@@ -123,17 +141,22 @@ public class VistaEstudianteSwing extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(14, 0, 0, 0));
 
         JPanel formulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        formulario.add(new JLabel("Nombre:"));
-        formulario.add(txtNombre);
-        formulario.add(new JLabel("Apellido:"));
-        formulario.add(txtApellido);
-        formulario.add(new JLabel("Correo:"));
-        formulario.add(txtCorreo);
+        formulario.add(new JLabel("ID Estudiante:"));
+        formulario.add(txtIdEstudiante);
+        formulario.add(new JLabel("ID Grupo:"));
+        formulario.add(txtIdGrupo);
+        formulario.add(new JLabel("Nota Final:"));
+        formulario.add(txtNotaFinal);
+        formulario.add(new JLabel("Estado:"));
+        formulario.add(cmbEstado);
 
         JPanel botonesIzq = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         botonesIzq.add(btnRegistrar);
         botonesIzq.add(btnActualizar);
         botonesIzq.add(btnEliminar);
+        botonesIzq.add(btnNotasEstudiante);
+        botonesIzq.add(btnNotasGrupo);
+        botonesIzq.add(btnEliminarEstudianteGrupo);
 
         JPanel botonesDer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         botonesDer.add(btnRefrescar);
@@ -173,11 +196,11 @@ public class VistaEstudianteSwing extends JPanel {
         });
 
         txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e)  {
+            @Override public void insertUpdate(DocumentEvent e) {
                 filtrar();
             }
 
-            @Override public void removeUpdate(DocumentEvent e)  {
+            @Override public void removeUpdate(DocumentEvent e) {
                 filtrar();
             }
 
@@ -215,6 +238,18 @@ public class VistaEstudianteSwing extends JPanel {
         btnRefrescar.addActionListener(e -> {
             if(onRefrescar != null) onRefrescar.run();
         });
+
+        btnNotasEstudiante.addActionListener(e -> {
+            if(onNotasEstudiante != null) onNotasEstudiante.run();
+        });
+
+        btnNotasGrupo.addActionListener(e -> {
+            if(onNotasGrupo != null) onNotasGrupo.run();
+        });
+
+        btnEliminarEstudianteGrupo.addActionListener(e -> {
+            if(onEliminarEstudianteGrupo != null) onEliminarEstudianteGrupo.run();
+        });
     }
 
     private void precargarCamposDesdeSeleccion() {
@@ -222,20 +257,29 @@ public class VistaEstudianteSwing extends JPanel {
         if(filaVista < 0) return;
         int fila = tabla.convertRowIndexToModel(filaVista);
 
-        txtNombre.setText((String) modeloTabla.getValueAt(fila, 1));
-        txtApellido.setText((String) modeloTabla.getValueAt(fila, 2));
-        txtCorreo.setText((String) modeloTabla.getValueAt(fila, 3));
+        txtIdEstudiante.setText(String.valueOf(modeloTabla.getValueAt(fila, 1)));
+        txtIdGrupo.setText(String.valueOf(modeloTabla.getValueAt(fila, 3)));
+
+        Object nota = modeloTabla.getValueAt(fila, 8);
+        txtNotaFinal.setText(SIN_NOTA.equals(nota) ? "" : String.valueOf(nota));
+        cmbEstado.setSelectedItem((String) modeloTabla.getValueAt(fila, 9));
     }
 
-    public void cargarEstudiantes(List<Estudiante> estudiantes) {
+    public void cargarInscripciones(List<InscripcionCurso> inscripciones) {
         modeloTabla.setRowCount(0);
 
-        for(Estudiante e : estudiantes) {
+        for(InscripcionCurso i : inscripciones) {
             modeloTabla.addRow(new Object[]{
-                e.getId(),
-                e.getNombre(),
-                e.getApellido(),
-                e.getCorreo()
+                i.getId(),
+                i.getEstudiante().getId(),
+                i.getEstudiante().getNombre()+ " " +i.getEstudiante().getApellido(),
+                i.getGrupo().getId(),
+                i.getGrupo().getMateria().getNombreMateria(),
+                i.getGrupo().getDocente().getNombre(),
+                i.getGrupo().getAula(),
+                i.getGrupo().getHorario(),
+                i.getNotaFinal() != null ? i.getNotaFinal() : SIN_NOTA,
+                i.getEstado()
             });
         }
     }
@@ -247,22 +291,78 @@ public class VistaEstudianteSwing extends JPanel {
         return (int) modeloTabla.getValueAt(fila, 0);
     }
 
-    public String getNombre() {
-        return txtNombre.getText().trim();
+    public String getIdEstudianteTexto() {
+        return txtIdEstudiante.getText().trim();
     }
 
-    public String getApellido() {
-        return txtApellido.getText().trim();
+    public String getIdGrupoTexto() {
+        return txtIdGrupo.getText().trim();
     }
 
-    public String getCorreo()   {
-        return txtCorreo.getText().trim();
+    public String getNotaFinalTexto() {
+        return txtNotaFinal.getText().trim();
+    }
+
+    public String getEstado() {
+        return (String) cmbEstado.getSelectedItem();
+    }
+
+    public Integer solicitarIdEstudianteParaConsulta() {
+        return solicitarEntero("Ingrese el ID del estudiante:");
+    }
+
+    public Integer solicitarIdGrupoParaConsulta() {
+        return solicitarEntero("Ingrese el ID del grupo:");
+    }
+
+    public int[] solicitarDatosParaEliminarEstudianteDeGrupo() {
+        JTextField txtEstudiante = new JTextField(10);
+        JTextField txtGrupo = new JTextField(10);
+
+        JPanel panel = new JPanel(new GridLayout(2, 2, 8, 8));
+        panel.add(new JLabel("ID Estudiante:"));
+        panel.add(txtEstudiante);
+        panel.add(new JLabel("ID Grupo:"));
+        panel.add(txtGrupo);
+
+        int opcion = JOptionPane.showConfirmDialog(
+            this,
+            panel,
+            "Quitar estudiante de grupo",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if(opcion != JOptionPane.OK_OPTION) return null;
+
+        try {
+            return new int[]{
+                Integer.parseInt(txtEstudiante.getText().trim()),
+                Integer.parseInt(txtGrupo.getText().trim())
+            };
+        } catch(NumberFormatException ex) {
+            mostrarError("Los IDs deben ser números enteros.");
+            return null;
+        }
+    }
+
+    private Integer solicitarEntero(String mensaje) {
+        String valor = JOptionPane.showInputDialog(this, mensaje);
+        if(valor == null) return null;
+
+        try {
+            return Integer.parseInt(valor.trim());
+        } catch(NumberFormatException ex) {
+            mostrarError("El valor ingresado debe ser un número entero.");
+            return null;
+        }
     }
 
     public void limpiarCampos() {
-        txtNombre.setText("");
-        txtApellido.setText("");
-        txtCorreo.setText("");
+        txtIdEstudiante.setText("");
+        txtIdGrupo.setText("");
+        txtNotaFinal.setText("");
+        cmbEstado.setSelectedIndex(0);
         tabla.clearSelection();
     }
 
@@ -288,5 +388,17 @@ public class VistaEstudianteSwing extends JPanel {
 
     public void setOnRefrescar(Runnable r) {
         this.onRefrescar = r;
+    }
+
+    public void setOnNotasEstudiante(Runnable r) {
+        this.onNotasEstudiante = r;
+    }
+
+    public void setOnNotasGrupo(Runnable r) {
+        this.onNotasGrupo = r;
+    }
+
+    public void setOnEliminarEstudianteGrupo(Runnable r) {
+        this.onEliminarEstudianteGrupo = r;
     }
 }

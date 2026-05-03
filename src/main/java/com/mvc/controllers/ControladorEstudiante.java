@@ -1,8 +1,8 @@
-package com.mvc.controlador;
+package com.mvc.controllers;
 
-import com.mvc.modelo.Estudiante;
-import com.mvc.servicios.EstudianteService;
-import com.mvc.vista.VistaEstudianteSwing;
+import com.mvc.models.Estudiante;
+import com.mvc.services.EstudianteService;
+import com.mvc.views.VistaEstudianteSwing;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
-package com.mvc.controlador;
+package com.mvc.controllers;
 
-import com.mvc.modelo.Docente;
-import com.mvc.servicios.DocenteService;
-import com.mvc.vista.VistaDocenteSwing;
+import com.mvc.models.Docente;
+import com.mvc.services.DocenteService;
+import com.mvc.views.VistaDocenteSwing;
 
 import java.util.List;
 

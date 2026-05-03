@@ -1,6 +1,6 @@
-package com.mvc.vista;
+package com.mvc.views;
 
-import com.mvc.modelo.Grupo;
+import com.mvc.models.Estudiante;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,7 +14,7 @@ import java.awt.event.FocusEvent;
 
 import java.util.List;
 
-public class VistaGrupoSwing extends JPanel {
+public class VistaEstudianteSwing extends JPanel {
 
     private DefaultTableModel modeloTabla;
     private JTable tabla;
@@ -22,10 +22,9 @@ public class VistaGrupoSwing extends JPanel {
 
     private JTextField txtBuscar;
 
-    private JTextField txtIdMateria;
-    private JTextField txtIdDocente;
-    private JTextField txtAula;
-    private JTextField txtHorario;
+    private JTextField txtNombre;
+    private JTextField txtApellido;
+    private JTextField txtCorreo;
 
     private JButton btnRegistrar;
     private JButton btnActualizar;
@@ -37,13 +36,11 @@ public class VistaGrupoSwing extends JPanel {
     private Runnable onEliminar;
     private Runnable onRefrescar;
 
-    private static final String[] COLUMNAS = {
-        "ID", "ID Materia", "Materia", "ID Docente", "Docente", "Aula", "Horario"
-    };
+    private static final String[] COLUMNAS = {"ID", "Nombre", "Apellido", "Correo"};
 
-    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar grupo...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar estudiante...";
 
-    public VistaGrupoSwing() {
+    public VistaEstudianteSwing() {
         initComponents();
     }
 
@@ -66,10 +63,6 @@ public class VistaGrupoSwing extends JPanel {
         tabla.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
         tabla.getColumnModel().getColumn(0).setMaxWidth(70);
-        tabla.getColumnModel().getColumn(1).setPreferredWidth(75);
-        tabla.getColumnModel().getColumn(1).setMaxWidth(95);
-        tabla.getColumnModel().getColumn(3).setPreferredWidth(75);
-        tabla.getColumnModel().getColumn(3).setMaxWidth(95);
 
         sorter = new TableRowSorter<>(modeloTabla);
         tabla.setRowSorter(sorter);
@@ -78,10 +71,9 @@ public class VistaGrupoSwing extends JPanel {
         txtBuscar.setForeground(Color.GRAY);
         txtBuscar.setText(PLACEHOLDER_BUSCAR);
 
-        txtIdMateria = new JTextField(8);
-        txtIdDocente = new JTextField(8);
-        txtAula = new JTextField(12);
-        txtHorario = new JTextField(16);
+        txtNombre  = new JTextField(14);
+        txtApellido = new JTextField(14);
+        txtCorreo = new JTextField(16);
 
         btnRegistrar = new JButton("Registrar");
         btnActualizar = new JButton("Actualizar");
@@ -96,10 +88,10 @@ public class VistaGrupoSwing extends JPanel {
     }
 
     private JPanel buildPanelEncabezado() {
-        JLabel lblTitulo = new JLabel("Gestión de Grupos");
+        JLabel lblTitulo = new JLabel("Gestión de Estudiantes");
         lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 20));
 
-        JLabel lblSubtitulo = new JLabel("Administra el registro, la actualización y la eliminación de grupos.");
+        JLabel lblSubtitulo = new JLabel("Administra el registro, actualización y eliminación de estudiantes");
         lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 12));
         lblSubtitulo.setForeground(Color.GRAY);
 
@@ -131,14 +123,12 @@ public class VistaGrupoSwing extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(14, 0, 0, 0));
 
         JPanel formulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        formulario.add(new JLabel("ID Materia:"));
-        formulario.add(txtIdMateria);
-        formulario.add(new JLabel("ID Docente:"));
-        formulario.add(txtIdDocente);
-        formulario.add(new JLabel("Aula:"));
-        formulario.add(txtAula);
-        formulario.add(new JLabel("Horario:"));
-        formulario.add(txtHorario);
+        formulario.add(new JLabel("Nombre:"));
+        formulario.add(txtNombre);
+        formulario.add(new JLabel("Apellido:"));
+        formulario.add(txtApellido);
+        formulario.add(new JLabel("Correo:"));
+        formulario.add(txtCorreo);
 
         JPanel botonesIzq = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         botonesIzq.add(btnRegistrar);
@@ -183,11 +173,11 @@ public class VistaGrupoSwing extends JPanel {
         });
 
         txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e) {
+            @Override public void insertUpdate(DocumentEvent e)  {
                 filtrar();
             }
 
-            @Override public void removeUpdate(DocumentEvent e) {
+            @Override public void removeUpdate(DocumentEvent e)  {
                 filtrar();
             }
 
@@ -232,24 +222,20 @@ public class VistaGrupoSwing extends JPanel {
         if(filaVista < 0) return;
         int fila = tabla.convertRowIndexToModel(filaVista);
 
-        txtIdMateria.setText(String.valueOf(modeloTabla.getValueAt(fila, 1)));
-        txtIdDocente.setText(String.valueOf(modeloTabla.getValueAt(fila, 3)));
-        txtAula.setText((String) modeloTabla.getValueAt(fila, 5));
-        txtHorario.setText((String) modeloTabla.getValueAt(fila, 6));
+        txtNombre.setText((String) modeloTabla.getValueAt(fila, 1));
+        txtApellido.setText((String) modeloTabla.getValueAt(fila, 2));
+        txtCorreo.setText((String) modeloTabla.getValueAt(fila, 3));
     }
 
-    public void cargarGrupos(List<Grupo> grupos) {
+    public void cargarEstudiantes(List<Estudiante> estudiantes) {
         modeloTabla.setRowCount(0);
 
-        for(Grupo g : grupos) {
+        for(Estudiante e : estudiantes) {
             modeloTabla.addRow(new Object[]{
-                g.getId(),
-                g.getMateria().getId(),
-                g.getMateria().getNombreMateria(),
-                g.getDocente().getId(),
-                g.getDocente().getNombre(),
-                g.getAula(),
-                g.getHorario()
+                e.getId(),
+                e.getNombre(),
+                e.getApellido(),
+                e.getCorreo()
             });
         }
     }
@@ -261,27 +247,22 @@ public class VistaGrupoSwing extends JPanel {
         return (int) modeloTabla.getValueAt(fila, 0);
     }
 
-    public String getIdMateriaTexto() {
-        return txtIdMateria.getText().trim();
+    public String getNombre() {
+        return txtNombre.getText().trim();
     }
 
-    public String getIdDocenteTexto() {
-        return txtIdDocente.getText().trim();
+    public String getApellido() {
+        return txtApellido.getText().trim();
     }
 
-    public String getAula() {
-        return txtAula.getText().trim();
-    }
-
-    public String getHorario() {
-        return txtHorario.getText().trim();
+    public String getCorreo()   {
+        return txtCorreo.getText().trim();
     }
 
     public void limpiarCampos() {
-        txtIdMateria.setText("");
-        txtIdDocente.setText("");
-        txtAula.setText("");
-        txtHorario.setText("");
+        txtNombre.setText("");
+        txtApellido.setText("");
+        txtCorreo.setText("");
         tabla.clearSelection();
     }
 

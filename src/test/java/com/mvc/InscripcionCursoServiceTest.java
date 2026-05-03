@@ -1,11 +1,7 @@
 package com.mvc;
 
-import com.mvc.modelo.Docente;
-import com.mvc.modelo.Estudiante;
-import com.mvc.modelo.Grupo;
-import com.mvc.modelo.InscripcionCurso;
-import com.mvc.modelo.Materia;
-import com.mvc.servicios.InscripcionCursoService;
+import com.mvc.models.*;
+import com.mvc.services.InscripcionCursoService;
 import com.mvc.dao.InscripcionCursoDao;
 
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,7 @@
 package com.mvc;
 
-import com.mvc.modelo.Docente;
-import com.mvc.servicios.DocenteService;
+import com.mvc.models.Docente;
+import com.mvc.services.DocenteService;
 import com.mvc.dao.DocenteDao;
 
 import org.junit.jupiter.api.BeforeEach;

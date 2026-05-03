@@ -1,6 +1,6 @@
-package com.mvc.vista;
+package com.mvc.views;
 
-import com.mvc.modelo.Docente;
+import com.mvc.models.Materia;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,7 +14,7 @@ import java.awt.event.FocusEvent;
 
 import java.util.List;
 
-public class VistaDocenteSwing extends JPanel {
+public class VistaMateriaSwing extends JPanel {
 
     private DefaultTableModel modeloTabla;
     private JTable tabla;
@@ -22,8 +22,8 @@ public class VistaDocenteSwing extends JPanel {
 
     private JTextField txtBuscar;
 
-    private JTextField txtNombre;
-    private JTextField txtEspecialidad;
+    private JTextField txtNombreMateria;
+    private JTextField txtCreditos;
 
     private JButton btnRegistrar;
     private JButton btnActualizar;
@@ -35,11 +35,11 @@ public class VistaDocenteSwing extends JPanel {
     private Runnable onEliminar;
     private Runnable onRefrescar;
 
-    private static final String[] COLUMNAS = {"ID", "Nombre", "Especialidad"};
+    private static final String[] COLUMNAS = {"ID", "Nombre", "Créditos"};
 
-    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar docente...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar materia...";
 
-    public VistaDocenteSwing() {
+    public VistaMateriaSwing() {
         initComponents();
     }
 
@@ -70,8 +70,8 @@ public class VistaDocenteSwing extends JPanel {
         txtBuscar.setForeground(Color.GRAY);
         txtBuscar.setText(PLACEHOLDER_BUSCAR);
 
-        txtNombre = new JTextField(16);
-        txtEspecialidad = new JTextField(18);
+        txtNombreMateria = new JTextField(18);
+        txtCreditos = new JTextField(8);
 
         btnRegistrar = new JButton("Registrar");
         btnActualizar = new JButton("Actualizar");
@@ -86,10 +86,10 @@ public class VistaDocenteSwing extends JPanel {
     }
 
     private JPanel buildPanelEncabezado() {
-        JLabel lblTitulo = new JLabel("Gestión de Docentes");
+        JLabel lblTitulo = new JLabel("Gestión de Materias");
         lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 20));
 
-        JLabel lblSubtitulo = new JLabel("Administra el registro, actualización y eliminación de docentes");
+        JLabel lblSubtitulo = new JLabel("Administra el registro, actualización y eliminación de materias");
         lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 12));
         lblSubtitulo.setForeground(Color.GRAY);
 
@@ -122,9 +122,9 @@ public class VistaDocenteSwing extends JPanel {
 
         JPanel formulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         formulario.add(new JLabel("Nombre:"));
-        formulario.add(txtNombre);
-        formulario.add(new JLabel("Especialidad:"));
-        formulario.add(txtEspecialidad);
+        formulario.add(txtNombreMateria);
+        formulario.add(new JLabel("Créditos:"));
+        formulario.add(txtCreditos);
 
         JPanel botonesIzq = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         botonesIzq.add(btnRegistrar);
@@ -218,18 +218,18 @@ public class VistaDocenteSwing extends JPanel {
         if(filaVista < 0) return;
         int fila = tabla.convertRowIndexToModel(filaVista);
 
-        txtNombre.setText((String) modeloTabla.getValueAt(fila, 1));
-        txtEspecialidad.setText((String) modeloTabla.getValueAt(fila, 2));
+        txtNombreMateria.setText((String) modeloTabla.getValueAt(fila, 1));
+        txtCreditos.setText(String.valueOf(modeloTabla.getValueAt(fila, 2)));
     }
 
-    public void cargarDocentes(List<Docente> docentes) {
+    public void cargarMaterias(List<Materia> materias) {
         modeloTabla.setRowCount(0);
 
-        for(Docente d : docentes) {
+        for(Materia m : materias) {
             modeloTabla.addRow(new Object[]{
-                d.getId(),
-                d.getNombre(),
-                d.getEspecialidad()
+                m.getId(),
+                m.getNombreMateria(),
+                m.getCreditos()
             });
         }
     }
@@ -241,17 +241,17 @@ public class VistaDocenteSwing extends JPanel {
         return (int) modeloTabla.getValueAt(fila, 0);
     }
 
-    public String getNombre() {
-        return txtNombre.getText().trim();
+    public String getNombreMateria() {
+        return txtNombreMateria.getText().trim();
     }
 
-    public String getEspecialidad() {
-        return txtEspecialidad.getText().trim();
+    public String getCreditosTexto() {
+        return txtCreditos.getText().trim();
     }
 
     public void limpiarCampos() {
-        txtNombre.setText("");
-        txtEspecialidad.setText("");
+        txtNombreMateria.setText("");
+        txtCreditos.setText("");
         tabla.clearSelection();
     }
 

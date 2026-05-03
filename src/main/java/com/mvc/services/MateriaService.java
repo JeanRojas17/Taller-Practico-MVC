@@ -1,9 +1,9 @@
-package com.mvc.servicios;
+package com.mvc.services;
 
 import java.util.List;
 
 import com.mvc.dao.MateriaDao;
-import com.mvc.modelo.Materia;
+import com.mvc.models.Materia;
 
 public class MateriaService {
 

@@ -1,14 +1,14 @@
-package com.mvc.controlador;
+package com.mvc.controllers;
 
 import java.util.List;
 
-import com.mvc.modelo.Estudiante;
-import com.mvc.modelo.Grupo;
-import com.mvc.modelo.InscripcionCurso;
-import com.mvc.servicios.EstudianteService;
-import com.mvc.servicios.GrupoService;
-import com.mvc.servicios.InscripcionCursoService;
-import com.mvc.vista.VistaInscripcionCursoSwing;
+import com.mvc.models.Estudiante;
+import com.mvc.models.Grupo;
+import com.mvc.models.InscripcionCurso;
+import com.mvc.services.EstudianteService;
+import com.mvc.services.GrupoService;
+import com.mvc.services.InscripcionCursoService;
+import com.mvc.views.VistaInscripcionCursoSwing;
 
 public class ControladorInscripcionCurso {
 
