@@ -20,8 +20,26 @@ public class VistaPrincipalSwing extends JFrame {
     private JPanel panelContenido;
     private JPanel headerPanel;
 
+    private final JPanel panelInicioPrueba;
+    private final JPanel panelEstudiantesPrueba;
+    private final JPanel panelDocentesPrueba;
+    private final JPanel panelMateriasPrueba;
+    private final JPanel panelGruposPrueba;
+    private final JPanel panelInscripcionesPrueba;
+
     public VistaPrincipalSwing() {
+        this(null, null, null, null, null, null);
+    }
+
+    VistaPrincipalSwing(JPanel panelInicio, JPanel panelEstudiantes, JPanel panelDocentes,
+                        JPanel panelMaterias, JPanel panelGrupos, JPanel panelInscripciones) {
         super("Sistema Académico UNIAJC");
+        this.panelInicioPrueba = panelInicio;
+        this.panelEstudiantesPrueba = panelEstudiantes;
+        this.panelDocentesPrueba = panelDocentes;
+        this.panelMateriasPrueba = panelMaterias;
+        this.panelGruposPrueba = panelGrupos;
+        this.panelInscripcionesPrueba = panelInscripciones;
         initComponents();
     }
 
@@ -179,6 +197,16 @@ public class VistaPrincipalSwing extends JFrame {
     }
 
     private void registrarPaneles() {
+        if(panelInicioPrueba != null) {
+            panelContenido.add(panelInicioPrueba, CARD_INICIO);
+            panelContenido.add(panelEstudiantesPrueba, CARD_ESTUDIANTES);
+            panelContenido.add(panelDocentesPrueba, CARD_DOCENTES);
+            panelContenido.add(panelMateriasPrueba, CARD_MATERIAS);
+            panelContenido.add(panelGruposPrueba, CARD_GRUPOS);
+            panelContenido.add(panelInscripcionesPrueba, CARD_INSCRIPCIONES);
+            return;
+        }
+
         panelContenido.add(crearPanelInicio(), CARD_INICIO);
 
         EstudianteDao estudianteDao = new EstudianteDao();
