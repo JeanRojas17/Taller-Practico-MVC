@@ -1,35 +1,41 @@
 package com.mvc;
 
 import com.mvc.dao.InscripcionCursoDao;
-import com.mvc.models.*;
+import com.mvc.models.Docente;
+import com.mvc.models.Estudiante;
+import com.mvc.models.Grupo;
+import com.mvc.models.InscripcionCurso;
+import com.mvc.models.Materia;
 import com.mvc.services.InscripcionCursoService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class InscripcionCursoServiceTest {
 
-    private FakeInscripcionCursoDao inscripcionCursoDao;
+    @Mock
+    private InscripcionCursoDao inscripcionCursoDao;
+
     private InscripcionCursoService inscripcionCursoService;
     private Estudiante estudiante;
     private Grupo grupo;
 
     @BeforeEach
     void setUp() {
-        inscripcionCursoDao = new FakeInscripcionCursoDao();
+        inscripcionCursoService = new InscripcionCursoService(inscripcionCursoDao);
         estudiante = new Estudiante(1, "Jean", "Rojas", "jean@email.com");
         Materia materia = new Materia(1, "Bases de Datos", 3);
         Docente docente = new Docente(1, "Ana Torres", "Software");
         grupo = new Grupo(1, materia, docente, "Aula 101", "Lunes 8am");
-
-        inscripcionCursoDao.inscripciones.add(new InscripcionCurso(1, estudiante, grupo, 4.2f, "Aprobado"));
-        inscripcionCursoService = new InscripcionCursoService(inscripcionCursoDao);
     }
 
     @Test
@@ -39,8 +45,8 @@ class InscripcionCursoServiceTest {
 
         inscripcionCursoService.registrarInscripcion(inscripcion);
 
-        assertSame(inscripcion, inscripcionCursoDao.inscripcionGuardada);
-        assertEquals(1, inscripcionCursoDao.guardadas);
+        verify(inscripcionCursoDao).guardarInscripcion(inscripcion);
+        verifyNoMoreInteractions(inscripcionCursoDao);
     }
 
     @Test
@@ -53,43 +59,56 @@ class InscripcionCursoServiceTest {
                 () -> assertThrows(IllegalArgumentException.class, () -> inscripcionCursoService.registrarInscripcion(new InscripcionCurso(2, estudiante, grupo, null, null)))
         );
 
-        assertEquals(0, inscripcionCursoDao.guardadas);
-        assertNull(inscripcionCursoDao.inscripcionGuardada);
+        verifyNoInteractions(inscripcionCursoDao);
     }
 
     @Test
     @DisplayName("Consulta todas las inscripciones desde el DAO")
     void mostrarTodasLasInscripciones_retornaDatosDelDao() {
+        List<InscripcionCurso> inscripcionesEsperadas = List.of(new InscripcionCurso(1, estudiante, grupo, 4.2f, "Aprobado"));
+        when(inscripcionCursoDao.obtenerTodasLasInscripciones()).thenReturn(inscripcionesEsperadas);
+
         List<InscripcionCurso> inscripciones = inscripcionCursoService.mostrarTodasLasInscripciones();
 
-        assertEquals(1, inscripciones.size());
-        assertEquals("Aprobado", inscripciones.get(0).getEstado());
+        assertSame(inscripcionesEsperadas, inscripciones);
+        verify(inscripcionCursoDao).obtenerTodasLasInscripciones();
+        verifyNoMoreInteractions(inscripcionCursoDao);
     }
 
     @Test
     @DisplayName("Consulta, actualiza y elimina delegando en el DAO")
     void operacionesBasicas_deleganEnDao() {
+        InscripcionCurso encontrada = new InscripcionCurso(1, estudiante, grupo, 4.2f, "Aprobado");
         InscripcionCurso actualizada = new InscripcionCurso(1, estudiante, grupo, 4.5f, "Aprobado");
+        when(inscripcionCursoDao.obtenerInscripcionPorId(1)).thenReturn(encontrada);
 
-        InscripcionCurso encontrada = inscripcionCursoService.obtenerInscripcionPorId(1);
+        InscripcionCurso resultado = inscripcionCursoService.obtenerInscripcionPorId(1);
         inscripcionCursoService.actualizarInscripcion(actualizada);
         inscripcionCursoService.eliminarInscripcion(1);
 
-        assertEquals(4.2f, encontrada.getNotaFinal());
-        assertSame(actualizada, inscripcionCursoDao.inscripcionActualizada);
-        assertEquals(1, inscripcionCursoDao.idEliminado);
+        assertSame(encontrada, resultado);
+        verify(inscripcionCursoDao).obtenerInscripcionPorId(1);
+        verify(inscripcionCursoDao).actualizarInscripcion(actualizada);
+        verify(inscripcionCursoDao).eliminarInscripcion(1);
+        verifyNoMoreInteractions(inscripcionCursoDao);
     }
 
     @Test
     @DisplayName("Filtra inscripciones por estudiante y por grupo delegando en el DAO")
     void filtrosPorEstudianteYGrupo_deleganEnDao() {
+        List<InscripcionCurso> porEstudianteEsperadas = List.of(new InscripcionCurso(1, estudiante, grupo, 4.2f, "Aprobado"));
+        List<InscripcionCurso> porGrupoEsperadas = List.of(new InscripcionCurso(2, estudiante, grupo, null, "Inscrito"));
+        when(inscripcionCursoDao.obtenerInscripcionesPorEstudiante(1)).thenReturn(porEstudianteEsperadas);
+        when(inscripcionCursoDao.obtenerInscripcionesPorGrupo(1)).thenReturn(porGrupoEsperadas);
+
         List<InscripcionCurso> porEstudiante = inscripcionCursoService.obtenerInscripcionesPorEstudiante(1);
         List<InscripcionCurso> porGrupo = inscripcionCursoService.obtenerInscripcionesPorGrupo(1);
 
-        assertEquals(1, porEstudiante.size());
-        assertEquals(1, porGrupo.size());
-        assertEquals(1, inscripcionCursoDao.idEstudianteConsultado);
-        assertEquals(1, inscripcionCursoDao.idGrupoConsultado);
+        assertSame(porEstudianteEsperadas, porEstudiante);
+        assertSame(porGrupoEsperadas, porGrupo);
+        verify(inscripcionCursoDao).obtenerInscripcionesPorEstudiante(1);
+        verify(inscripcionCursoDao).obtenerInscripcionesPorGrupo(1);
+        verifyNoMoreInteractions(inscripcionCursoDao);
     }
 
     @Test
@@ -97,71 +116,7 @@ class InscripcionCursoServiceTest {
     void eliminarEstudianteDeGrupo_delegaEnDao() {
         inscripcionCursoService.eliminarEstudianteDeGrupo(1, 1);
 
-        assertEquals(1, inscripcionCursoDao.idEstudianteEliminado);
-        assertEquals(1, inscripcionCursoDao.idGrupoEliminado);
-    }
-
-    private static class FakeInscripcionCursoDao extends InscripcionCursoDao {
-        private final List<InscripcionCurso> inscripciones = new ArrayList<>();
-        private InscripcionCurso inscripcionGuardada;
-        private InscripcionCurso inscripcionActualizada;
-        private Integer idEliminado;
-        private Integer idEstudianteConsultado;
-        private Integer idGrupoConsultado;
-        private Integer idEstudianteEliminado;
-        private Integer idGrupoEliminado;
-        private int guardadas;
-
-        @Override
-        public void guardarInscripcion(InscripcionCurso inscripcion) {
-            inscripcionGuardada = inscripcion;
-            guardadas++;
-            inscripciones.add(inscripcion);
-        }
-
-        @Override
-        public List<InscripcionCurso> obtenerTodasLasInscripciones() {
-            return List.copyOf(inscripciones);
-        }
-
-        @Override
-        public InscripcionCurso obtenerInscripcionPorId(int id) {
-            return inscripciones.stream()
-                    .filter(inscripcion -> inscripcion.getId() == id)
-                    .findFirst()
-                    .orElse(null);
-        }
-
-        @Override
-        public void actualizarInscripcion(InscripcionCurso inscripcion) {
-            inscripcionActualizada = inscripcion;
-        }
-
-        @Override
-        public void eliminarInscripcion(int id) {
-            idEliminado = id;
-        }
-
-        @Override
-        public List<InscripcionCurso> obtenerInscripcionesPorEstudiante(int idEstudiante) {
-            idEstudianteConsultado = idEstudiante;
-            return inscripciones.stream()
-                    .filter(inscripcion -> inscripcion.getEstudiante().getId() == idEstudiante)
-                    .toList();
-        }
-
-        @Override
-        public List<InscripcionCurso> obtenerInscripcionesPorGrupo(int idGrupo) {
-            idGrupoConsultado = idGrupo;
-            return inscripciones.stream()
-                    .filter(inscripcion -> inscripcion.getGrupo().getId() == idGrupo)
-                    .toList();
-        }
-
-        @Override
-        public void eliminarInscripcionPorEstudianteYGrupo(int idEstudiante, int idGrupo) {
-            idEstudianteEliminado = idEstudiante;
-            idGrupoEliminado = idGrupo;
-        }
+        verify(inscripcionCursoDao).eliminarInscripcionPorEstudianteYGrupo(1, 1);
+        verifyNoMoreInteractions(inscripcionCursoDao);
     }
 }

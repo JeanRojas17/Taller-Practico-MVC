@@ -3,26 +3,28 @@ package com.mvc;
 import com.mvc.dao.EstudianteDao;
 import com.mvc.models.Estudiante;
 import com.mvc.services.EstudianteService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class EstudianteServiceTest {
 
-    private FakeEstudianteDao estudianteDao;
+    @Mock
+    private EstudianteDao estudianteDao;
+
     private EstudianteService estudianteService;
 
     @BeforeEach
     void setUp() {
-        estudianteDao = new FakeEstudianteDao();
-        estudianteDao.estudiantes.add(new Estudiante(1, "Jean", "Rojas", "jean@email.com"));
-        estudianteDao.estudiantes.add(new Estudiante(2, "Laura", "Diaz", "laura@email.com"));
         estudianteService = new EstudianteService(estudianteDao);
     }
 
@@ -33,8 +35,8 @@ class EstudianteServiceTest {
 
         estudianteService.registrarEstudiante(estudiante);
 
-        assertSame(estudiante, estudianteDao.estudianteGuardado);
-        assertEquals(1, estudianteDao.guardados);
+        verify(estudianteDao).guardarEstudiante(estudiante);
+        verifyNoMoreInteractions(estudianteDao);
     }
 
     @Test
@@ -46,68 +48,40 @@ class EstudianteServiceTest {
                 () -> assertThrows(IllegalArgumentException.class, () -> estudianteService.registrarEstudiante(new Estudiante(3, "Sofia", null, "sofia@email.com")))
         );
 
-        assertEquals(0, estudianteDao.guardados);
-        assertNull(estudianteDao.estudianteGuardado);
+        verifyNoInteractions(estudianteDao);
     }
 
     @Test
     @DisplayName("Consulta todos los estudiantes desde el DAO")
     void mostrarTodosLosEstudiantes_retornaDatosDelDao() {
+        List<Estudiante> estudiantesEsperados = List.of(
+                new Estudiante(1, "Jean", "Rojas", "jean@email.com"),
+                new Estudiante(2, "Laura", "Diaz", "laura@email.com")
+        );
+        when(estudianteDao.obtenerTodosLosEstudiantes()).thenReturn(estudiantesEsperados);
+
         List<Estudiante> estudiantes = estudianteService.mostrarTodosLosEstudiantes();
 
-        assertEquals(2, estudiantes.size());
-        assertEquals("Jean", estudiantes.get(0).getNombre());
+        assertSame(estudiantesEsperados, estudiantes);
+        verify(estudianteDao).obtenerTodosLosEstudiantes();
+        verifyNoMoreInteractions(estudianteDao);
     }
 
     @Test
     @DisplayName("Consulta, actualiza y elimina delegando en el DAO")
     void operacionesBasicas_deleganEnDao() {
+        Estudiante encontrado = new Estudiante(2, "Laura", "Diaz", "laura@email.com");
         Estudiante actualizado = new Estudiante(2, "Laura", "Diaz", "laura.actualizada@email.com");
+        when(estudianteDao.obtenerEstudiantePorId(2)).thenReturn(encontrado);
 
-        Estudiante encontrado = estudianteService.obtenerEstudiantePorId(2);
+        Estudiante resultado = estudianteService.obtenerEstudiantePorId(2);
         estudianteService.actualizarEstudiante(actualizado);
         estudianteService.eliminarEstudiante(1);
 
-        assertEquals("Laura", encontrado.getNombre());
-        assertSame(actualizado, estudianteDao.estudianteActualizado);
-        assertEquals(1, estudianteDao.idEliminado);
-    }
-
-    private static class FakeEstudianteDao extends EstudianteDao {
-        private final List<Estudiante> estudiantes = new ArrayList<>();
-        private Estudiante estudianteGuardado;
-        private Estudiante estudianteActualizado;
-        private Integer idEliminado;
-        private int guardados;
-
-        @Override
-        public void guardarEstudiante(Estudiante estudiante) {
-            estudianteGuardado = estudiante;
-            guardados++;
-            estudiantes.add(estudiante);
-        }
-
-        @Override
-        public List<Estudiante> obtenerTodosLosEstudiantes() {
-            return List.copyOf(estudiantes);
-        }
-
-        @Override
-        public Estudiante obtenerEstudiantePorId(int id) {
-            return estudiantes.stream()
-                    .filter(estudiante -> estudiante.getId() == id)
-                    .findFirst()
-                    .orElse(null);
-        }
-
-        @Override
-        public void actualizarEstudiante(Estudiante estudiante) {
-            estudianteActualizado = estudiante;
-        }
-
-        @Override
-        public void eliminarEstudiante(int id) {
-            idEliminado = id;
-        }
+        assertSame(encontrado, resultado);
+        verify(estudianteDao).obtenerEstudiantePorId(2);
+        verify(estudianteDao).actualizarEstudiante(actualizado);
+        verify(estudianteDao).eliminarEstudiante(1);
+        verifyNoMoreInteractions(estudianteDao);
     }
 }

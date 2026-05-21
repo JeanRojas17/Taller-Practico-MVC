@@ -3,26 +3,28 @@ package com.mvc;
 import com.mvc.dao.DocenteDao;
 import com.mvc.models.Docente;
 import com.mvc.services.DocenteService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class DocenteServiceTest {
 
-    private FakeDocenteDao docenteDao;
+    @Mock
+    private DocenteDao docenteDao;
+
     private DocenteService docenteService;
 
     @BeforeEach
     void setUp() {
-        docenteDao = new FakeDocenteDao();
-        docenteDao.docentes.add(new Docente(1, "Ana Torres", "Bases de Datos"));
-        docenteDao.docentes.add(new Docente(2, "Luis Perez", "Programacion"));
         docenteService = new DocenteService(docenteDao);
     }
 
@@ -33,8 +35,8 @@ class DocenteServiceTest {
 
         docenteService.registrarDocente(docente);
 
-        assertSame(docente, docenteDao.docenteGuardado);
-        assertEquals(1, docenteDao.guardados);
+        verify(docenteDao).guardarDocente(docente);
+        verifyNoMoreInteractions(docenteDao);
     }
 
     @Test
@@ -46,68 +48,40 @@ class DocenteServiceTest {
                 () -> assertThrows(IllegalArgumentException.class, () -> docenteService.registrarDocente(new Docente(3, "Marta Gomez", null)))
         );
 
-        assertEquals(0, docenteDao.guardados);
-        assertNull(docenteDao.docenteGuardado);
+        verifyNoInteractions(docenteDao);
     }
 
     @Test
     @DisplayName("Consulta todos los docentes desde el DAO")
     void mostrarTodosLosDocentes_retornaDatosDelDao() {
+        List<Docente> docentesEsperados = List.of(
+                new Docente(1, "Ana Torres", "Bases de Datos"),
+                new Docente(2, "Luis Perez", "Programacion")
+        );
+        when(docenteDao.obtenerTodosLosDocentes()).thenReturn(docentesEsperados);
+
         List<Docente> docentes = docenteService.mostrarTodosLosDocentes();
 
-        assertEquals(2, docentes.size());
-        assertEquals("Ana Torres", docentes.get(0).getNombre());
+        assertSame(docentesEsperados, docentes);
+        verify(docenteDao).obtenerTodosLosDocentes();
+        verifyNoMoreInteractions(docenteDao);
     }
 
     @Test
     @DisplayName("Consulta, actualiza y elimina delegando en el DAO")
     void operacionesBasicas_deleganEnDao() {
+        Docente encontrado = new Docente(2, "Luis Perez", "Programacion");
         Docente actualizado = new Docente(2, "Luis Perez", "Arquitectura");
+        when(docenteDao.obtenerDocentePorId(2)).thenReturn(encontrado);
 
-        Docente encontrado = docenteService.obtenerDocentePorId(2);
+        Docente resultado = docenteService.obtenerDocentePorId(2);
         docenteService.actualizarDocente(actualizado);
         docenteService.eliminarDocente(1);
 
-        assertEquals("Luis Perez", encontrado.getNombre());
-        assertSame(actualizado, docenteDao.docenteActualizado);
-        assertEquals(1, docenteDao.idEliminado);
-    }
-
-    private static class FakeDocenteDao extends DocenteDao {
-        private final List<Docente> docentes = new ArrayList<>();
-        private Docente docenteGuardado;
-        private Docente docenteActualizado;
-        private Integer idEliminado;
-        private int guardados;
-
-        @Override
-        public void guardarDocente(Docente docente) {
-            docenteGuardado = docente;
-            guardados++;
-            docentes.add(docente);
-        }
-
-        @Override
-        public List<Docente> obtenerTodosLosDocentes() {
-            return List.copyOf(docentes);
-        }
-
-        @Override
-        public Docente obtenerDocentePorId(int id) {
-            return docentes.stream()
-                    .filter(docente -> docente.getId() == id)
-                    .findFirst()
-                    .orElse(null);
-        }
-
-        @Override
-        public void actualizarDocente(Docente docente) {
-            docenteActualizado = docente;
-        }
-
-        @Override
-        public void eliminarDocente(int id) {
-            idEliminado = id;
-        }
+        assertSame(encontrado, resultado);
+        verify(docenteDao).obtenerDocentePorId(2);
+        verify(docenteDao).actualizarDocente(actualizado);
+        verify(docenteDao).eliminarDocente(1);
+        verifyNoMoreInteractions(docenteDao);
     }
 }
