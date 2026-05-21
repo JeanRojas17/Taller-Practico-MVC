@@ -18,6 +18,7 @@ public class VistaPrincipalSwing extends JFrame {
 
     private CardLayout cardLayout;
     private JPanel panelContenido;
+    private JPanel headerPanel;
 
     public VistaPrincipalSwing() {
         super("Sistema Académico UNIAJC");
@@ -37,10 +38,11 @@ public class VistaPrincipalSwing extends JFrame {
 
         registrarPaneles();
 
-        add(buildHeader(), BorderLayout.NORTH);
+        headerPanel = buildHeader();
+        add(headerPanel, BorderLayout.NORTH);
         add(panelContenido, BorderLayout.CENTER);
 
-        cardLayout.show(panelContenido, CARD_INICIO);
+        showCard(CARD_INICIO);
     }
 
     private JMenuBar buildMenuBar() {
@@ -108,8 +110,13 @@ public class VistaPrincipalSwing extends JFrame {
     private JMenuItem buildMenuItem(String text, String cardName) {
         JMenuItem item = new JMenuItem(text);
         item.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        item.addActionListener(e -> cardLayout.show(panelContenido, cardName));
+        item.addActionListener(e -> showCard(cardName));
         return item;
+    }
+
+    private void showCard(String cardName) {
+        cardLayout.show(panelContenido, cardName);
+        headerPanel.setVisible(CARD_INICIO.equals(cardName));
     }
 
     private JPanel buildHeader() {

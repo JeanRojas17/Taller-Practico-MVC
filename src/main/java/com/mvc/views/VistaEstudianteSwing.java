@@ -5,15 +5,15 @@ import com.mvc.models.Estudiante;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
+import javax.swing.RowFilter;
 
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class VistaEstudianteSwing extends JPanel {
@@ -23,7 +23,6 @@ public class VistaEstudianteSwing extends JPanel {
     private TableRowSorter<DefaultTableModel> sorter;
 
     private JTextField txtBuscar;
-    private JComboBox<String> cmbOrden;
 
     private JTextField txtNombre;
     private JTextField txtApellido;
@@ -41,9 +40,6 @@ public class VistaEstudianteSwing extends JPanel {
     private Runnable onRefrescar;
 
     private static final String[] COLUMNAS = {"ID", "Nombre", "Apellido", "Correo"};
-    private static final String[] OPCIONES_ORDEN = {
-            "ID ↑", "ID ↓", "Nombre ↑", "Nombre ↓", "Apellido ↑", "Apellido ↓"
-    };
     private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar estudiante...";
 
     public VistaEstudianteSwing() {
@@ -60,6 +56,14 @@ public class VistaEstudianteSwing extends JPanel {
             public boolean isCellEditable(int row, int col) {
                 return false;
             }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {
+                    return Integer.class;
+                }
+                return String.class;
+            }
         };
 
         tabla = new JTable(modeloTabla);
@@ -70,18 +74,19 @@ public class VistaEstudianteSwing extends JPanel {
         tabla.setFillsViewportHeight(true);
         tabla.getColumnModel().getColumn(0).setPreferredWidth(60);
         tabla.getColumnModel().getColumn(0).setMaxWidth(80);
+        
+        // Alinear ID a la izquierda
+        DefaultTableCellRenderer rendererIzq = new DefaultTableCellRenderer();
+        rendererIzq.setHorizontalAlignment(SwingConstants.LEFT);
+        tabla.getColumnModel().getColumn(0).setCellRenderer(rendererIzq);
 
         sorter = new TableRowSorter<>(modeloTabla);
+        sorter.setComparator(0, Comparator.comparingInt(Integer::intValue));
         tabla.setRowSorter(sorter);
 
         txtBuscar = new JTextField(18);
         txtBuscar.setForeground(Color.GRAY);
         txtBuscar.setText(PLACEHOLDER_BUSCAR);
-
-        cmbOrden = new JComboBox<>(OPCIONES_ORDEN);
-        cmbOrden.setPreferredSize(new Dimension(150, 30));
-        cmbOrden.setBackground(Color.WHITE);
-        cmbOrden.setFont(new Font("SansSerif", Font.PLAIN, 12));
 
         txtNombre = new JTextField(14);
         txtApellido = new JTextField(14);
@@ -149,7 +154,6 @@ public class VistaEstudianteSwing extends JPanel {
 
         JPanel buscador = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buscador.setBackground(Color.WHITE);
-        buscador.add(cmbOrden);
         buscador.add(txtBuscar);
 
         JPanel encabezado = new JPanel(new BorderLayout());
@@ -173,24 +177,15 @@ public class VistaEstudianteSwing extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(0, 14));
         panel.setBackground(Color.WHITE);
 
-        JPanel formulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        formulario.setBackground(Color.WHITE);
-        formulario.add(new JLabel("Nombre:"));
-        formulario.add(txtNombre);
-        formulario.add(new JLabel("Apellido:"));
-        formulario.add(txtApellido);
-        formulario.add(new JLabel("Correo:"));
-        formulario.add(txtCorreo);
-
         JPanel botonesIzq = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         botonesIzq.setBackground(Color.WHITE);
         botonesIzq.add(btnRegistrar);
         botonesIzq.add(btnActualizar);
         botonesIzq.add(btnEliminar);
+        botonesIzq.add(btnLimpiar);
 
         JPanel botonesDer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         botonesDer.setBackground(Color.WHITE);
-        botonesDer.add(btnLimpiar);
         botonesDer.add(btnRefrescar);
 
         JPanel panelBotones = new JPanel(new BorderLayout());
@@ -202,8 +197,7 @@ public class VistaEstudianteSwing extends JPanel {
         separador.setForeground(new Color(200, 200, 200));
 
         panel.add(separador, BorderLayout.NORTH);
-        panel.add(formulario, BorderLayout.CENTER);
-        panel.add(panelBotones, BorderLayout.SOUTH);
+        panel.add(panelBotones, BorderLayout.CENTER);
 
         return panel;
     }
@@ -253,33 +247,15 @@ public class VistaEstudianteSwing extends JPanel {
             }
         });
 
-        cmbOrden.addActionListener(e -> ordenar());
-
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 precargarCamposDesdeSeleccion();
             }
         });
 
-        btnRegistrar.addActionListener(e -> {
-            if (txtNombre.getText().trim().isEmpty() || txtApellido.getText().trim().isEmpty() || txtCorreo.getText().trim().isEmpty()) {
-                mostrarError("Complete todos los campos para registrar un estudiante.");
-                return;
-            }
-            if (onRegistrar != null) {
-                onRegistrar.run();
-            }
-        });
+        btnRegistrar.addActionListener(e -> mostrarDialogoRegistro());
 
-        btnActualizar.addActionListener(e -> {
-            if (getIdSeleccionado() < 0) {
-                mostrarError("Seleccione un estudiante para actualizar.");
-                return;
-            }
-            if (onActualizar != null) {
-                onActualizar.run();
-            }
-        });
+        btnActualizar.addActionListener(e -> mostrarDialogoActualizar());
 
         btnEliminar.addActionListener(e -> {
             if (onEliminar != null) {
@@ -291,35 +267,99 @@ public class VistaEstudianteSwing extends JPanel {
             if (onRefrescar != null) {
                 onRefrescar.run();
             }
+            limpiarBusqueda();
         });
 
-        btnLimpiar.addActionListener(e -> limpiarCampos());
+        btnLimpiar.addActionListener(e -> limpiarBusqueda());
     }
 
-    private void ordenar() {
-        String seleccion = (String) cmbOrden.getSelectedItem();
-        if (seleccion == null) {
+    private void limpiarBusqueda() {
+        sorter.setRowFilter(null);
+        sorter.setSortKeys(null);
+        tabla.clearSelection();
+        txtBuscar.setText(PLACEHOLDER_BUSCAR);
+        txtBuscar.setForeground(Color.GRAY);
+    }
+
+    private void mostrarDialogoRegistro() {
+        JTextField nombre = new JTextField(20);
+        JTextField apellido = new JTextField(20);
+        JTextField correo = new JTextField(20);
+
+        JPanel panel = new JPanel(new GridLayout(0, 1, 6, 6));
+        panel.add(new JLabel("Nombre:"));
+        panel.add(nombre);
+        panel.add(new JLabel("Apellido:"));
+        panel.add(apellido);
+        panel.add(new JLabel("Correo:"));
+        panel.add(correo);
+
+        int opcion = JOptionPane.showOptionDialog(
+                this,
+                panel,
+                "Registrar estudiante",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new String[]{"Guardar", "Cancelar"},
+                "Guardar"
+        );
+
+        if (opcion == JOptionPane.YES_OPTION) {
+            txtNombre.setText(nombre.getText().trim());
+            txtApellido.setText(apellido.getText().trim());
+            txtCorreo.setText(correo.getText().trim());
+            if (onRegistrar != null) {
+                onRegistrar.run();
+            }
+        }
+    }
+
+    private void mostrarDialogoActualizar() {
+        int idSeleccionado = getIdSeleccionado();
+        if (idSeleccionado < 0) {
+            mostrarError("Selecciona un estudiante para modificar.");
             return;
         }
 
-        int columna = 0;
-        SortOrder orden = SortOrder.ASCENDING;
+        int filaVista = tabla.getSelectedRow();
+        int fila = tabla.convertRowIndexToModel(filaVista);
 
-        if (seleccion.startsWith("ID")) {
-            columna = 0;
-        } else if (seleccion.startsWith("Nombre")) {
-            columna = 1;
-        } else if (seleccion.startsWith("Apellido")) {
-            columna = 2;
+        String nombre = String.valueOf(modeloTabla.getValueAt(fila, 1));
+        String apellido = String.valueOf(modeloTabla.getValueAt(fila, 2));
+        String correo = String.valueOf(modeloTabla.getValueAt(fila, 3));
+
+        JTextField nombreField = new JTextField(nombre, 20);
+        JTextField apellidoField = new JTextField(apellido, 20);
+        JTextField correoField = new JTextField(correo, 20);
+
+        JPanel panel = new JPanel(new GridLayout(0, 1, 6, 6));
+        panel.add(new JLabel("Nombre:"));
+        panel.add(nombreField);
+        panel.add(new JLabel("Apellido:"));
+        panel.add(apellidoField);
+        panel.add(new JLabel("Correo:"));
+        panel.add(correoField);
+
+        int opcion = JOptionPane.showOptionDialog(
+                this,
+                panel,
+                "Modificar estudiante",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new String[]{"Guardar", "Cancelar"},
+                "Guardar"
+        );
+
+        if (opcion == JOptionPane.YES_OPTION) {
+            txtNombre.setText(nombreField.getText().trim());
+            txtApellido.setText(apellidoField.getText().trim());
+            txtCorreo.setText(correoField.getText().trim());
+            if (onActualizar != null) {
+                onActualizar.run();
+            }
         }
-
-        if (seleccion.endsWith("↓")) {
-            orden = SortOrder.DESCENDING;
-        }
-
-        List<RowSorter.SortKey> keys = new ArrayList<>();
-        keys.add(new RowSorter.SortKey(columna, orden));
-        sorter.setSortKeys(keys);
     }
 
     private void precargarCamposDesdeSeleccion() {
