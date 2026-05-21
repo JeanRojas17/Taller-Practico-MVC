@@ -5,13 +5,14 @@ import com.mvc.models.InscripcionCurso;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-
+import java.util.Comparator;
 import java.util.List;
 
 public class VistaInscripcionCursoSwing extends JPanel {
@@ -30,6 +31,7 @@ public class VistaInscripcionCursoSwing extends JPanel {
     private JButton btnRegistrar;
     private JButton btnActualizar;
     private JButton btnEliminar;
+    private JButton btnLimpiar;
     private JButton btnRefrescar;
     private JButton btnNotasEstudiante;
     private JButton btnNotasGrupo;
@@ -44,10 +46,10 @@ public class VistaInscripcionCursoSwing extends JPanel {
     private Runnable onEliminarEstudianteGrupo;
 
     private static final String[] COLUMNAS = {
-        "ID", "ID Estudiante", "Estudiante", "ID Grupo", "Materia", "Docente", "Aula", "Horario", "Nota Final", "Estado"
+            "ID", "ID Estudiante", "Estudiante", "ID Grupo", "Materia", "Docente", "Aula", "Horario", "Nota Final", "Estado"
     };
-
-    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar inscripción...";
+    private static final String[] ESTADOS = {"Inscrito", "En curso", "Retirado"};
+    private static final String PLACEHOLDER_BUSCAR = "Buscar inscripcion...";
     private static final String SIN_NOTA = "Sin nota";
 
     public VistaInscripcionCursoSwing() {
@@ -55,30 +57,48 @@ public class VistaInscripcionCursoSwing extends JPanel {
     }
 
     private void initComponents() {
-
-        setLayout(new BorderLayout(0, 0));
-        setBorder(BorderFactory.createEmptyBorder(24, 28, 20, 28));
+        setBackground(new Color(245, 247, 250));
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(18, 20, 18, 20));
 
         modeloTabla = new DefaultTableModel(COLUMNAS, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
                 return false;
             }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0 || columnIndex == 1 || columnIndex == 3) {
+                    return Integer.class;
+                }
+                return Object.class;
+            }
         };
 
         tabla = new JTable(modeloTabla);
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabla.setRowHeight(26);
+        tabla.setRowHeight(28);
         tabla.getTableHeader().setReorderingAllowed(false);
         tabla.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
-        tabla.getColumnModel().getColumn(0).setMaxWidth(70);
-        tabla.getColumnModel().getColumn(1).setPreferredWidth(95);
-        tabla.getColumnModel().getColumn(1).setMaxWidth(115);
-        tabla.getColumnModel().getColumn(3).setPreferredWidth(75);
-        tabla.getColumnModel().getColumn(3).setMaxWidth(95);
+        tabla.setFillsViewportHeight(true);
+        tabla.getColumnModel().getColumn(0).setPreferredWidth(60);
+        tabla.getColumnModel().getColumn(0).setMaxWidth(80);
+        tabla.getColumnModel().getColumn(1).setPreferredWidth(105);
+        tabla.getColumnModel().getColumn(1).setMaxWidth(125);
+        tabla.getColumnModel().getColumn(3).setPreferredWidth(85);
+        tabla.getColumnModel().getColumn(3).setMaxWidth(105);
+
+        DefaultTableCellRenderer rendererIzq = new DefaultTableCellRenderer();
+        rendererIzq.setHorizontalAlignment(SwingConstants.LEFT);
+        tabla.getColumnModel().getColumn(0).setCellRenderer(rendererIzq);
+        tabla.getColumnModel().getColumn(1).setCellRenderer(rendererIzq);
+        tabla.getColumnModel().getColumn(3).setCellRenderer(rendererIzq);
 
         sorter = new TableRowSorter<>(modeloTabla);
+        sorter.setComparator(0, Comparator.comparingInt(Integer::intValue));
+        sorter.setComparator(1, Comparator.comparingInt(Integer::intValue));
+        sorter.setComparator(3, Comparator.comparingInt(Integer::intValue));
         tabla.setRowSorter(sorter);
 
         txtBuscar = new JTextField(18);
@@ -88,99 +108,152 @@ public class VistaInscripcionCursoSwing extends JPanel {
         txtIdEstudiante = new JTextField(8);
         txtIdGrupo = new JTextField(8);
         txtNotaFinal = new JTextField(8);
-        cmbEstado = new JComboBox<>(new String[]{"Inscrito", "En curso", "Retirado"});
+        cmbEstado = new JComboBox<>(ESTADOS);
 
         btnRegistrar = new JButton("Registrar");
         btnActualizar = new JButton("Actualizar");
         btnEliminar = new JButton("Eliminar");
+        btnLimpiar = new JButton("Limpiar");
         btnRefrescar = new JButton("Refrescar");
         btnNotasEstudiante = new JButton("Notas estudiante");
         btnNotasGrupo = new JButton("Notas grupo");
         btnEliminarEstudianteGrupo = new JButton("Quitar estudiante");
 
-        add(buildPanelEncabezado(), BorderLayout.NORTH);
-        add(buildPanelTabla(), BorderLayout.CENTER);
-        add(buildPanelAcciones(), BorderLayout.SOUTH);
+        estilizarBotones();
+
+        JPanel panelPrincipal = new JPanel(new BorderLayout(0, 16));
+        panelPrincipal.setBackground(Color.WHITE);
+        panelPrincipal.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(210, 210, 210)),
+                BorderFactory.createEmptyBorder(22, 22, 22, 22)));
+
+        panelPrincipal.add(buildPanelEncabezado(), BorderLayout.NORTH);
+        panelPrincipal.add(buildPanelTabla(), BorderLayout.CENTER);
+        panelPrincipal.add(buildPanelAcciones(), BorderLayout.SOUTH);
+
+        add(panelPrincipal, BorderLayout.CENTER);
 
         initEventos();
     }
 
+    private void estilizarBotones() {
+        btnRegistrar.setBackground(new Color(76, 175, 80));
+        btnRegistrar.setForeground(Color.WHITE);
+        btnActualizar.setBackground(new Color(33, 150, 243));
+        btnActualizar.setForeground(Color.WHITE);
+        btnEliminar.setBackground(new Color(244, 67, 54));
+        btnEliminar.setForeground(Color.WHITE);
+        btnRefrescar.setBackground(new Color(96, 125, 139));
+        btnRefrescar.setForeground(Color.WHITE);
+        btnLimpiar.setBackground(new Color(158, 158, 158));
+        btnLimpiar.setForeground(Color.WHITE);
+        btnNotasEstudiante.setBackground(new Color(0, 150, 136));
+        btnNotasEstudiante.setForeground(Color.WHITE);
+        btnNotasGrupo.setBackground(new Color(0, 150, 136));
+        btnNotasGrupo.setForeground(Color.WHITE);
+        btnEliminarEstudianteGrupo.setBackground(new Color(255, 152, 0));
+        btnEliminarEstudianteGrupo.setForeground(Color.WHITE);
+
+        for (JButton btn : new JButton[]{
+                btnRegistrar, btnActualizar, btnEliminar, btnLimpiar, btnRefrescar,
+                btnNotasEstudiante, btnNotasGrupo, btnEliminarEstudianteGrupo
+        }) {
+            btn.setFocusPainted(false);
+            btn.setBorderPainted(false);
+            btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btn.setPreferredSize(new Dimension(110, 32));
+            btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        }
+
+        btnNotasEstudiante.setPreferredSize(new Dimension(145, 32));
+        btnNotasGrupo.setPreferredSize(new Dimension(120, 32));
+        btnEliminarEstudianteGrupo.setPreferredSize(new Dimension(150, 32));
+    }
+
     private JPanel buildPanelEncabezado() {
-        JLabel lblTitulo = new JLabel("Gestión de Inscripciones");
-        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 20));
+        JLabel lblTitulo = new JLabel("Gestion de Inscripciones");
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        lblTitulo.setForeground(new Color(30, 70, 130));
 
         JLabel lblSubtitulo = new JLabel("Administra estudiantes inscritos en grupos, notas y estados");
-        lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        lblSubtitulo.setForeground(Color.GRAY);
+        lblSubtitulo.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        lblSubtitulo.setForeground(new Color(100, 110, 125));
 
-        JPanel panelTitulo = new JPanel();
-        panelTitulo.setLayout(new BoxLayout(panelTitulo, BoxLayout.Y_AXIS));
-        panelTitulo.add(lblTitulo);
-        panelTitulo.add(Box.createVerticalStrut(3));
-        panelTitulo.add(lblSubtitulo);
+        JPanel tituloPanel = new JPanel();
+        tituloPanel.setBackground(Color.WHITE);
+        tituloPanel.setLayout(new BoxLayout(tituloPanel, BoxLayout.Y_AXIS));
+        tituloPanel.add(lblTitulo);
+        tituloPanel.add(Box.createVerticalStrut(4));
+        tituloPanel.add(lblSubtitulo);
 
-        JPanel panelBuscar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        panelBuscar.add(txtBuscar);
+        JPanel buscador = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        buscador.setBackground(Color.WHITE);
+        buscador.add(txtBuscar);
 
         JPanel encabezado = new JPanel(new BorderLayout());
-        encabezado.add(panelTitulo, BorderLayout.WEST);
-        encabezado.add(panelBuscar, BorderLayout.EAST);
-        encabezado.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
+        encabezado.setBackground(Color.WHITE);
+        encabezado.add(tituloPanel, BorderLayout.WEST);
+        encabezado.add(buscador, BorderLayout.EAST);
+        encabezado.setBorder(BorderFactory.createEmptyBorder(0, 0, 12, 0));
 
         return encabezado;
     }
 
     private JScrollPane buildPanelTabla() {
         JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        scroll.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                BorderFactory.createEmptyBorder(2, 2, 2, 2)));
         return scroll;
     }
 
     private JPanel buildPanelAcciones() {
-        JPanel panel = new JPanel(new BorderLayout(0, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(14, 0, 0, 0));
+        JPanel panel = new JPanel(new BorderLayout(0, 14));
+        panel.setBackground(Color.WHITE);
 
-        JPanel formulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        formulario.add(new JLabel("ID Estudiante:"));
-        formulario.add(txtIdEstudiante);
-        formulario.add(new JLabel("ID Grupo:"));
-        formulario.add(txtIdGrupo);
-        formulario.add(new JLabel("Nota Final:"));
-        formulario.add(txtNotaFinal);
-        formulario.add(new JLabel("Estado:"));
-        formulario.add(cmbEstado);
+        JPanel accionesCrud = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        accionesCrud.setBackground(Color.WHITE);
+        accionesCrud.add(btnRegistrar);
+        accionesCrud.add(btnActualizar);
+        accionesCrud.add(btnEliminar);
+        accionesCrud.add(btnLimpiar);
 
-        JPanel botonesIzq = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        botonesIzq.add(btnRegistrar);
-        botonesIzq.add(btnActualizar);
-        botonesIzq.add(btnEliminar);
-        botonesIzq.add(btnNotasEstudiante);
-        botonesIzq.add(btnNotasGrupo);
-        botonesIzq.add(btnEliminarEstudianteGrupo);
+        JPanel accionesConsulta = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        accionesConsulta.setBackground(Color.WHITE);
+        accionesConsulta.add(btnNotasEstudiante);
+        accionesConsulta.add(btnNotasGrupo);
+        accionesConsulta.add(btnEliminarEstudianteGrupo);
 
-        JPanel botonesDer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        JPanel accionesIzq = new JPanel();
+        accionesIzq.setBackground(Color.WHITE);
+        accionesIzq.setLayout(new BoxLayout(accionesIzq, BoxLayout.Y_AXIS));
+        accionesIzq.add(accionesCrud);
+        accionesIzq.add(Box.createVerticalStrut(8));
+        accionesIzq.add(accionesConsulta);
+
+        JPanel botonesDer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        botonesDer.setBackground(Color.WHITE);
         botonesDer.add(btnRefrescar);
 
         JPanel panelBotones = new JPanel(new BorderLayout());
-        panelBotones.add(botonesIzq, BorderLayout.WEST);
+        panelBotones.setBackground(Color.WHITE);
+        panelBotones.add(accionesIzq, BorderLayout.WEST);
         panelBotones.add(botonesDer, BorderLayout.EAST);
 
         JSeparator separador = new JSeparator();
         separador.setForeground(new Color(200, 200, 200));
 
         panel.add(separador, BorderLayout.NORTH);
-        panel.add(formulario, BorderLayout.CENTER);
-        panel.add(panelBotones, BorderLayout.SOUTH);
+        panel.add(panelBotones, BorderLayout.CENTER);
 
         return panel;
     }
 
     private void initEventos() {
-
         txtBuscar.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                if(txtBuscar.getText().equals(PLACEHOLDER_BUSCAR)) {
+                if (txtBuscar.getText().equals(PLACEHOLDER_BUSCAR)) {
                     txtBuscar.setText("");
                     txtBuscar.setForeground(Color.BLACK);
                 }
@@ -188,7 +261,7 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
             @Override
             public void focusLost(FocusEvent e) {
-                if(txtBuscar.getText().isEmpty()) {
+                if (txtBuscar.getText().isEmpty()) {
                     txtBuscar.setForeground(Color.GRAY);
                     txtBuscar.setText(PLACEHOLDER_BUSCAR);
                 }
@@ -196,65 +269,180 @@ public class VistaInscripcionCursoSwing extends JPanel {
         });
 
         txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e) {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
                 filtrar();
             }
 
-            @Override public void removeUpdate(DocumentEvent e) {
+            @Override
+            public void removeUpdate(DocumentEvent e) {
                 filtrar();
             }
 
-            @Override public void changedUpdate(DocumentEvent e) {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
                 filtrar();
             }
 
             private void filtrar() {
                 String texto = txtBuscar.getText().trim();
-
-                if(texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
+                if (texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
                     sorter.setRowFilter(null);
                 } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" +texto));
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto));
                 }
             }
         });
 
         tabla.getSelectionModel().addListSelectionListener(e -> {
-            if(!e.getValueIsAdjusting()) precargarCamposDesdeSeleccion();
+            if (!e.getValueIsAdjusting()) {
+                precargarCamposDesdeSeleccion();
+            }
         });
 
-        btnRegistrar.addActionListener(e -> {
-            if(onRegistrar != null) onRegistrar.run();
-        });
+        btnRegistrar.addActionListener(e -> mostrarDialogoRegistro());
 
-        btnActualizar.addActionListener(e -> {
-            if(onActualizar != null) onActualizar.run();
-        });
+        btnActualizar.addActionListener(e -> mostrarDialogoActualizar());
 
         btnEliminar.addActionListener(e -> {
-            if(onEliminar != null) onEliminar.run();
+            if (onEliminar != null) {
+                onEliminar.run();
+            }
         });
 
         btnRefrescar.addActionListener(e -> {
-            if(onRefrescar != null) onRefrescar.run();
+            if (onRefrescar != null) {
+                onRefrescar.run();
+            }
+            limpiarBusqueda();
         });
 
+        btnLimpiar.addActionListener(e -> limpiarBusqueda());
+
         btnNotasEstudiante.addActionListener(e -> {
-            if(onNotasEstudiante != null) onNotasEstudiante.run();
+            if (onNotasEstudiante != null) {
+                onNotasEstudiante.run();
+            }
         });
 
         btnNotasGrupo.addActionListener(e -> {
-            if(onNotasGrupo != null) onNotasGrupo.run();
+            if (onNotasGrupo != null) {
+                onNotasGrupo.run();
+            }
         });
 
         btnEliminarEstudianteGrupo.addActionListener(e -> {
-            if(onEliminarEstudianteGrupo != null) onEliminarEstudianteGrupo.run();
+            if (onEliminarEstudianteGrupo != null) {
+                onEliminarEstudianteGrupo.run();
+            }
         });
+    }
+
+    private void limpiarBusqueda() {
+        sorter.setRowFilter(null);
+        sorter.setSortKeys(null);
+        tabla.clearSelection();
+        txtBuscar.setText(PLACEHOLDER_BUSCAR);
+        txtBuscar.setForeground(Color.GRAY);
+    }
+
+    private void mostrarDialogoRegistro() {
+        JTextField idEstudiante = new JTextField(20);
+        JTextField idGrupo = new JTextField(20);
+        JTextField notaFinal = new JTextField(20);
+        JComboBox<String> estado = new JComboBox<>(ESTADOS);
+
+        JPanel panel = buildPanelFormulario(idEstudiante, idGrupo, notaFinal, estado);
+
+        int opcion = JOptionPane.showOptionDialog(
+                this,
+                panel,
+                "Registrar inscripcion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new String[]{"Guardar", "Cancelar"},
+                "Guardar"
+        );
+
+        if (opcion == JOptionPane.YES_OPTION) {
+            txtIdEstudiante.setText(idEstudiante.getText().trim());
+            txtIdGrupo.setText(idGrupo.getText().trim());
+            txtNotaFinal.setText(notaFinal.getText().trim());
+            cmbEstado.setSelectedItem(estado.getSelectedItem());
+            if (onRegistrar != null) {
+                onRegistrar.run();
+            }
+        }
+    }
+
+    private void mostrarDialogoActualizar() {
+        int idSeleccionado = getIdSeleccionado();
+        if (idSeleccionado < 0) {
+            mostrarError("Selecciona una inscripcion para modificar.");
+            return;
+        }
+
+        int filaVista = tabla.getSelectedRow();
+        int fila = tabla.convertRowIndexToModel(filaVista);
+
+        String idEstudiante = String.valueOf(modeloTabla.getValueAt(fila, 1));
+        String idGrupo = String.valueOf(modeloTabla.getValueAt(fila, 3));
+        Object nota = modeloTabla.getValueAt(fila, 8);
+        String notaFinal = SIN_NOTA.equals(nota) ? "" : String.valueOf(nota);
+        String estadoActual = String.valueOf(modeloTabla.getValueAt(fila, 9));
+
+        JTextField idEstudianteField = new JTextField(idEstudiante, 20);
+        JTextField idGrupoField = new JTextField(idGrupo, 20);
+        JTextField notaFinalField = new JTextField(notaFinal, 20);
+        JComboBox<String> estadoField = new JComboBox<>(ESTADOS);
+        estadoField.setSelectedItem(estadoActual);
+
+        JPanel panel = buildPanelFormulario(idEstudianteField, idGrupoField, notaFinalField, estadoField);
+
+        int opcion = JOptionPane.showOptionDialog(
+                this,
+                panel,
+                "Modificar inscripcion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new String[]{"Guardar", "Cancelar"},
+                "Guardar"
+        );
+
+        if (opcion == JOptionPane.YES_OPTION) {
+            txtIdEstudiante.setText(idEstudianteField.getText().trim());
+            txtIdGrupo.setText(idGrupoField.getText().trim());
+            txtNotaFinal.setText(notaFinalField.getText().trim());
+            cmbEstado.setSelectedItem(estadoField.getSelectedItem());
+            if (onActualizar != null) {
+                onActualizar.run();
+            }
+        }
+    }
+
+    private JPanel buildPanelFormulario(
+            JTextField idEstudiante,
+            JTextField idGrupo,
+            JTextField notaFinal,
+            JComboBox<String> estado
+    ) {
+        JPanel panel = new JPanel(new GridLayout(0, 1, 6, 6));
+        panel.add(new JLabel("ID Estudiante:"));
+        panel.add(idEstudiante);
+        panel.add(new JLabel("ID Grupo:"));
+        panel.add(idGrupo);
+        panel.add(new JLabel("Nota Final:"));
+        panel.add(notaFinal);
+        panel.add(new JLabel("Estado:"));
+        panel.add(estado);
+        return panel;
     }
 
     private void precargarCamposDesdeSeleccion() {
         int filaVista = tabla.getSelectedRow();
-        if(filaVista < 0) return;
+        if (filaVista < 0) return;
         int fila = tabla.convertRowIndexToModel(filaVista);
 
         txtIdEstudiante.setText(String.valueOf(modeloTabla.getValueAt(fila, 1)));
@@ -268,25 +456,25 @@ public class VistaInscripcionCursoSwing extends JPanel {
     public void cargarInscripciones(List<InscripcionCurso> inscripciones) {
         modeloTabla.setRowCount(0);
 
-        for(InscripcionCurso i : inscripciones) {
+        for (InscripcionCurso i : inscripciones) {
             modeloTabla.addRow(new Object[]{
-                i.getId(),
-                i.getEstudiante().getId(),
-                i.getEstudiante().getNombre()+ " " +i.getEstudiante().getApellido(),
-                i.getGrupo().getId(),
-                i.getGrupo().getMateria().getNombreMateria(),
-                i.getGrupo().getDocente().getNombre(),
-                i.getGrupo().getAula(),
-                i.getGrupo().getHorario(),
-                i.getNotaFinal() != null ? i.getNotaFinal() : SIN_NOTA,
-                i.getEstado()
+                    i.getId(),
+                    i.getEstudiante().getId(),
+                    i.getEstudiante().getNombre() + " " + i.getEstudiante().getApellido(),
+                    i.getGrupo().getId(),
+                    i.getGrupo().getMateria().getNombreMateria(),
+                    i.getGrupo().getDocente().getNombre(),
+                    i.getGrupo().getAula(),
+                    i.getGrupo().getHorario(),
+                    i.getNotaFinal() != null ? i.getNotaFinal() : SIN_NOTA,
+                    i.getEstado()
             });
         }
     }
 
     public int getIdSeleccionado() {
         int filaVista = tabla.getSelectedRow();
-        if(filaVista < 0) return -1;
+        if (filaVista < 0) return -1;
         int fila = tabla.convertRowIndexToModel(filaVista);
         return (int) modeloTabla.getValueAt(fila, 0);
     }
@@ -326,34 +514,34 @@ public class VistaInscripcionCursoSwing extends JPanel {
         panel.add(txtGrupo);
 
         int opcion = JOptionPane.showConfirmDialog(
-            this,
-            panel,
-            "Quitar estudiante de grupo",
-            JOptionPane.OK_CANCEL_OPTION,
-            JOptionPane.QUESTION_MESSAGE
+                this,
+                panel,
+                "Quitar estudiante de grupo",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE
         );
 
-        if(opcion != JOptionPane.OK_OPTION) return null;
+        if (opcion != JOptionPane.OK_OPTION) return null;
 
         try {
             return new int[]{
-                Integer.parseInt(txtEstudiante.getText().trim()),
-                Integer.parseInt(txtGrupo.getText().trim())
+                    Integer.parseInt(txtEstudiante.getText().trim()),
+                    Integer.parseInt(txtGrupo.getText().trim())
             };
-        } catch(NumberFormatException ex) {
-            mostrarError("Los IDs deben ser números enteros.");
+        } catch (NumberFormatException ex) {
+            mostrarError("Los IDs deben ser numeros enteros.");
             return null;
         }
     }
 
     private Integer solicitarEntero(String mensaje) {
         String valor = JOptionPane.showInputDialog(this, mensaje);
-        if(valor == null) return null;
+        if (valor == null) return null;
 
         try {
             return Integer.parseInt(valor.trim());
-        } catch(NumberFormatException ex) {
-            mostrarError("El valor ingresado debe ser un número entero.");
+        } catch (NumberFormatException ex) {
+            mostrarError("El valor ingresado debe ser un numero entero.");
             return null;
         }
     }
@@ -367,7 +555,7 @@ public class VistaInscripcionCursoSwing extends JPanel {
     }
 
     public void mostrarMensaje(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Sistema Académico UNIAJC", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, mensaje, "Sistema Academico UNIAJC", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void mostrarError(String mensaje) {
