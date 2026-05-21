@@ -47,23 +47,17 @@ public class VistaPrincipalSwing extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBackground(new Color(41, 128, 185));
         menuBar.setOpaque(true);
-        menuBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+        menuBar.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 
-        JMenu menuArchivo = new JMenu("Archivo");
-        menuArchivo.setForeground(Color.WHITE);
-        menuArchivo.setFont(new Font("Segoe UI", Font.BOLD, 13));
-
+        JMenu menuArchivo = createTopMenu("Archivo");
         JMenuItem itemInicio = buildMenuItem("Inicio", CARD_INICIO);
-        JMenuItem itemConfiguracion = new JMenuItem("Configuración");
-        JMenuItem itemSalir = new JMenuItem("Salir");
+        JMenuItem itemConfiguracion = createMenuItem("Configuración");
+        JMenuItem itemSalir = createMenuItem("Salir");
 
-        itemConfiguracion.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         itemConfiguracion.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 "Funcionalidad de configuración en desarrollo.",
                 "Configuración",
                 JOptionPane.INFORMATION_MESSAGE));
-
-        itemSalir.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         itemSalir.addActionListener(e -> System.exit(0));
 
         menuArchivo.add(itemInicio);
@@ -71,20 +65,44 @@ public class VistaPrincipalSwing extends JFrame {
         menuArchivo.addSeparator();
         menuArchivo.add(itemSalir);
 
-        JMenu menuGestion = new JMenu("Gestión");
-        menuGestion.setForeground(Color.WHITE);
-        menuGestion.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        menuGestion.add(buildMenuItem("Estudiantes", CARD_ESTUDIANTES));
-        menuGestion.add(buildMenuItem("Docentes", CARD_DOCENTES));
-        menuGestion.add(buildMenuItem("Materias", CARD_MATERIAS));
-        menuGestion.add(buildMenuItem("Grupos", CARD_GRUPOS));
-        menuGestion.add(buildMenuItem("Inscripciones", CARD_INSCRIPCIONES));
-
         menuBar.add(menuArchivo);
-        menuBar.add(menuGestion);
-        menuBar.add(Box.createHorizontalGlue());
+        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(createTopMenu("Estudiante", "Gestión de Estudiantes", CARD_ESTUDIANTES));
+        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(createTopMenu("Docente", "Gestión de Docentes", CARD_DOCENTES));
+        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(createTopMenu("Materia", "Gestión de Materias", CARD_MATERIAS));
+        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(createTopMenu("Grupo", "Gestión de Grupos", CARD_GRUPOS));
+        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(createTopMenu("Inscripción", "Gestión de Inscripciones", CARD_INSCRIPCIONES));
 
         return menuBar;
+    }
+
+    private JMenu createTopMenu(String text) {
+        JMenu menu = new JMenu(text);
+        menu.setForeground(Color.WHITE);
+        menu.setBackground(new Color(41, 128, 185));
+        menu.setOpaque(true);
+        menu.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        menu.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+        return menu;
+    }
+
+    private JMenu createTopMenu(String text, String itemText, String cardName) {
+        JMenu menu = createTopMenu(text);
+        JMenuItem item = buildMenuItem(itemText, cardName);
+        menu.add(item);
+        return menu;
+    }
+
+    private JMenuItem createMenuItem(String text) {
+        JMenuItem item = new JMenuItem(text);
+        item.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        item.setBackground(Color.WHITE);
+        item.setForeground(Color.BLACK);
+        return item;
     }
 
     private JMenuItem buildMenuItem(String text, String cardName) {
@@ -129,7 +147,7 @@ public class VistaPrincipalSwing extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(4, 8, 4, 8);
         gbc.anchor = GridBagConstraints.CENTER;
 
         JLabel label = new JLabel("Bienvenido al Sistema Académico UNIAJC");
@@ -140,11 +158,15 @@ public class VistaPrincipalSwing extends JFrame {
         subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         subtitle.setForeground(new Color(96, 125, 139));
 
+        JLabel versionLabel = new JLabel("Versión 1.0");
+        versionLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
+        versionLabel.setForeground(new Color(129, 140, 150));
+
         panel.add(label, gbc);
         gbc.gridy++;
-        panel.add(Box.createVerticalStrut(12), gbc);
-        gbc.gridy++;
         panel.add(subtitle, gbc);
+        gbc.gridy++;
+        panel.add(versionLabel, gbc);
 
         return panel;
     }
