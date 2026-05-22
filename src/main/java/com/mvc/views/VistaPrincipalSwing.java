@@ -2,6 +2,7 @@ package com.mvc.views;
 
 import com.mvc.controllers.*;
 import com.mvc.dao.*;
+import com.mvc.models.Usuario;
 import com.mvc.services.*;
 
 import javax.swing.*;
@@ -27,13 +28,28 @@ public class VistaPrincipalSwing extends JFrame {
     private final JPanel panelGruposPrueba;
     private final JPanel panelInscripcionesPrueba;
 
+    private final Usuario usuarioActual;
+
     public VistaPrincipalSwing() {
         this(null, null, null, null, null, null);
+    }
+
+    public VistaPrincipalSwing(Usuario usuario) {
+        super("Sistema Académico UNIAJC");
+        this.usuarioActual = usuario;
+        this.panelInicioPrueba = null;
+        this.panelEstudiantesPrueba = null;
+        this.panelDocentesPrueba = null;
+        this.panelMateriasPrueba = null;
+        this.panelGruposPrueba = null;
+        this.panelInscripcionesPrueba = null;
+        initComponents();
     }
 
     VistaPrincipalSwing(JPanel panelInicio, JPanel panelEstudiantes, JPanel panelDocentes,
                         JPanel panelMaterias, JPanel panelGrupos, JPanel panelInscripciones) {
         super("Sistema Académico UNIAJC");
+        this.usuarioActual = null;
         this.panelInicioPrueba = panelInicio;
         this.panelEstudiantesPrueba = panelEstudiantes;
         this.panelDocentesPrueba = panelDocentes;
@@ -72,30 +88,41 @@ public class VistaPrincipalSwing extends JFrame {
         JMenu menuArchivo = createTopMenu("Archivo");
         JMenuItem itemInicio = buildMenuItem("Inicio", CARD_INICIO);
         JMenuItem itemConfiguracion = createMenuItem("Configuración");
+        JMenuItem itemCerrarSesion  = createMenuItem("Cerrar sesión");
         JMenuItem itemSalir = createMenuItem("Salir");
 
         itemConfiguracion.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 "Funcionalidad de configuración en desarrollo.",
                 "Configuración",
                 JOptionPane.INFORMATION_MESSAGE));
+        itemCerrarSesion.addActionListener(e -> cerrarSesion());
         itemSalir.addActionListener(e -> System.exit(0));
 
         menuArchivo.add(itemInicio);
         menuArchivo.add(itemConfiguracion);
+        menuArchivo.add(itemCerrarSesion);
         menuArchivo.addSeparator();
         menuArchivo.add(itemSalir);
 
         menuBar.add(menuArchivo);
-        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(Box.createHorizontalStrut(3));
         menuBar.add(createTopMenu("Estudiante", "Gestión de Estudiantes", CARD_ESTUDIANTES));
-        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(Box.createHorizontalStrut(3));
         menuBar.add(createTopMenu("Docente", "Gestión de Docentes", CARD_DOCENTES));
-        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(Box.createHorizontalStrut(3));
         menuBar.add(createTopMenu("Materia", "Gestión de Materias", CARD_MATERIAS));
-        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(Box.createHorizontalStrut(3));
         menuBar.add(createTopMenu("Grupo", "Gestión de Grupos", CARD_GRUPOS));
-        menuBar.add(Box.createHorizontalStrut(1));
+        menuBar.add(Box.createHorizontalStrut(3));
         menuBar.add(createTopMenu("Inscripción", "Gestión de Inscripciones", CARD_INSCRIPCIONES));
+
+        if(usuarioActual != null) {
+            menuBar.add(Box.createHorizontalGlue());
+            JLabel lblRol = new JLabel(usuarioActual.getUsername()+ "  ·  " +usuarioActual.getRol()+ "  ");
+            lblRol.setForeground(Color.WHITE);
+            lblRol.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            menuBar.add(lblRol);
+        }
 
         return menuBar;
     }
@@ -148,7 +175,9 @@ public class VistaPrincipalSwing extends JFrame {
         title.setFont(new Font("Segoe UI", Font.BOLD, 26));
         title.setForeground(new Color(31, 58, 147));
 
-        JLabel subtitle = new JLabel("Bienvenido al Sistema Académico de UNIAJC. Selecciona una opción en el menú para comenzar.");
+        JLabel subtitle = new JLabel(usuarioActual != null
+            ? "Bienvenido, " +usuarioActual.getUsername()+ " (" +usuarioActual.getRol()+ "). Selecciona una opción en el menú para comenzar."
+            : "Bienvenido al Sistema Académico de UNIAJC. Selecciona una opción en el menú para comenzar.");
         subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         subtitle.setForeground(new Color(96, 125, 139));
 
@@ -207,37 +236,66 @@ public class VistaPrincipalSwing extends JFrame {
             return;
         }
 
+        boolean esAdmin = usuarioActual == null || usuarioActual.esAdministrador();
+
         panelContenido.add(crearPanelInicio(), CARD_INICIO);
 
         EstudianteDao estudianteDao = new EstudianteDao();
         EstudianteService estudianteService = new EstudianteService(estudianteDao);
         VistaEstudianteSwing vistaEstudiante = new VistaEstudianteSwing();
         new ControladorEstudiante(vistaEstudiante, estudianteService);
+        if (!esAdmin) vistaEstudiante.ocultarBotonEliminar();
 
         DocenteDao docenteDao = new DocenteDao();
         DocenteService docenteService = new DocenteService(docenteDao);
         VistaDocenteSwing vistaDocente = new VistaDocenteSwing();
         new ControladorDocente(vistaDocente, docenteService);
+        if (!esAdmin) vistaDocente.ocultarBotonEliminar();
 
         MateriaDao materiaDao = new MateriaDao();
         MateriaService materiaService = new MateriaService(materiaDao);
         VistaMateriaSwing vistaMateria = new VistaMateriaSwing();
         new ControladorMateria(vistaMateria, materiaService);
+        if (!esAdmin) vistaMateria.ocultarBotonEliminar();
 
         GrupoDao grupoDao = new GrupoDao();
         GrupoService grupoService = new GrupoService(grupoDao);
         VistaGrupoSwing vistaGrupo = new VistaGrupoSwing();
         new ControladorGrupo(vistaGrupo, grupoService, materiaService, docenteService);
+        if (!esAdmin) vistaGrupo.ocultarBotonEliminar();
 
         InscripcionCursoDao inscripcionCursoDao = new InscripcionCursoDao();
         InscripcionCursoService inscripcionCursoService = new InscripcionCursoService(inscripcionCursoDao);
         VistaInscripcionCursoSwing vistaInscripcionCurso = new VistaInscripcionCursoSwing();
         new ControladorInscripcionCurso(vistaInscripcionCurso, inscripcionCursoService, estudianteService, grupoService);
+        if (!esAdmin) vistaInscripcionCurso.ocultarBotonEliminar();
 
         panelContenido.add(vistaEstudiante, CARD_ESTUDIANTES);
         panelContenido.add(vistaDocente, CARD_DOCENTES);
         panelContenido.add(vistaMateria, CARD_MATERIAS);
         panelContenido.add(vistaGrupo, CARD_GRUPOS);
         panelContenido.add(vistaInscripcionCurso, CARD_INSCRIPCIONES);
+    }
+
+    private void cerrarSesion() {
+        int opcion = JOptionPane.showConfirmDialog(
+            this,
+            "¿Estás seguro de que deseas cerrar sesión?",
+            "Cerrar sesión",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (opcion != JOptionPane.YES_OPTION) return;
+
+        dispose();
+
+        SwingUtilities.invokeLater(() -> {
+            com.mvc.dao.UsuarioDao usuarioDao = new com.mvc.dao.UsuarioDao();
+            com.mvc.services.UsuarioService usuarioService = new com.mvc.services.UsuarioService(usuarioDao);
+            VistaLoginSwing vistaLogin = new VistaLoginSwing();
+            new com.mvc.controllers.ControladorLogin(vistaLogin, usuarioService);
+            vistaLogin.setVisible(true);
+        });
     }
 }
