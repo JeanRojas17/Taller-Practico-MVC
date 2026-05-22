@@ -403,6 +403,10 @@ public class VistaMateriaSwing extends JPanel {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
+    public void ocultarBotonEliminar() {
+        btnEliminar.setVisible(false);
+    }
+
     public void setOnRegistrar(Runnable r) {
         this.onRegistrar = r;
     }

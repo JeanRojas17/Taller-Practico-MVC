@@ -8,7 +8,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import javax.swing.RowFilter;
 
 import java.awt.*;
 import java.awt.event.FocusAdapter;
@@ -417,6 +416,10 @@ public class VistaEstudianteSwing extends JPanel {
 
     public void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void ocultarBotonEliminar() {
+        btnEliminar.setVisible(false);
     }
 
     public void setOnRegistrar(Runnable r) {
