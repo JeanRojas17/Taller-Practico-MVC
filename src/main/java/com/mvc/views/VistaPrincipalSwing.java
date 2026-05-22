@@ -91,10 +91,11 @@ public class VistaPrincipalSwing extends JFrame {
         JMenuItem itemCerrarSesion  = createMenuItem("Cerrar sesión");
         JMenuItem itemSalir = createMenuItem("Salir");
 
-        itemConfiguracion.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Funcionalidad de configuración en desarrollo.",
-                "Configuración",
-                JOptionPane.INFORMATION_MESSAGE));
+        itemConfiguracion.addActionListener(e -> {
+            com.mvc.dao.UsuarioDao uDao = new com.mvc.dao.UsuarioDao();
+            com.mvc.services.UsuarioService uService = new com.mvc.services.UsuarioService(uDao);
+            new com.mvc.views.DialogConfiguracion(this, usuarioActual, uService).setVisible(true);
+        });
         itemCerrarSesion.addActionListener(e -> cerrarSesion());
         itemSalir.addActionListener(e -> System.exit(0));
 

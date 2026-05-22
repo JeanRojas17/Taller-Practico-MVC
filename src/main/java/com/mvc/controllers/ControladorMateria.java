@@ -1,5 +1,6 @@
 package com.mvc.controllers;
 
+import com.mvc.config.ConfiguracionApp;
 import com.mvc.models.Materia;
 import com.mvc.services.MateriaService;
 import com.mvc.views.VistaMateriaSwing;
@@ -88,15 +89,17 @@ public class ControladorMateria {
             return;
         }
 
-        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
-            vista,
-            "Estás seguro de que deseas eliminar la materia con ID " +id+ "?",
-            "Confirmar eliminación",
-            javax.swing.JOptionPane.YES_NO_OPTION,
-            javax.swing.JOptionPane.WARNING_MESSAGE
-        );
+        if(ConfiguracionApp.getInstance().isConfirmarEliminacion()) {
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
+                vista,
+                "Estás seguro de que deseas eliminar la materia con ID " +id+ "?",
+                "Confirmar eliminación",
+                javax.swing.JOptionPane.YES_NO_OPTION,
+                javax.swing.JOptionPane.WARNING_MESSAGE
+            );
 
-        if(confirmacion != javax.swing.JOptionPane.YES_OPTION) return;
+            if (confirmacion != javax.swing.JOptionPane.YES_OPTION) return;
+        }
 
         try {
             service.eliminarMateria(id);

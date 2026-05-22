@@ -2,6 +2,7 @@ package com.mvc.controllers;
 
 import java.util.List;
 
+import com.mvc.config.ConfiguracionApp;
 import com.mvc.models.Estudiante;
 import com.mvc.models.Grupo;
 import com.mvc.models.InscripcionCurso;
@@ -57,10 +58,10 @@ public class ControladorInscripcionCurso {
 
         try {
             Estudiante estudiante = obtenerEstudiante(idEstudianteTexto);
-            if(estudiante == null) return;
+            if (estudiante == null) return;
 
             Grupo grupo = obtenerGrupo(idGrupoTexto);
-            if(grupo == null) return;
+            if (grupo == null) return;
 
             Float notaFinal = notaStr.isBlank() ? null : Float.parseFloat(notaStr);
             String estado = calcularEstado(notaStr, estadoElegido);
@@ -100,10 +101,10 @@ public class ControladorInscripcionCurso {
 
         try {
             Estudiante estudiante = obtenerEstudiante(idEstudianteTexto);
-            if(estudiante == null) return;
+            if (estudiante == null) return;
 
             Grupo grupo = obtenerGrupo(idGrupoTexto);
-            if(grupo == null) return;
+            if (grupo == null) return;
 
             Float notaFinal = notaStr.isBlank() ? null : Float.parseFloat(notaStr);
             String estado = calcularEstado(notaStr, estadoElegido);
@@ -129,15 +130,17 @@ public class ControladorInscripcionCurso {
             return;
         }
 
-        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
-            vista,
-            "Estas seguro de que deseas eliminar la inscripción con ID " +id+ "?",
-            "Confirmar eliminación",
-            javax.swing.JOptionPane.YES_NO_OPTION,
-            javax.swing.JOptionPane.WARNING_MESSAGE
-        );
+        if(ConfiguracionApp.getInstance().isConfirmarEliminacion()) {
+            int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
+                vista,
+                "Estas seguro de que deseas eliminar la inscripción con ID " +id+ "?",
+                "Confirmar eliminación",
+                javax.swing.JOptionPane.YES_NO_OPTION,
+                javax.swing.JOptionPane.WARNING_MESSAGE
+            );
 
-        if(confirmacion != javax.swing.JOptionPane.YES_OPTION) return;
+            if (confirmacion != javax.swing.JOptionPane.YES_OPTION) return;
+        }
 
         try {
             inscripcionService.eliminarInscripcion(id);
