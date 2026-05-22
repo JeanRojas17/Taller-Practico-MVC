@@ -1,6 +1,9 @@
 package com.mvc;
 
-import com.mvc.views.VistaPrincipalSwing;
+import com.mvc.controllers.ControladorLogin;
+import com.mvc.dao.UsuarioDao;
+import com.mvc.services.UsuarioService;
+import com.mvc.views.VistaLoginSwing;
 
 import javax.swing.*;
 
@@ -13,7 +16,11 @@ public class Main {
             } catch (Exception ignored) {
             }
 
-            new VistaPrincipalSwing().setVisible(true);
+            UsuarioDao usuarioDao = new UsuarioDao();
+            UsuarioService usuarioService = new UsuarioService(usuarioDao);
+            VistaLoginSwing vistaLogin = new VistaLoginSwing();
+            new ControladorLogin(vistaLogin, usuarioService);
+            vistaLogin.setVisible(true);
         });
     }
 }
