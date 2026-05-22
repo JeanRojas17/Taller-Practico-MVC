@@ -35,7 +35,6 @@ public class VistaInscripcionCursoSwing extends JPanel {
     private JButton btnRefrescar;
     private JButton btnNotasEstudiante;
     private JButton btnNotasGrupo;
-    private JButton btnEliminarEstudianteGrupo;
 
     private Runnable onRegistrar;
     private Runnable onActualizar;
@@ -43,13 +42,12 @@ public class VistaInscripcionCursoSwing extends JPanel {
     private Runnable onRefrescar;
     private Runnable onNotasEstudiante;
     private Runnable onNotasGrupo;
-    private Runnable onEliminarEstudianteGrupo;
 
     private static final String[] COLUMNAS = {
             "ID", "ID Estudiante", "Estudiante", "ID Grupo", "Materia", "Docente", "Aula", "Horario", "Nota Final", "Estado"
     };
     private static final String[] ESTADOS = {"Inscrito", "En curso", "Retirado"};
-    private static final String PLACEHOLDER_BUSCAR = "Buscar inscripcion...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar inscripcion...";
     private static final String SIN_NOTA = "Sin nota";
 
     public VistaInscripcionCursoSwing() {
@@ -117,7 +115,6 @@ public class VistaInscripcionCursoSwing extends JPanel {
         btnRefrescar = new JButton("Refrescar");
         btnNotasEstudiante = new JButton("Notas estudiante");
         btnNotasGrupo = new JButton("Notas grupo");
-        btnEliminarEstudianteGrupo = new JButton("Quitar estudiante");
 
         estilizarBotones();
 
@@ -151,12 +148,10 @@ public class VistaInscripcionCursoSwing extends JPanel {
         btnNotasEstudiante.setForeground(Color.WHITE);
         btnNotasGrupo.setBackground(new Color(0, 150, 136));
         btnNotasGrupo.setForeground(Color.WHITE);
-        btnEliminarEstudianteGrupo.setBackground(new Color(255, 152, 0));
-        btnEliminarEstudianteGrupo.setForeground(Color.WHITE);
 
         for (JButton btn : new JButton[]{
                 btnRegistrar, btnActualizar, btnEliminar, btnLimpiar, btnRefrescar,
-                btnNotasEstudiante, btnNotasGrupo, btnEliminarEstudianteGrupo
+                btnNotasEstudiante, btnNotasGrupo
         }) {
             btn.setFocusPainted(false);
             btn.setBorderPainted(false);
@@ -167,7 +162,6 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
         btnNotasEstudiante.setPreferredSize(new Dimension(145, 32));
         btnNotasGrupo.setPreferredSize(new Dimension(120, 32));
-        btnEliminarEstudianteGrupo.setPreferredSize(new Dimension(150, 32));
     }
 
     private JPanel buildPanelEncabezado() {
@@ -218,11 +212,10 @@ public class VistaInscripcionCursoSwing extends JPanel {
         accionesCrud.add(btnEliminar);
         accionesCrud.add(btnLimpiar);
 
-        JPanel accionesConsulta = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        JPanel accionesConsulta = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         accionesConsulta.setBackground(Color.WHITE);
         accionesConsulta.add(btnNotasEstudiante);
         accionesConsulta.add(btnNotasGrupo);
-        accionesConsulta.add(btnEliminarEstudianteGrupo);
 
         JPanel accionesIzq = new JPanel();
         accionesIzq.setBackground(Color.WHITE);
@@ -328,12 +321,6 @@ public class VistaInscripcionCursoSwing extends JPanel {
         btnNotasGrupo.addActionListener(e -> {
             if (onNotasGrupo != null) {
                 onNotasGrupo.run();
-            }
-        });
-
-        btnEliminarEstudianteGrupo.addActionListener(e -> {
-            if (onEliminarEstudianteGrupo != null) {
-                onEliminarEstudianteGrupo.run();
             }
         });
     }
@@ -503,37 +490,6 @@ public class VistaInscripcionCursoSwing extends JPanel {
         return solicitarEntero("Ingrese el ID del grupo:");
     }
 
-    public int[] solicitarDatosParaEliminarEstudianteDeGrupo() {
-        JTextField txtEstudiante = new JTextField(10);
-        JTextField txtGrupo = new JTextField(10);
-
-        JPanel panel = new JPanel(new GridLayout(2, 2, 8, 8));
-        panel.add(new JLabel("ID Estudiante:"));
-        panel.add(txtEstudiante);
-        panel.add(new JLabel("ID Grupo:"));
-        panel.add(txtGrupo);
-
-        int opcion = JOptionPane.showConfirmDialog(
-                this,
-                panel,
-                "Quitar estudiante de grupo",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-
-        if (opcion != JOptionPane.OK_OPTION) return null;
-
-        try {
-            return new int[]{
-                    Integer.parseInt(txtEstudiante.getText().trim()),
-                    Integer.parseInt(txtGrupo.getText().trim())
-            };
-        } catch (NumberFormatException ex) {
-            mostrarError("Los IDs deben ser numeros enteros.");
-            return null;
-        }
-    }
-
     private Integer solicitarEntero(String mensaje) {
         String valor = JOptionPane.showInputDialog(this, mensaje);
         if (valor == null) return null;
@@ -584,9 +540,5 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
     public void setOnNotasGrupo(Runnable r) {
         this.onNotasGrupo = r;
-    }
-
-    public void setOnEliminarEstudianteGrupo(Runnable r) {
-        this.onEliminarEstudianteGrupo = r;
     }
 }

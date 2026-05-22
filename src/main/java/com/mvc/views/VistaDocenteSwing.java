@@ -38,7 +38,7 @@ public class VistaDocenteSwing extends JPanel {
     private Runnable onRefrescar;
 
     private static final String[] COLUMNAS = {"ID", "Nombre", "Especialidad"};
-    private static final String PLACEHOLDER_BUSCAR = "Buscar docente...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar docente...";
 
     public VistaDocenteSwing() {
         initComponents();

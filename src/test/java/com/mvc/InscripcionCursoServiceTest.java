@@ -110,13 +110,4 @@ class InscripcionCursoServiceTest {
         verify(inscripcionCursoDao).obtenerInscripcionesPorGrupo(1);
         verifyNoMoreInteractions(inscripcionCursoDao);
     }
-
-    @Test
-    @DisplayName("Elimina un estudiante de un grupo delegando en el DAO")
-    void eliminarEstudianteDeGrupo_delegaEnDao() {
-        inscripcionCursoService.eliminarEstudianteDeGrupo(1, 1);
-
-        verify(inscripcionCursoDao).eliminarInscripcionPorEstudianteYGrupo(1, 1);
-        verifyNoMoreInteractions(inscripcionCursoDao);
-    }
 }

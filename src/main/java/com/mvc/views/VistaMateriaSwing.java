@@ -38,7 +38,7 @@ public class VistaMateriaSwing extends JPanel {
     private Runnable onRefrescar;
 
     private static final String[] COLUMNAS = {"ID", "Nombre", "Creditos"};
-    private static final String PLACEHOLDER_BUSCAR = "Buscar materia...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar materia...";
 
     public VistaMateriaSwing() {
         initComponents();

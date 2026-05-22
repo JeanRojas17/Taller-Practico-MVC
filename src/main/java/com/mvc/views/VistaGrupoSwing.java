@@ -42,7 +42,7 @@ public class VistaGrupoSwing extends JPanel {
     private static final String[] COLUMNAS = {
             "ID", "ID Materia", "Materia", "ID Docente", "Docente", "Aula", "Horario"
     };
-    private static final String PLACEHOLDER_BUSCAR = "Buscar grupo...";
+    private static final String PLACEHOLDER_BUSCAR = "🔍 Buscar grupo...";
 
     public VistaGrupoSwing() {
         initComponents();

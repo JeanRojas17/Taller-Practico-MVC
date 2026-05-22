@@ -31,7 +31,6 @@ public class ControladorInscripcionCurso {
         vista.setOnRefrescar(this::refrescar);
         vista.setOnNotasEstudiante(this::mostrarNotasPorEstudiante);
         vista.setOnNotasGrupo(this::mostrarNotasPorGrupo);
-        vista.setOnEliminarEstudianteGrupo(this::eliminarEstudianteDeGrupo);
 
         refrescar();
     }
@@ -178,35 +177,6 @@ public class ControladorInscripcionCurso {
 
         List<InscripcionCurso> inscripciones = inscripcionService.obtenerInscripcionesPorGrupo(idGrupo);
         vista.cargarInscripciones(inscripciones);
-    }
-
-    private void eliminarEstudianteDeGrupo() {
-        int[] datos = vista.solicitarDatosParaEliminarEstudianteDeGrupo();
-        if(datos == null) return;
-
-        int idEstudiante = datos[0];
-        int idGrupo = datos[1];
-
-        Estudiante estudiante = estudianteService.obtenerEstudiantePorId(idEstudiante);
-        Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
-
-        if(estudiante == null) {
-            vista.mostrarError("No se encontró un estudiante con el ID proporcionado.");
-            return;
-        }
-        if(grupo == null) {
-            vista.mostrarError("No se encontró un grupo con el ID proporcionado.");
-            return;
-        }
-
-        try {
-            inscripcionService.eliminarEstudianteDeGrupo(idEstudiante, idGrupo);
-            vista.mostrarMensaje("Estudiante eliminado del grupo exitosamente.");
-            vista.limpiarCampos();
-            refrescar();
-        } catch(Exception ex) {
-            vista.mostrarError("Error al eliminar estudiante del grupo: " +ex.getMessage());
-        }
     }
 
     private Estudiante obtenerEstudiante(String idEstudianteTexto) {
