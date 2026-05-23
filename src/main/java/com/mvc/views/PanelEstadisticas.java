@@ -1,6 +1,5 @@
 package com.mvc.views;
 
-import com.mvc.dao.*;
 import com.mvc.models.Auditoria;
 import com.mvc.services.*;
 
@@ -127,7 +126,7 @@ public class PanelEstadisticas extends JPanel {
         seccion.setAlignmentX(Component.LEFT_ALIGNMENT);
         seccion.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        JLabel lblTitulo = new JLabel("📋 Historial de actividad reciente");
+        JLabel lblTitulo = new JLabel("Historial de actividad reciente");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblTitulo.setForeground(new Color(31, 58, 147));
 

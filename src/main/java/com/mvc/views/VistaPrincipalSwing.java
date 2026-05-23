@@ -123,14 +123,6 @@ public class VistaPrincipalSwing extends JFrame {
         menuBar.add(Box.createHorizontalStrut(3));
         menuBar.add(createTopMenu("Inscripción", "Gestión de Inscripciones", CARD_INSCRIPCIONES));
 
-        if(usuarioActual != null) {
-            menuBar.add(Box.createHorizontalGlue());
-            JLabel lblRol = new JLabel(usuarioActual.getUsername()+ "  ·  " +usuarioActual.getRol()+ "  ");
-            lblRol.setForeground(Color.WHITE);
-            lblRol.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            menuBar.add(lblRol);
-        }
-
         return menuBar;
     }
 
@@ -210,11 +202,11 @@ public class VistaPrincipalSwing extends JFrame {
         String rol = usuarioActual != null ? usuarioActual.getRol() : "-";
         String hora = horaLogin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 
-        JLabel lblIzq = new JLabel("👤  " +usuario+ "   |   🛡  " +rol);
+        JLabel lblIzq = new JLabel(usuario+ "   |   " +rol);
         lblIzq.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblIzq.setForeground(new Color(189, 195, 199));
 
-        lblEstadoBarra = new JLabel("🕐 Sesión iniciada: " +hora);
+        lblEstadoBarra = new JLabel("Sesión iniciada: " +hora);
         lblEstadoBarra.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblEstadoBarra.setForeground(new Color(189, 195, 199));
 
