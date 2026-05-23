@@ -12,6 +12,7 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -30,6 +31,8 @@ public class VistaMateriaSwing extends JPanel {
     private JButton btnActualizar;
     private JButton btnEliminar;
     private JButton btnLimpiar;
+    private JButton btnExportarPDF;
+    private JButton btnExportarExcel;
     private JButton btnRefrescar;
 
     private Runnable onRegistrar;
@@ -57,9 +60,10 @@ public class VistaMateriaSwing extends JPanel {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 0 || columnIndex == 2) {
+                if(columnIndex == 0 || columnIndex == 2) {
                     return Integer.class;
                 }
+
                 return String.class;
             }
         };
@@ -96,6 +100,8 @@ public class VistaMateriaSwing extends JPanel {
         btnActualizar = new JButton("Actualizar");
         btnEliminar = new JButton("Eliminar");
         btnLimpiar = new JButton("Limpiar");
+        btnExportarPDF = new JButton("Exportar PDF");
+        btnExportarExcel = new JButton("Exportar Excel");
         btnRefrescar = new JButton("Refrescar");
 
         estilizarBotones();
@@ -127,7 +133,12 @@ public class VistaMateriaSwing extends JPanel {
         btnLimpiar.setBackground(new Color(158, 158, 158));
         btnLimpiar.setForeground(Color.WHITE);
 
-        for (JButton btn : new JButton[]{btnRegistrar, btnActualizar, btnEliminar, btnLimpiar, btnRefrescar}) {
+        btnExportarPDF.setBackground(new Color(142, 68, 173));
+        btnExportarPDF.setForeground(Color.WHITE);
+        btnExportarExcel.setBackground(new Color(39, 174, 96));
+        btnExportarExcel.setForeground(Color.WHITE);
+
+        for(JButton btn : new JButton[]{btnRegistrar, btnActualizar, btnEliminar, btnLimpiar, btnRefrescar, btnExportarPDF, btnExportarExcel}) {
             btn.setFocusPainted(false);
             btn.setBorderPainted(false);
             btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -186,6 +197,8 @@ public class VistaMateriaSwing extends JPanel {
 
         JPanel botonesDer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         botonesDer.setBackground(Color.WHITE);
+        botonesDer.add(btnExportarPDF);
+        botonesDer.add(btnExportarExcel);
         botonesDer.add(btnRefrescar);
 
         JPanel panelBotones = new JPanel(new BorderLayout());
@@ -206,7 +219,7 @@ public class VistaMateriaSwing extends JPanel {
         txtBuscar.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (txtBuscar.getText().equals(PLACEHOLDER_BUSCAR)) {
+                if(txtBuscar.getText().equals(PLACEHOLDER_BUSCAR)) {
                     txtBuscar.setText("");
                     txtBuscar.setForeground(Color.BLACK);
                 }
@@ -214,7 +227,7 @@ public class VistaMateriaSwing extends JPanel {
 
             @Override
             public void focusLost(FocusEvent e) {
-                if (txtBuscar.getText().isEmpty()) {
+                if(txtBuscar.getText().isEmpty()) {
                     txtBuscar.setForeground(Color.GRAY);
                     txtBuscar.setText(PLACEHOLDER_BUSCAR);
                 }
@@ -239,16 +252,17 @@ public class VistaMateriaSwing extends JPanel {
 
             private void filtrar() {
                 String texto = txtBuscar.getText().trim();
-                if (texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
+
+                if(texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
                     sorter.setRowFilter(null);
                 } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto));
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" +texto));
                 }
             }
         });
 
         tabla.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
+            if(!e.getValueIsAdjusting()) {
                 precargarCamposDesdeSeleccion();
             }
         });
@@ -258,19 +272,29 @@ public class VistaMateriaSwing extends JPanel {
         btnActualizar.addActionListener(e -> mostrarDialogoActualizar());
 
         btnEliminar.addActionListener(e -> {
-            if (onEliminar != null) {
+            if(onEliminar != null) {
                 onEliminar.run();
             }
         });
 
         btnRefrescar.addActionListener(e -> {
-            if (onRefrescar != null) {
+            if(onRefrescar != null) {
                 onRefrescar.run();
             }
+
             limpiarBusqueda();
         });
 
         btnLimpiar.addActionListener(e -> limpiarBusqueda());
+
+        btnExportarPDF.addActionListener(e ->
+            com.mvc.services.ExportadorService.exportarPDF(tabla, "Materias"));
+        btnExportarExcel.addActionListener(e ->
+            com.mvc.services.ExportadorService.exportarExcel(tabla, "Materias"));
+    }
+
+    public void ocultarBotonEliminar() {
+        btnEliminar.setVisible(false);
     }
 
     private void limpiarBusqueda() {
@@ -302,10 +326,11 @@ public class VistaMateriaSwing extends JPanel {
                 "Guardar"
         );
 
-        if (opcion == JOptionPane.YES_OPTION) {
+        if(opcion == JOptionPane.YES_OPTION) {
             txtNombreMateria.setText(nombre.getText().trim());
             txtCreditos.setText(creditos.getText().trim());
-            if (onRegistrar != null) {
+
+            if(onRegistrar != null) {
                 onRegistrar.run();
             }
         }
@@ -313,7 +338,8 @@ public class VistaMateriaSwing extends JPanel {
 
     private void mostrarDialogoActualizar() {
         int idSeleccionado = getIdSeleccionado();
-        if (idSeleccionado < 0) {
+
+        if(idSeleccionado < 0) {
             mostrarError("Selecciona una materia para modificar.");
             return;
         }
@@ -344,10 +370,11 @@ public class VistaMateriaSwing extends JPanel {
                 "Guardar"
         );
 
-        if (opcion == JOptionPane.YES_OPTION) {
+        if(opcion == JOptionPane.YES_OPTION) {
             txtNombreMateria.setText(nombreField.getText().trim());
             txtCreditos.setText(creditosField.getText().trim());
-            if (onActualizar != null) {
+            
+            if(onActualizar != null) {
                 onActualizar.run();
             }
         }
@@ -365,7 +392,7 @@ public class VistaMateriaSwing extends JPanel {
     public void cargarMaterias(List<Materia> materias) {
         modeloTabla.setRowCount(0);
 
-        for (Materia m : materias) {
+        for(Materia m : materias) {
             modeloTabla.addRow(new Object[]{
                     m.getId(),
                     m.getNombreMateria(),
@@ -401,10 +428,6 @@ public class VistaMateriaSwing extends JPanel {
 
     public void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-    }
-
-    public void ocultarBotonEliminar() {
-        btnEliminar.setVisible(false);
     }
 
     public void setOnRegistrar(Runnable r) {

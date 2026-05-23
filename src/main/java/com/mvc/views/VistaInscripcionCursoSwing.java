@@ -12,6 +12,7 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -35,6 +36,8 @@ public class VistaInscripcionCursoSwing extends JPanel {
     private JButton btnRefrescar;
     private JButton btnNotasEstudiante;
     private JButton btnNotasGrupo;
+    private JButton btnExportarPDF;
+    private JButton btnExportarExcel;
 
     private Runnable onRegistrar;
     private Runnable onActualizar;
@@ -67,9 +70,10 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 0 || columnIndex == 1 || columnIndex == 3) {
+                if(columnIndex == 0 || columnIndex == 1 || columnIndex == 3) {
                     return Integer.class;
                 }
+
                 return Object.class;
             }
         };
@@ -115,6 +119,8 @@ public class VistaInscripcionCursoSwing extends JPanel {
         btnRefrescar = new JButton("Refrescar");
         btnNotasEstudiante = new JButton("Notas estudiante");
         btnNotasGrupo = new JButton("Notas grupo");
+        btnExportarPDF = new JButton("Exportar PDF");
+        btnExportarExcel = new JButton("Exportar Excel");
 
         estilizarBotones();
 
@@ -149,9 +155,14 @@ public class VistaInscripcionCursoSwing extends JPanel {
         btnNotasGrupo.setBackground(new Color(0, 150, 136));
         btnNotasGrupo.setForeground(Color.WHITE);
 
-        for (JButton btn : new JButton[]{
+        btnExportarPDF.setBackground(new Color(142, 68, 173));
+        btnExportarPDF.setForeground(Color.WHITE);
+        btnExportarExcel.setBackground(new Color(39, 174, 96));
+        btnExportarExcel.setForeground(Color.WHITE);
+
+        for(JButton btn : new JButton[]{
                 btnRegistrar, btnActualizar, btnEliminar, btnLimpiar, btnRefrescar,
-                btnNotasEstudiante, btnNotasGrupo
+                btnNotasEstudiante, btnNotasGrupo, btnExportarPDF, btnExportarExcel
         }) {
             btn.setFocusPainted(false);
             btn.setBorderPainted(false);
@@ -224,8 +235,10 @@ public class VistaInscripcionCursoSwing extends JPanel {
         accionesIzq.add(Box.createVerticalStrut(8));
         accionesIzq.add(accionesConsulta);
 
-        JPanel botonesDer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        JPanel botonesDer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 20));
         botonesDer.setBackground(Color.WHITE);
+        botonesDer.add(btnExportarPDF);
+        botonesDer.add(btnExportarExcel);
         botonesDer.add(btnRefrescar);
 
         JPanel panelBotones = new JPanel(new BorderLayout());
@@ -246,7 +259,7 @@ public class VistaInscripcionCursoSwing extends JPanel {
         txtBuscar.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (txtBuscar.getText().equals(PLACEHOLDER_BUSCAR)) {
+                if(txtBuscar.getText().equals(PLACEHOLDER_BUSCAR)) {
                     txtBuscar.setText("");
                     txtBuscar.setForeground(Color.BLACK);
                 }
@@ -254,7 +267,7 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
             @Override
             public void focusLost(FocusEvent e) {
-                if (txtBuscar.getText().isEmpty()) {
+                if(txtBuscar.getText().isEmpty()) {
                     txtBuscar.setForeground(Color.GRAY);
                     txtBuscar.setText(PLACEHOLDER_BUSCAR);
                 }
@@ -279,16 +292,17 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
             private void filtrar() {
                 String texto = txtBuscar.getText().trim();
-                if (texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
+
+                if(texto.isEmpty() || texto.equals(PLACEHOLDER_BUSCAR)) {
                     sorter.setRowFilter(null);
                 } else {
-                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto));
+                    sorter.setRowFilter(RowFilter.regexFilter("(?i)" +texto));
                 }
             }
         });
 
         tabla.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
+            if(!e.getValueIsAdjusting()) {
                 precargarCamposDesdeSeleccion();
             }
         });
@@ -298,31 +312,41 @@ public class VistaInscripcionCursoSwing extends JPanel {
         btnActualizar.addActionListener(e -> mostrarDialogoActualizar());
 
         btnEliminar.addActionListener(e -> {
-            if (onEliminar != null) {
+            if(onEliminar != null) {
                 onEliminar.run();
             }
         });
 
         btnRefrescar.addActionListener(e -> {
-            if (onRefrescar != null) {
+            if(onRefrescar != null) {
                 onRefrescar.run();
             }
+
             limpiarBusqueda();
         });
 
         btnLimpiar.addActionListener(e -> limpiarBusqueda());
 
+        btnExportarPDF.addActionListener(e ->
+            com.mvc.services.ExportadorService.exportarPDF(tabla, "Inscripciones"));
+        btnExportarExcel.addActionListener(e ->
+            com.mvc.services.ExportadorService.exportarExcel(tabla, "Inscripciones"));
+
         btnNotasEstudiante.addActionListener(e -> {
-            if (onNotasEstudiante != null) {
+            if(onNotasEstudiante != null) {
                 onNotasEstudiante.run();
             }
         });
 
         btnNotasGrupo.addActionListener(e -> {
-            if (onNotasGrupo != null) {
+            if(onNotasGrupo != null) {
                 onNotasGrupo.run();
             }
         });
+    }
+
+    public void ocultarBotonEliminar() {
+        btnEliminar.setVisible(false);
     }
 
     private void limpiarBusqueda() {
@@ -352,12 +376,13 @@ public class VistaInscripcionCursoSwing extends JPanel {
                 "Guardar"
         );
 
-        if (opcion == JOptionPane.YES_OPTION) {
+        if(opcion == JOptionPane.YES_OPTION) {
             txtIdEstudiante.setText(idEstudiante.getText().trim());
             txtIdGrupo.setText(idGrupo.getText().trim());
             txtNotaFinal.setText(notaFinal.getText().trim());
             cmbEstado.setSelectedItem(estado.getSelectedItem());
-            if (onRegistrar != null) {
+
+            if(onRegistrar != null) {
                 onRegistrar.run();
             }
         }
@@ -365,7 +390,8 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
     private void mostrarDialogoActualizar() {
         int idSeleccionado = getIdSeleccionado();
-        if (idSeleccionado < 0) {
+
+        if(idSeleccionado < 0) {
             mostrarError("Selecciona una inscripcion para modificar.");
             return;
         }
@@ -398,12 +424,13 @@ public class VistaInscripcionCursoSwing extends JPanel {
                 "Guardar"
         );
 
-        if (opcion == JOptionPane.YES_OPTION) {
+        if(opcion == JOptionPane.YES_OPTION) {
             txtIdEstudiante.setText(idEstudianteField.getText().trim());
             txtIdGrupo.setText(idGrupoField.getText().trim());
             txtNotaFinal.setText(notaFinalField.getText().trim());
             cmbEstado.setSelectedItem(estadoField.getSelectedItem());
-            if (onActualizar != null) {
+            
+            if(onActualizar != null) {
                 onActualizar.run();
             }
         }
@@ -443,7 +470,7 @@ public class VistaInscripcionCursoSwing extends JPanel {
     public void cargarInscripciones(List<InscripcionCurso> inscripciones) {
         modeloTabla.setRowCount(0);
 
-        for (InscripcionCurso i : inscripciones) {
+        for(InscripcionCurso i : inscripciones) {
             modeloTabla.addRow(new Object[]{
                     i.getId(),
                     i.getEstudiante().getId(),
@@ -496,7 +523,7 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
         try {
             return Integer.parseInt(valor.trim());
-        } catch (NumberFormatException ex) {
+        } catch(NumberFormatException ex) {
             mostrarError("El valor ingresado debe ser un numero entero.");
             return null;
         }
@@ -516,10 +543,6 @@ public class VistaInscripcionCursoSwing extends JPanel {
 
     public void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-    }
-
-    public void ocultarBotonEliminar() {
-        btnEliminar.setVisible(false);
     }
 
     public void setOnRegistrar(Runnable r) {
