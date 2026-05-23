@@ -2,6 +2,7 @@ package com.mvc.controllers;
 
 import com.mvc.config.ConfiguracionApp;
 import com.mvc.models.Estudiante;
+import com.mvc.services.AuditoriaService;
 import com.mvc.services.EstudianteService;
 import com.mvc.views.VistaEstudianteSwing;
 
@@ -38,6 +39,7 @@ public class ControladorEstudiante {
             Estudiante nuevo = new Estudiante(0, nombre, apellido, correo);
 
             service.registrarEstudiante(nuevo);
+            AuditoriaService.getInstance().registrar("CREAR", "Estudiante", "Estudiante registrado: " +nombre+ " " +apellido);
             vista.mostrarMensaje("Estudiante registrado exitosamente.");
             vista.limpiarCampos();
             refrescar();
@@ -69,6 +71,7 @@ public class ControladorEstudiante {
             Estudiante actualizado = new Estudiante(id, nombre, apellido, correo);
 
             service.actualizarEstudiante(actualizado);
+            AuditoriaService.getInstance().registrar("ACTUALIZAR", "Estudiante", "Estudiante ID " +id+ " actualizado: " +nombre+ " " +apellido);
             vista.mostrarMensaje("Estudiante actualizado exitosamente.");
             vista.limpiarCampos();
             refrescar();
@@ -99,6 +102,7 @@ public class ControladorEstudiante {
 
         try {
             service.eliminarEstudiante(id);
+            AuditoriaService.getInstance().registrar("ELIMINAR", "Estudiante", "Estudiante ID " +id+ " eliminado.");
             vista.mostrarMensaje("Estudiante eliminado exitosamente.");
             vista.limpiarCampos();
             refrescar();

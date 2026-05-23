@@ -8,6 +8,9 @@ import com.mvc.services.*;
 import javax.swing.*;
 import java.awt.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class VistaPrincipalSwing extends JFrame {
 
     private static final String CARD_INICIO = "Inicio";
@@ -20,6 +23,8 @@ public class VistaPrincipalSwing extends JFrame {
     private CardLayout cardLayout;
     private JPanel panelContenido;
     private JPanel headerPanel;
+    private JLabel lblEstadoBarra;
+    private final LocalDateTime horaLogin = LocalDateTime.now();
 
     private final JPanel panelInicioPrueba;
     private final JPanel panelEstudiantesPrueba;
@@ -75,6 +80,7 @@ public class VistaPrincipalSwing extends JFrame {
         headerPanel = buildHeader();
         add(headerPanel, BorderLayout.NORTH);
         add(panelContenido, BorderLayout.CENTER);
+        add(buildStatusBar(), BorderLayout.SOUTH);
 
         showCard(CARD_INICIO);
     }
@@ -194,36 +200,32 @@ public class VistaPrincipalSwing extends JFrame {
         return header;
     }
 
+    private JPanel buildStatusBar() {
+        JPanel barra = new JPanel(new BorderLayout());
+        barra.setBackground(new Color(44, 62, 80));
+        barra.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+        barra.setPreferredSize(new Dimension(0, 28));
+
+        String usuario = usuarioActual != null ? usuarioActual.getUsername() : "sistema";
+        String rol = usuarioActual != null ? usuarioActual.getRol() : "-";
+        String hora = horaLogin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+
+        JLabel lblIzq = new JLabel("👤  " +usuario+ "   |   🛡  " +rol);
+        lblIzq.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblIzq.setForeground(new Color(189, 195, 199));
+
+        lblEstadoBarra = new JLabel("🕐 Sesión iniciada: " +hora);
+        lblEstadoBarra.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblEstadoBarra.setForeground(new Color(189, 195, 199));
+
+        barra.add(lblIzq, BorderLayout.WEST);
+        barra.add(lblEstadoBarra, BorderLayout.EAST);
+        return barra;
+    }
+
     private JPanel crearPanelInicio() {
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(242, 245, 249));
-        panel.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(4, 8, 4, 8);
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        JLabel label = new JLabel("Bienvenido al Sistema Académico UNIAJC");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        label.setForeground(new Color(31, 58, 147));
-
-        JLabel subtitle = new JLabel("Utiliza el menú para gestionar estudiantes, docentes, materias, grupos e inscripciones.");
-        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        subtitle.setForeground(new Color(96, 125, 139));
-
-        JLabel versionLabel = new JLabel("Versión 1.0");
-        versionLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
-        versionLabel.setForeground(new Color(129, 140, 150));
-
-        panel.add(label, gbc);
-        gbc.gridy++;
-        panel.add(subtitle, gbc);
-        gbc.gridy++;
-        panel.add(versionLabel, gbc);
-
-        return panel;
+        String username = usuarioActual != null ? usuarioActual.getUsername() : null;
+        return new PanelEstadisticas(username);
     }
 
     private void registrarPaneles() {

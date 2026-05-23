@@ -13,7 +13,6 @@ import com.mvc.models.*;
 
 public class InscripcionCursoDao {
 
-    // Método auxiliar para construir una InscripcionCurso completa desde un ResultSet
     private InscripcionCurso mapearInscripcion(ResultSet rs) throws SQLException {
 
         Estudiante estudiante = new Estudiante();
@@ -79,7 +78,6 @@ public class InscripcionCursoDao {
             JOIN "practica-mvc".docente    d ON g.id_docente     = d.id_docente
             """;
 
-    // INSERT
     public void guardarInscripcion(InscripcionCurso inscripcion) {
         String sql = "INSERT INTO \"practica-mvc\".inscripcion_curso (id_estudiante, id_grupo, nota_final, estado) VALUES (?, ?, ?, ?);";
 
@@ -102,7 +100,6 @@ public class InscripcionCursoDao {
         }
     }
 
-    // SELECT ALL
     public List<InscripcionCurso> obtenerTodasLasInscripciones() {
         List<InscripcionCurso> inscripciones = new ArrayList<>();
 
@@ -122,7 +119,6 @@ public class InscripcionCursoDao {
         return inscripciones;
     }
 
-    // SELECT BY ID
     public InscripcionCurso obtenerInscripcionPorId(int id) {
         InscripcionCurso inscripcion = null;
 
@@ -144,7 +140,6 @@ public class InscripcionCursoDao {
         return inscripcion;
     }
 
-    // UPDATE
     public void actualizarInscripcion(InscripcionCurso inscripcion) {
         String sql = "UPDATE \"practica-mvc\".inscripcion_curso SET id_estudiante = ?, id_grupo = ?, nota_final = ?, estado = ? WHERE id_inscripcion = ?;";
 
@@ -169,7 +164,6 @@ public class InscripcionCursoDao {
         }
     }
 
-    // DELETE
     public void eliminarInscripcion(int id) {
         String sql = "DELETE FROM \"practica-mvc\".inscripcion_curso WHERE id_inscripcion = ?;";
 
@@ -183,7 +177,6 @@ public class InscripcionCursoDao {
         }
     }
 
-    // SELECT por estudiante
     public List<InscripcionCurso> obtenerInscripcionesPorEstudiante(int idEstudiante) {
         List<InscripcionCurso> inscripciones = new ArrayList<>();
 
@@ -205,7 +198,6 @@ public class InscripcionCursoDao {
         return inscripciones;
     }
 
-    // SELECT por grupo
     public List<InscripcionCurso> obtenerInscripcionesPorGrupo(int idGrupo) {
         List<InscripcionCurso> inscripciones = new ArrayList<>();
 

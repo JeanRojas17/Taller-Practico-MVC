@@ -1,6 +1,7 @@
 package com.mvc.controllers;
 
 import com.mvc.models.Usuario;
+import com.mvc.services.AuditoriaService;
 import com.mvc.services.UsuarioService;
 import com.mvc.views.VistaLoginSwing;
 import com.mvc.views.VistaPrincipalSwing;
@@ -26,6 +27,9 @@ public class ControladorLogin {
                 vistaLogin.limpiarCampos();
                 return;
             }
+
+            AuditoriaService.getInstance().setUsuarioActivo(usuario.getUsername());
+            AuditoriaService.getInstance().registrar("CREAR", "Sesión", "Inicio de sesión como " +usuario.getRol());
 
             vistaLogin.setVisible(false);
             vistaLogin.dispose();

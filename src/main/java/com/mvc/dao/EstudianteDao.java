@@ -1,12 +1,10 @@
 package com.mvc.dao;
 
-// Importaciones necesarias para la conexión a la base de datos y consulta de datos a la tabla de estudiantes
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-// Importaciones necesarias para manejar listas de estudiantes
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +13,6 @@ import com.mvc.models.Estudiante;
 
 public class EstudianteDao {
 
-    // guardarEstudiante(Estudiante estudiante)
-    // INSERT INTO "practica-mvc".estudiantes (name, lastname, email) VALUES ('Gabriel', 'Perez', 'pepito@email.com');
     public void guardarEstudiante(Estudiante estudiante) {
         String sql = "INSERT INTO \"practica-mvc\".estudiante (nombre, apellido, email) VALUES (?, ?, ?);";
 
@@ -33,8 +29,6 @@ public class EstudianteDao {
         }
     }
 
-    // obtenerTodosLosEstudiantes()
-    // SELECT id, name, lastname, email FROM "practica-mvc".estudiantes;
     public List<Estudiante> obtenerTodosLosEstudiantes() {
         List<Estudiante> estudiantes = new ArrayList<Estudiante>();
         
@@ -61,8 +55,6 @@ public class EstudianteDao {
         return estudiantes;
     }
 
-    // obtenerEstudiantePorId(int id)
-    // SELECT id, name, lastname, email FROM "practica-mvc".estudiantes WHERE id = 2;
     public Estudiante obtenerEstudiantePorId(int id) {
         Estudiante estudiante = null;
         
@@ -88,10 +80,6 @@ public class EstudianteDao {
         return estudiante;
     }
 
-    // actualizarEstudiante(Estudiante estudiante)
-    // UPDATE "practica-mvc".estudiantes
-    // SET email = 'emailactualizado@example.com', lastname = 'nuevoapellido'
-    // WHERE id = 2;
     public void actualizarEstudiante(Estudiante estudiante) {
         String sql = "UPDATE \"practica-mvc\".estudiante SET nombre = ?, apellido = ?, email = ? WHERE id_estudiante = ?;";
 
@@ -108,8 +96,6 @@ public class EstudianteDao {
         }   
     }
     
-    // eliminarEstudiante(int id)
-    // DELETE FROM "practica-mvc".estudiante WHERE id = 1;
     public void eliminarEstudiante(int id) {
         String sql = "DELETE FROM \"practica-mvc\".estudiante WHERE id_estudiante = ?;";
 

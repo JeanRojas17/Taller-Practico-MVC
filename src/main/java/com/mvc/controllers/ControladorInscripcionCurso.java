@@ -6,6 +6,7 @@ import com.mvc.config.ConfiguracionApp;
 import com.mvc.models.Estudiante;
 import com.mvc.models.Grupo;
 import com.mvc.models.InscripcionCurso;
+import com.mvc.services.AuditoriaService;
 import com.mvc.services.EstudianteService;
 import com.mvc.services.GrupoService;
 import com.mvc.services.InscripcionCursoService;
@@ -69,6 +70,7 @@ public class ControladorInscripcionCurso {
             InscripcionCurso nueva = new InscripcionCurso(0, estudiante, grupo, notaFinal, estado);
 
             inscripcionService.registrarInscripcion(nueva);
+            AuditoriaService.getInstance().registrar("CREAR", "InscripcionCurso", "Inscripción registrada: Estudiante ID " +idEstudianteTexto+ ", Grupo ID " +idGrupoTexto+ ", Estado: " +estado);
             vista.mostrarMensaje("Inscripción registrada exitosamente. Estado: " +estado);
             vista.limpiarCampos();
             refrescar();
@@ -112,6 +114,7 @@ public class ControladorInscripcionCurso {
             InscripcionCurso actualizada = new InscripcionCurso(id, estudiante, grupo, notaFinal, estado);
 
             inscripcionService.actualizarInscripcion(actualizada);
+            AuditoriaService.getInstance().registrar("ACTUALIZAR", "InscripcionCurso", "Inscripción ID " +id+ " actualizada. Estado: " +estado);
             vista.mostrarMensaje("Inscripción actualizada exitosamente. Estado: " +estado);
             vista.limpiarCampos();
             refrescar();
@@ -144,6 +147,7 @@ public class ControladorInscripcionCurso {
 
         try {
             inscripcionService.eliminarInscripcion(id);
+            AuditoriaService.getInstance().registrar("ELIMINAR", "InscripcionCurso", "Inscripción ID " +id+ " eliminada.");
             vista.mostrarMensaje("Inscripción eliminada exitosamente.");
             vista.limpiarCampos();
             refrescar();

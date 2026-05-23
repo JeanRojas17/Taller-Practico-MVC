@@ -74,7 +74,6 @@ public class VistaEstudianteSwing extends JPanel {
         tabla.getColumnModel().getColumn(0).setPreferredWidth(60);
         tabla.getColumnModel().getColumn(0).setMaxWidth(80);
         
-        // Alinear ID a la izquierda
         DefaultTableCellRenderer rendererIzq = new DefaultTableCellRenderer();
         rendererIzq.setHorizontalAlignment(SwingConstants.LEFT);
         tabla.getColumnModel().getColumn(0).setCellRenderer(rendererIzq);

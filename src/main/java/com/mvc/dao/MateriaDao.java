@@ -13,7 +13,6 @@ import com.mvc.models.Materia;
 
 public class MateriaDao {
 
-    // INSERT
     public void guardarMateria(Materia materia) {
         String sql = "INSERT INTO \"practica-mvc\".materia (nombre_materia, creditos) VALUES (?, ?);";
 
@@ -29,7 +28,6 @@ public class MateriaDao {
         }
     }
 
-    // SELECT ALL
     public List<Materia> obtenerTodasLasMaterias() {
         List<Materia> materias = new ArrayList<>();
 
@@ -55,7 +53,6 @@ public class MateriaDao {
         return materias;
     }
 
-    // SELECT BY ID
     public Materia obtenerMateriaPorId(int id) {
         Materia materia = null;
 
@@ -81,7 +78,6 @@ public class MateriaDao {
         return materia;
     }
 
-    // UPDATE
     public void actualizarMateria(Materia materia) {
         String sql = "UPDATE \"practica-mvc\".materia SET nombre_materia = ?, creditos = ? WHERE id_materia = ?;";
 
@@ -98,7 +94,6 @@ public class MateriaDao {
         }
     }
 
-    // DELETE
     public void eliminarMateria(int id) {
         String sql = "DELETE FROM \"practica-mvc\".materia WHERE id_materia = ?;";
 

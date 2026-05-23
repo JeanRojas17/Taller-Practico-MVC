@@ -15,7 +15,6 @@ import com.mvc.models.Materia;
 
 public class GrupoDao {
 
-    // Método auxiliar para construir un Grupo completo desde un ResultSet
     private Grupo mapearGrupo(ResultSet rs) throws SQLException {
         Materia materia = new Materia();
 
@@ -40,8 +39,6 @@ public class GrupoDao {
         return grupo;
     }
 
-    // INSERT
-    // Solo guardamos los IDs de materia y docente como claves foráneas
     public void guardarGrupo(Grupo grupo) {
         String sql = "INSERT INTO \"practica-mvc\".grupo (id_materia, id_docente, aula, horario) VALUES (?, ?, ?, ?);";
 
@@ -59,7 +56,6 @@ public class GrupoDao {
         }
     }
 
-    // SELECT ALL con JOIN para traer nombre de materia y docente
     public List<Grupo> obtenerTodosLosGrupos() {
         List<Grupo> grupos = new ArrayList<>();
 
@@ -94,7 +90,6 @@ public class GrupoDao {
         return grupos;
     }
 
-    // SELECT BY ID con JOIN
     public Grupo obtenerGrupoPorId(int id) {
         Grupo grupo = null;
 
@@ -131,7 +126,6 @@ public class GrupoDao {
         return grupo;
     }
 
-    // UPDATE
     public void actualizarGrupo(Grupo grupo) {
         String sql = "UPDATE \"practica-mvc\".grupo SET id_materia = ?, id_docente = ?, aula = ?, horario = ? WHERE id_grupo = ?;";
 
@@ -150,7 +144,6 @@ public class GrupoDao {
         }
     }
 
-    // DELETE
     public void eliminarGrupo(int id) {
         String sql = "DELETE FROM \"practica-mvc\".grupo WHERE id_grupo = ?;";
 

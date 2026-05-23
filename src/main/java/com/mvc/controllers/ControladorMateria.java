@@ -2,6 +2,7 @@ package com.mvc.controllers;
 
 import com.mvc.config.ConfiguracionApp;
 import com.mvc.models.Materia;
+import com.mvc.services.AuditoriaService;
 import com.mvc.services.MateriaService;
 import com.mvc.views.VistaMateriaSwing;
 
@@ -38,6 +39,7 @@ public class ControladorMateria {
             Materia nueva = new Materia(0, nombreMateria, creditos);
 
             service.registrarMateria(nueva);
+            AuditoriaService.getInstance().registrar("CREAR", "Materia", "Materia registrada: " +nombreMateria+ " (" +creditosTexto+ " créditos)");
             vista.mostrarMensaje("Materia registrada exitosamente.");
             vista.limpiarCampos();
             refrescar();
@@ -71,6 +73,7 @@ public class ControladorMateria {
             Materia actualizada = new Materia(id, nombreMateria, creditos);
 
             service.actualizarMateria(actualizada);
+            AuditoriaService.getInstance().registrar("ACTUALIZAR", "Materia", "Materia ID " +id+ " actualizada: " +nombreMateria);
             vista.mostrarMensaje("Materia actualizada exitosamente.");
             vista.limpiarCampos();
             refrescar();
@@ -103,6 +106,7 @@ public class ControladorMateria {
 
         try {
             service.eliminarMateria(id);
+            AuditoriaService.getInstance().registrar("ELIMINAR", "Materia", "Materia ID " +id+ " eliminada.");
             vista.mostrarMensaje("Materia eliminada exitosamente.");
             vista.limpiarCampos();
             refrescar();

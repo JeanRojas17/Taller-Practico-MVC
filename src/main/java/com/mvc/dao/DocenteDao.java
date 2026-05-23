@@ -13,7 +13,6 @@ import com.mvc.models.Docente;
 
 public class DocenteDao {
 
-    // INSERT
     public void guardarDocente(Docente docente) {
         String sql = "INSERT INTO \"practica-mvc\".docente (nombre, especialidad) VALUES (?, ?);";
 
@@ -29,7 +28,6 @@ public class DocenteDao {
         }
     }
 
-    // SELECT ALL
     public List<Docente> obtenerTodosLosDocentes() {
         List<Docente> docentes = new ArrayList<>();
 
@@ -55,7 +53,6 @@ public class DocenteDao {
         return docentes;
     }
 
-    // SELECT BY ID
     public Docente obtenerDocentePorId(int id) {
         Docente docente = null;
 
@@ -80,7 +77,6 @@ public class DocenteDao {
         return docente;
     }
 
-    // UPDATE
     public void actualizarDocente(Docente docente) {
         String sql = "UPDATE \"practica-mvc\".docente SET nombre = ?, especialidad = ? WHERE id_docente = ?;";
 
@@ -96,7 +92,6 @@ public class DocenteDao {
         }
     }
 
-    // DELETE
     public void eliminarDocente(int id) {
         String sql = "DELETE FROM \"practica-mvc\".docente WHERE id_docente = ?;";
 

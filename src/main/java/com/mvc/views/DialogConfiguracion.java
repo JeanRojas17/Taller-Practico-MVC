@@ -49,17 +49,12 @@ public class DialogConfiguracion extends JDialog {
         add(buildFooter(), BorderLayout.SOUTH);
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // TAB 1 — Mi perfil
-    // ══════════════════════════════════════════════════════════════════════
-
     private JPanel buildTabPerfil() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(COLOR_FONDO);
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
-        // ── Cambiar nombre de usuario ─────────────────────────────────────
         JPanel panelUsername = buildSection("Cambiar nombre de usuario");
 
         JTextField txtNuevoUsername = buildField();
@@ -86,7 +81,6 @@ public class DialogConfiguracion extends JDialog {
             }
         });
 
-        // ── Cambiar contraseña ────────────────────────────────────────────
         JPanel panelPassword = buildSection("Cambiar contraseña");
 
         JPasswordField txtActual = buildPasswordField();
@@ -132,10 +126,6 @@ public class DialogConfiguracion extends JDialog {
         return panel;
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // TAB 2 — Preferencias
-    // ══════════════════════════════════════════════════════════════════════
-
     private JPanel buildTabPreferencias() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -168,16 +158,11 @@ public class DialogConfiguracion extends JDialog {
         return panel;
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // TAB 3 — Gestión de usuarios (solo Administrador)
-    // ══════════════════════════════════════════════════════════════════════
-
     private JPanel buildTabGestionUsuarios() {
         JPanel panel = new JPanel(new BorderLayout(0, 10));
         panel.setBackground(COLOR_FONDO);
         panel.setBorder(BorderFactory.createEmptyBorder(12, 16, 12, 16));
 
-        // ── Tabla ─────────────────────────────────────────────────────────
         String[] columnas = {"ID", "Usuario", "Contraseña", "Rol"};
         DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
             @Override
@@ -198,7 +183,6 @@ public class DialogConfiguracion extends JDialog {
 
         cargarTablaUsuarios(modelo);
 
-        // ── Formulario ────────────────────────────────────────────────────
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(COLOR_FONDO);
         GridBagConstraints g = new GridBagConstraints();
@@ -233,7 +217,6 @@ public class DialogConfiguracion extends JDialog {
         g.gridx = 1;
         form.add(cmbRol, g);
 
-        // ── Botones ───────────────────────────────────────────────────────
         JButton btnCrear = buildBoton("Crear", new Color(39, 174, 96));
         JButton btnActualizar = buildBoton("Actualizar", COLOR_PRIMARIO);
         JButton btnEliminar = buildBoton("Eliminar", new Color(192, 57, 43));
@@ -246,7 +229,6 @@ public class DialogConfiguracion extends JDialog {
         botones.add(btnEliminar);
         botones.add(btnLimpiar);
 
-        // Selección en tabla → rellena form
         tabla.getSelectionModel().addListSelectionListener(ev -> {
             if (ev.getValueIsAdjusting()) return;
             int fila = tabla.getSelectedRow();
@@ -256,7 +238,6 @@ public class DialogConfiguracion extends JDialog {
             cmbRol.setSelectedItem(modelo.getValueAt(fila, 3));
         });
 
-        // Crear
         btnCrear.addActionListener(e -> {
             try {
                 usuarioService.crearUsuario(txtUsername.getText().trim(), txtPassword.getText().trim(), (String) cmbRol.getSelectedItem());
@@ -268,7 +249,6 @@ public class DialogConfiguracion extends JDialog {
             }
         });
 
-        // Actualizar
         btnActualizar.addActionListener(e -> {
             int fila = tabla.getSelectedRow();
             if (fila < 0) {
@@ -288,7 +268,6 @@ public class DialogConfiguracion extends JDialog {
             }
         });
 
-        // Eliminar
         btnEliminar.addActionListener(e -> {
             int fila = tabla.getSelectedRow();
             if (fila < 0) {
@@ -312,7 +291,6 @@ public class DialogConfiguracion extends JDialog {
             }
         });
 
-        // Limpiar
         btnLimpiar.addActionListener(e -> limpiarForm(txtUsername, txtPassword, cmbRol, tabla));
 
         panel.add(scroll, BorderLayout.CENTER);
@@ -344,10 +322,6 @@ public class DialogConfiguracion extends JDialog {
         cmb.setSelectedIndex(0);
         tabla.clearSelection();
     }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // Footer y helpers de estilo
-    // ══════════════════════════════════════════════════════════════════════
 
     private JPanel buildFooter() {
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));

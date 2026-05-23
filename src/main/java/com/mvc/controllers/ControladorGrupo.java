@@ -4,6 +4,7 @@ import com.mvc.config.ConfiguracionApp;
 import com.mvc.models.Docente;
 import com.mvc.models.Grupo;
 import com.mvc.models.Materia;
+import com.mvc.services.AuditoriaService;
 import com.mvc.services.DocenteService;
 import com.mvc.services.GrupoService;
 import com.mvc.services.MateriaService;
@@ -53,6 +54,7 @@ public class ControladorGrupo {
             Grupo nuevo = new Grupo(0, materia, docente, aula, horario);
 
             grupoService.registrarGrupo(nuevo);
+            AuditoriaService.getInstance().registrar("CREAR", "Grupo", "Grupo registrado: Aula " +aula+ ", Horario " +horario);
             vista.mostrarMensaje("Grupo registrado exitosamente.");
             vista.limpiarCampos();
             refrescar();
@@ -93,6 +95,7 @@ public class ControladorGrupo {
             Grupo actualizado = new Grupo(id, materia, docente, aula, horario);
 
             grupoService.actualizarGrupo(actualizado);
+            AuditoriaService.getInstance().registrar("ACTUALIZAR", "Grupo", "Grupo ID " +id+ " actualizado: Aula " +aula);
             vista.mostrarMensaje("Grupo actualizado exitosamente.");
             vista.limpiarCampos();
             refrescar();
@@ -125,6 +128,7 @@ public class ControladorGrupo {
 
         try {
             grupoService.eliminarGrupo(id);
+            AuditoriaService.getInstance().registrar("ELIMINAR", "Grupo", "Grupo ID " +id+ " eliminado.");
             vista.mostrarMensaje("Grupo eliminado exitosamente.");
             vista.limpiarCampos();
             refrescar();

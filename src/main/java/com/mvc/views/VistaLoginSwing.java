@@ -49,12 +49,10 @@ public class VistaLoginSwing extends JFrame {
         card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(COLOR_BORDE, 1), BorderFactory.createEmptyBorder(36, 40, 32, 40)));
         card.setMaximumSize(new Dimension(360, 420));
 
-        // ── Logo / ícono superior ──────────────────────────────────────────
         JLabel lblIcono = new JLabel("🎓", SwingConstants.CENTER);
         lblIcono.setFont(new Font("SansSerif", Font.PLAIN, 48));
         lblIcono.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // ── Título ────────────────────────────────────────────────────────
         JLabel lblTitulo = new JLabel("Bienvenido", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 24));
         lblTitulo.setForeground(COLOR_TITULO);
@@ -65,12 +63,10 @@ public class VistaLoginSwing extends JFrame {
         lblSubtitulo.setForeground(COLOR_SUBTITULO);
         lblSubtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // ── Separador ────────────────────────────────────────────────────
         JSeparator sep = new JSeparator();
         sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         sep.setForeground(COLOR_BORDE);
 
-        // ── Campos ───────────────────────────────────────────────────────
         JPanel camposPanel = new JPanel();
         camposPanel.setLayout(new BoxLayout(camposPanel, BoxLayout.Y_AXIS));
         camposPanel.setBackground(COLOR_TARJETA);
@@ -105,7 +101,6 @@ public class VistaLoginSwing extends JFrame {
         camposPanel.add(Box.createVerticalStrut(4));
         camposPanel.add(txtPassword);
 
-        // ── Botones ───────────────────────────────────────────────────────
         btnIngresar = buildBoton("Ingresar", COLOR_BTN_INGRESO);
         btnCancelar = buildBoton("Cancelar", COLOR_BTN_CANCEL);
 
@@ -115,7 +110,6 @@ public class VistaLoginSwing extends JFrame {
         botonesPanel.add(btnIngresar);
         botonesPanel.add(btnCancelar);
 
-        // ── Ensamblar tarjeta ─────────────────────────────────────────────
         card.add(lblIcono);
         card.add(Box.createVerticalStrut(10));
         card.add(lblTitulo);
@@ -128,18 +122,14 @@ public class VistaLoginSwing extends JFrame {
         card.add(Box.createVerticalStrut(40));
         card.add(botonesPanel);
 
-        // ── Eventos ───────────────────────────────────────────────────────
         btnIngresar.addActionListener(e -> disparaIngreso());
         btnCancelar.addActionListener(e -> System.exit(0));
 
-        // Permitir Enter para ingresar
         txtUsuario.addActionListener(e -> disparaIngreso());
         txtPassword.addActionListener(e -> disparaIngreso());
 
         return card;
     }
-
-    // ── Helpers de estilo ─────────────────────────────────────────────────
 
     private JLabel buildLabel(String texto) {
         JLabel lbl = new JLabel(texto);
@@ -201,8 +191,6 @@ public class VistaLoginSwing extends JFrame {
         });
     }
 
-    // ── Lógica de disparo ─────────────────────────────────────────────────
-
     private void disparaIngreso() {
         String usuario = txtUsuario.getText().trim();
         String password = String.valueOf(txtPassword.getPassword()).trim();
@@ -214,8 +202,6 @@ public class VistaLoginSwing extends JFrame {
             onIngresar.accept(usuario, password);
         }
     }
-
-    // ── Métodos públicos para el controlador ──────────────────────────────
 
     public void setOnIngresar(BiConsumer<String, String> handler) {
         this.onIngresar = handler;
