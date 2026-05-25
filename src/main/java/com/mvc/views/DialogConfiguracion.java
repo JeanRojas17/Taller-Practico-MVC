@@ -15,15 +15,21 @@ public class DialogConfiguracion extends JDialog {
 
     private final Usuario usuarioActual;
     private final UsuarioService usuarioService;
+    private final java.util.function.Consumer<String> onUsernameActualizado;
 
     private static final Color COLOR_PRIMARIO = new Color(41, 128, 185);
     private static final Color COLOR_FONDO = new Color(242, 245, 249);
     private static final Color COLOR_BORDE = new Color(210, 215, 220);
 
     public DialogConfiguracion(JFrame parent, Usuario usuarioActual, UsuarioService usuarioService) {
+        this(parent, usuarioActual, usuarioService, null);
+    }
+
+    public DialogConfiguracion(JFrame parent, Usuario usuarioActual, UsuarioService usuarioService, java.util.function.Consumer<String> onUsernameActualizado) {
         super(parent, "Configuración", true);
         this.usuarioActual = usuarioActual;
         this.usuarioService = usuarioService;
+        this.onUsernameActualizado = onUsernameActualizado;
         initComponents();
     }
 
@@ -58,7 +64,7 @@ public class DialogConfiguracion extends JDialog {
         JPanel panelUsername = buildSection("Cambiar nombre de usuario");
 
         JTextField txtNuevoUsername = buildField();
-        JButton btnCambiarUsername = buildBoton("Guardar nombre de usuario", COLOR_PRIMARIO);
+        JButton btnCambiarUsername = buildBoton("Guardar", COLOR_PRIMARIO);
 
         panelUsername.add(buildLabel("Nuevo nombre de usuario"));
         panelUsername.add(Box.createVerticalStrut(4));
@@ -73,6 +79,7 @@ public class DialogConfiguracion extends JDialog {
                 usuarioService.cambiarUsername(usuarioActual.getId(), usuarioActual.getUsername(), nuevo);
                 usuarioActual.setUsername(nuevo);
                 txtNuevoUsername.setText("");
+                if (onUsernameActualizado != null) onUsernameActualizado.accept(nuevo);
                 JOptionPane.showMessageDialog(this,
                     "Nombre de usuario actualizado correctamente.",
                     "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -87,6 +94,7 @@ public class DialogConfiguracion extends JDialog {
         JPasswordField txtNueva = buildPasswordField();
         JPasswordField txtConfirm = buildPasswordField();
         JButton btnCambiarPassword = buildBoton("Guardar contraseña", COLOR_PRIMARIO);
+        btnCambiarPassword.setPreferredSize(new Dimension(170, 32));
 
         panelPassword.add(buildLabel("Contraseña actual"));
         panelPassword.add(Box.createVerticalStrut(4));
