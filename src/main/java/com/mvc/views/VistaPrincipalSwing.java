@@ -23,8 +23,14 @@ public class VistaPrincipalSwing extends JFrame {
     private CardLayout cardLayout;
     private JPanel panelContenido;
     private JPanel headerPanel;
-    private JLabel lblEstadoBarra;
-    private final LocalDateTime horaLogin = LocalDateTime.now();
+
+    private JLabel lblUsuarioBarra;
+    private JLabel lblRelojBarra;
+    private Timer timerReloj;
+
+    private PanelEstadisticas panelEstadisticas;
+
+    private JLabel lblHeaderSubtitle;
 
     private final JPanel panelInicioPrueba;
     private final JPanel panelEstudiantesPrueba;
@@ -83,6 +89,47 @@ public class VistaPrincipalSwing extends JFrame {
         add(buildStatusBar(), BorderLayout.SOUTH);
 
         showCard(CARD_INICIO);
+
+        iniciarReloj();
+    }
+
+    private void iniciarReloj() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+        timerReloj = new Timer(1000, e ->
+            lblRelojBarra.setText("Sesión iniciada: " +LocalDateTime.now().format(fmt))
+        );
+
+        timerReloj.setInitialDelay(0);
+        timerReloj.start();
+
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                timerReloj.stop();
+            }
+        });
+    }
+
+    public void onUsernameActualizado(String nuevoUsername) {
+        String rol = usuarioActual != null ? usuarioActual.getRol() : "-";
+        lblUsuarioBarra.setText(nuevoUsername+ "   |   " +rol);
+
+        if(lblHeaderSubtitle != null) {
+            lblHeaderSubtitle.setText(
+                "Bienvenido, " +nuevoUsername+ " (" +rol+ "). Selecciona una opción en el menú para comenzar."
+            );
+        }
+
+        if(panelEstadisticas != null) {
+            panelEstadisticas.actualizarUsername(nuevoUsername);
+        }
+    }
+
+    public void notificarCambiosDatos() {
+        if(panelEstadisticas != null) {
+            new Thread(() -> panelEstadisticas.refrescar(), "stats-refresh").start();
+        }
     }
 
     private JMenuBar buildMenuBar() {
@@ -100,7 +147,7 @@ public class VistaPrincipalSwing extends JFrame {
         itemConfiguracion.addActionListener(e -> {
             com.mvc.dao.UsuarioDao uDao = new com.mvc.dao.UsuarioDao();
             com.mvc.services.UsuarioService uService = new com.mvc.services.UsuarioService(uDao);
-            new com.mvc.views.DialogConfiguracion(this, usuarioActual, uService).setVisible(true);
+            new DialogConfiguracion(this, usuarioActual, uService, this::onUsernameActualizado).setVisible(true);
         });
         itemCerrarSesion.addActionListener(e -> cerrarSesion());
         itemSalir.addActionListener(e -> System.exit(0));
@@ -138,8 +185,7 @@ public class VistaPrincipalSwing extends JFrame {
 
     private JMenu createTopMenu(String text, String itemText, String cardName) {
         JMenu menu = createTopMenu(text);
-        JMenuItem item = buildMenuItem(itemText, cardName);
-        menu.add(item);
+        menu.add(buildMenuItem(itemText, cardName));
         return menu;
     }
 
@@ -174,18 +220,18 @@ public class VistaPrincipalSwing extends JFrame {
         title.setFont(new Font("Segoe UI", Font.BOLD, 26));
         title.setForeground(new Color(31, 58, 147));
 
-        JLabel subtitle = new JLabel(usuarioActual != null
+        lblHeaderSubtitle = new JLabel(usuarioActual != null
             ? "Bienvenido, " +usuarioActual.getUsername()+ " (" +usuarioActual.getRol()+ "). Selecciona una opción en el menú para comenzar."
             : "Bienvenido al Sistema Académico de UNIAJC. Selecciona una opción en el menú para comenzar.");
-        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        subtitle.setForeground(new Color(96, 125, 139));
+        lblHeaderSubtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblHeaderSubtitle.setForeground(new Color(96, 125, 139));
 
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setBackground(new Color(236, 240, 241));
         textPanel.add(title);
         textPanel.add(Box.createVerticalStrut(6));
-        textPanel.add(subtitle);
+        textPanel.add(lblHeaderSubtitle);
 
         header.add(textPanel, BorderLayout.WEST);
 
@@ -200,24 +246,19 @@ public class VistaPrincipalSwing extends JFrame {
 
         String usuario = usuarioActual != null ? usuarioActual.getUsername() : "sistema";
         String rol = usuarioActual != null ? usuarioActual.getRol() : "-";
-        String hora = horaLogin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 
-        JLabel lblIzq = new JLabel(usuario+ "   |   " +rol);
-        lblIzq.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblIzq.setForeground(new Color(189, 195, 199));
+        lblUsuarioBarra = new JLabel(usuario+ "   |   " +rol);
+        lblUsuarioBarra.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblUsuarioBarra.setForeground(new Color(189, 195, 199));
 
-        lblEstadoBarra = new JLabel("Sesión iniciada: " +hora);
-        lblEstadoBarra.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblEstadoBarra.setForeground(new Color(189, 195, 199));
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        lblRelojBarra = new JLabel("Sesión iniciada: " +LocalDateTime.now().format(fmt));
+        lblRelojBarra.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblRelojBarra.setForeground(new Color(189, 195, 199));
 
-        barra.add(lblIzq, BorderLayout.WEST);
-        barra.add(lblEstadoBarra, BorderLayout.EAST);
+        barra.add(lblUsuarioBarra, BorderLayout.WEST);
+        barra.add(lblRelojBarra, BorderLayout.EAST);
         return barra;
-    }
-
-    private JPanel crearPanelInicio() {
-        String username = usuarioActual != null ? usuarioActual.getUsername() : null;
-        return new PanelEstadisticas(username);
     }
 
     private void registrarPaneles() {
@@ -233,36 +274,40 @@ public class VistaPrincipalSwing extends JFrame {
 
         boolean esAdmin = usuarioActual == null || usuarioActual.esAdministrador();
 
-        panelContenido.add(crearPanelInicio(), CARD_INICIO);
+        panelEstadisticas = new PanelEstadisticas(usuarioActual != null ? usuarioActual.getUsername() : null);
+
+        panelContenido.add(panelEstadisticas, CARD_INICIO);
+
+        Runnable notificar = this::notificarCambiosDatos;
 
         EstudianteDao estudianteDao = new EstudianteDao();
         EstudianteService estudianteService = new EstudianteService(estudianteDao);
         VistaEstudianteSwing vistaEstudiante = new VistaEstudianteSwing();
-        new ControladorEstudiante(vistaEstudiante, estudianteService);
+        new ControladorEstudiante(vistaEstudiante, estudianteService, notificar);
         if (!esAdmin) vistaEstudiante.ocultarBotonEliminar();
 
         DocenteDao docenteDao = new DocenteDao();
         DocenteService docenteService = new DocenteService(docenteDao);
         VistaDocenteSwing vistaDocente = new VistaDocenteSwing();
-        new ControladorDocente(vistaDocente, docenteService);
+        new ControladorDocente(vistaDocente, docenteService, notificar);
         if (!esAdmin) vistaDocente.ocultarBotonEliminar();
 
         MateriaDao materiaDao = new MateriaDao();
         MateriaService materiaService = new MateriaService(materiaDao);
         VistaMateriaSwing vistaMateria = new VistaMateriaSwing();
-        new ControladorMateria(vistaMateria, materiaService);
+        new ControladorMateria(vistaMateria, materiaService, notificar);
         if (!esAdmin) vistaMateria.ocultarBotonEliminar();
 
         GrupoDao grupoDao = new GrupoDao();
         GrupoService grupoService = new GrupoService(grupoDao);
         VistaGrupoSwing vistaGrupo = new VistaGrupoSwing();
-        new ControladorGrupo(vistaGrupo, grupoService, materiaService, docenteService);
+        new ControladorGrupo(vistaGrupo, grupoService, materiaService, docenteService, notificar);
         if (!esAdmin) vistaGrupo.ocultarBotonEliminar();
 
         InscripcionCursoDao inscripcionCursoDao = new InscripcionCursoDao();
         InscripcionCursoService inscripcionCursoService = new InscripcionCursoService(inscripcionCursoDao);
         VistaInscripcionCursoSwing vistaInscripcionCurso = new VistaInscripcionCursoSwing();
-        new ControladorInscripcionCurso(vistaInscripcionCurso, inscripcionCursoService, estudianteService, grupoService);
+        new ControladorInscripcionCurso(vistaInscripcionCurso, inscripcionCursoService, estudianteService, grupoService, notificar);
         if (!esAdmin) vistaInscripcionCurso.ocultarBotonEliminar();
 
         panelContenido.add(vistaEstudiante, CARD_ESTUDIANTES);
@@ -283,6 +328,7 @@ public class VistaPrincipalSwing extends JFrame {
 
         if (opcion != JOptionPane.YES_OPTION) return;
 
+        timerReloj.stop();
         dispose();
 
         SwingUtilities.invokeLater(() -> {
