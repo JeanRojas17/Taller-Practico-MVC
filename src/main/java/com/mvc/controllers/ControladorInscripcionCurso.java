@@ -20,12 +20,18 @@ public class ControladorInscripcionCurso {
     private final InscripcionCursoService inscripcionService;
     private final EstudianteService estudianteService;
     private final GrupoService grupoService;
+    private final Runnable notificar;
 
     public ControladorInscripcionCurso(VistaInscripcionCursoSwing vista, InscripcionCursoService inscripcionService, EstudianteService estudianteService, GrupoService grupoService) {
+        this(vista, inscripcionService, estudianteService, grupoService, null);
+    }
+
+    public ControladorInscripcionCurso(VistaInscripcionCursoSwing vista, InscripcionCursoService inscripcionService, EstudianteService estudianteService, GrupoService grupoService, Runnable notificar) {
         this.vista = vista;
         this.inscripcionService = inscripcionService;
         this.estudianteService = estudianteService;
         this.grupoService = grupoService;
+        this.notificar = notificar;
 
         vista.setOnRegistrar(this::registrar);
         vista.setOnActualizar(this::actualizar);
@@ -74,6 +80,7 @@ public class ControladorInscripcionCurso {
             vista.mostrarMensaje("Inscripción registrada exitosamente. Estado: " +estado);
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(NumberFormatException ex) {
             vista.mostrarError("Los campos ID Estudiante e ID Grupo deben ser números enteros, y Nota Final debe ser numérica.");
         } catch(IllegalArgumentException ex) {
@@ -118,6 +125,7 @@ public class ControladorInscripcionCurso {
             vista.mostrarMensaje("Inscripción actualizada exitosamente. Estado: " +estado);
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(NumberFormatException ex) {
             vista.mostrarError("Los campos ID Estudiante e ID Grupo deben ser números enteros, y Nota Final debe ser numérica.");
         } catch(Exception ex) {
@@ -136,7 +144,7 @@ public class ControladorInscripcionCurso {
         if(ConfiguracionApp.getInstance().isConfirmarEliminacion()) {
             int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
                 vista,
-                "Estas seguro de que deseas eliminar la inscripción con ID " +id+ "?",
+                "¿Estas seguro de que deseas eliminar la inscripción con ID " +id+ "?",
                 "Confirmar eliminación",
                 javax.swing.JOptionPane.YES_NO_OPTION,
                 javax.swing.JOptionPane.WARNING_MESSAGE
@@ -151,6 +159,7 @@ public class ControladorInscripcionCurso {
             vista.mostrarMensaje("Inscripción eliminada exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(Exception ex) {
             vista.mostrarError("Error al eliminar: " +ex.getMessage());
         }
@@ -158,7 +167,7 @@ public class ControladorInscripcionCurso {
 
     private void mostrarNotasPorEstudiante() {
         Integer idEstudiante = vista.solicitarIdEstudianteParaConsulta();
-        if(idEstudiante == null) return;
+        if (idEstudiante == null) return;
 
         Estudiante estudiante = estudianteService.obtenerEstudiantePorId(idEstudiante);
 
@@ -173,7 +182,7 @@ public class ControladorInscripcionCurso {
 
     private void mostrarNotasPorGrupo() {
         Integer idGrupo = vista.solicitarIdGrupoParaConsulta();
-        if(idGrupo == null) return;
+        if (idGrupo == null) return;
 
         Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
 

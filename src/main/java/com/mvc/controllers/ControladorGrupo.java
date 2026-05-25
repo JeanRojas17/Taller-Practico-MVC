@@ -18,12 +18,18 @@ public class ControladorGrupo {
     private final GrupoService grupoService;
     private final MateriaService materiaService;
     private final DocenteService docenteService;
+    private final Runnable notificar;
 
     public ControladorGrupo(VistaGrupoSwing vista, GrupoService grupoService, MateriaService materiaService, DocenteService docenteService) {
+        this(vista, grupoService, materiaService, docenteService, null);
+    }
+
+    public ControladorGrupo(VistaGrupoSwing vista, GrupoService grupoService, MateriaService materiaService, DocenteService docenteService, Runnable notificar) {
         this.vista = vista;
         this.grupoService = grupoService;
         this.materiaService = materiaService;
         this.docenteService = docenteService;
+        this.notificar = notificar;
 
         vista.setOnRegistrar(this::registrar);
         vista.setOnActualizar(this::actualizar);
@@ -58,6 +64,7 @@ public class ControladorGrupo {
             vista.mostrarMensaje("Grupo registrado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(NumberFormatException ex) {
             vista.mostrarError("Los campos ID Materia e ID Docente deben ser números enteros.");
         } catch(IllegalArgumentException ex) {
@@ -99,6 +106,7 @@ public class ControladorGrupo {
             vista.mostrarMensaje("Grupo actualizado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(NumberFormatException ex) {
             vista.mostrarError("Los campos ID Materia e ID Docente deben ser números enteros.");
         } catch(Exception ex) {
@@ -117,7 +125,7 @@ public class ControladorGrupo {
         if(ConfiguracionApp.getInstance().isConfirmarEliminacion()) {
             int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
                 vista,
-                "Estás seguro de que deseas eliminar el grupo con ID " +id+ "?",
+                "¿Estás seguro de que deseas eliminar el grupo con ID " +id+ "?",
                 "Confirmar eliminación",
                 javax.swing.JOptionPane.YES_NO_OPTION,
                 javax.swing.JOptionPane.WARNING_MESSAGE
@@ -132,6 +140,7 @@ public class ControladorGrupo {
             vista.mostrarMensaje("Grupo eliminado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(Exception ex) {
             vista.mostrarError("Error al eliminar: " +ex.getMessage());
         }

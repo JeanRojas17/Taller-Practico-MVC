@@ -12,10 +12,16 @@ public class ControladorMateria {
 
     private final VistaMateriaSwing vista;
     private final MateriaService service;
+    private final Runnable notificar;
 
     public ControladorMateria(VistaMateriaSwing vista, MateriaService service) {
+        this(vista, service, null);
+    }
+
+    public ControladorMateria(VistaMateriaSwing vista, MateriaService service, Runnable notificar) {
         this.vista = vista;
         this.service = service;
+        this.notificar = notificar;
 
         vista.setOnRegistrar(this::registrar);
         vista.setOnActualizar(this::actualizar);
@@ -43,6 +49,7 @@ public class ControladorMateria {
             vista.mostrarMensaje("Materia registrada exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(NumberFormatException ex) {
             vista.mostrarError("El campo Créditos debe ser un número entero.");
         } catch(IllegalArgumentException ex) {
@@ -77,6 +84,7 @@ public class ControladorMateria {
             vista.mostrarMensaje("Materia actualizada exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(NumberFormatException ex) {
             vista.mostrarError("El campo Créditos debe ser un número entero.");
         } catch(Exception ex) {
@@ -95,7 +103,7 @@ public class ControladorMateria {
         if(ConfiguracionApp.getInstance().isConfirmarEliminacion()) {
             int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
                 vista,
-                "Estás seguro de que deseas eliminar la materia con ID " +id+ "?",
+                "¿Estás seguro de que deseas eliminar la materia con ID " +id+ "?",
                 "Confirmar eliminación",
                 javax.swing.JOptionPane.YES_NO_OPTION,
                 javax.swing.JOptionPane.WARNING_MESSAGE
@@ -110,6 +118,7 @@ public class ControladorMateria {
             vista.mostrarMensaje("Materia eliminada exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(Exception ex) {
             vista.mostrarError("Error al eliminar: " +ex.getMessage());
         }

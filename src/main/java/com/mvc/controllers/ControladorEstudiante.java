@@ -12,10 +12,16 @@ public class ControladorEstudiante {
 
     private final VistaEstudianteSwing vista;
     private final EstudianteService service;
+    private final Runnable notificar;
 
     public ControladorEstudiante(VistaEstudianteSwing vista, EstudianteService service) {
+        this(vista, service, null);
+    }
+
+    public ControladorEstudiante(VistaEstudianteSwing vista, EstudianteService service, Runnable notificar) {
         this.vista = vista;
         this.service = service;
+        this.notificar = notificar;
 
         vista.setOnRegistrar(this::registrar);
         vista.setOnActualizar(this::actualizar);
@@ -43,6 +49,7 @@ public class ControladorEstudiante {
             vista.mostrarMensaje("Estudiante registrado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(IllegalArgumentException ex) {
             vista.mostrarError(ex.getMessage());
         } catch(Exception ex) {
@@ -75,6 +82,7 @@ public class ControladorEstudiante {
             vista.mostrarMensaje("Estudiante actualizado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(Exception ex) {
             vista.mostrarError("Error al actualizar: " +ex.getMessage());
         }
@@ -106,6 +114,7 @@ public class ControladorEstudiante {
             vista.mostrarMensaje("Estudiante eliminado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch (Exception ex) {
             vista.mostrarError("Error al eliminar: " +ex.getMessage());
         }

@@ -12,10 +12,16 @@ public class ControladorDocente {
 
     private final VistaDocenteSwing vista;
     private final DocenteService service;
+    private final Runnable notificar;
 
     public ControladorDocente(VistaDocenteSwing vista, DocenteService service) {
+        this(vista, service, null);
+    }
+
+    public ControladorDocente(VistaDocenteSwing vista, DocenteService service, Runnable notificar) {
         this.vista = vista;
         this.service = service;
+        this.notificar = notificar;
 
         vista.setOnRegistrar(this::registrar);
         vista.setOnActualizar(this::actualizar);
@@ -42,6 +48,7 @@ public class ControladorDocente {
             vista.mostrarMensaje("Docente registrado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(IllegalArgumentException ex) {
             vista.mostrarError(ex.getMessage());
         } catch(Exception ex) {
@@ -73,6 +80,7 @@ public class ControladorDocente {
             vista.mostrarMensaje("Docente actualizado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(Exception ex) {
             vista.mostrarError("Error al actualizar: " +ex.getMessage());
         }
@@ -89,7 +97,7 @@ public class ControladorDocente {
         if(ConfiguracionApp.getInstance().isConfirmarEliminacion()) {
             int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
                 vista,
-                "Estás seguro de que deseas eliminar el docente con ID " +id+ "?",
+                "¿Estás seguro de que deseas eliminar el docente con ID " +id+ "?",
                 "Confirmar eliminación",
                 javax.swing.JOptionPane.YES_NO_OPTION,
                 javax.swing.JOptionPane.WARNING_MESSAGE
@@ -104,6 +112,7 @@ public class ControladorDocente {
             vista.mostrarMensaje("Docente eliminado exitosamente.");
             vista.limpiarCampos();
             refrescar();
+            if (notificar != null) notificar.run();
         } catch(Exception ex) {
             vista.mostrarError("Error al eliminar: " +ex.getMessage());
         }
