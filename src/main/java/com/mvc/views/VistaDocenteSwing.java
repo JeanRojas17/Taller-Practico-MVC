@@ -138,7 +138,7 @@ public class VistaDocenteSwing extends JPanel {
             btn.setFocusPainted(false);
             btn.setBorderPainted(false);
             btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btn.setPreferredSize(new Dimension(110, 32));
+            btn.setPreferredSize(new Dimension(130, 32));
             btn.setFont(new Font("SansSerif", Font.BOLD, 12));
         }
     }
