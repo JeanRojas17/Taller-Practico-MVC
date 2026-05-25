@@ -4,6 +4,9 @@ import com.mvc.config.ConexionPostgresDatabase;
 import com.mvc.models.Auditoria;
 
 import java.sql.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +45,15 @@ public class AuditoriaDao {
                 a.setAccion(rs.getString("accion"));
                 a.setEntidad(rs.getString("entidad"));
                 a.setDescripcion(rs.getString("descripcion"));
-                a.setFechaHora(rs.getTimestamp("fecha_hora").toLocalDateTime());
+                Timestamp ts = rs.getTimestamp("fecha_hora");
+
+                if(ts != null) {
+                    Instant instant = ts.toInstant();
+                    LocalDateTime local = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+                    a.setFechaHora(local);
+                } else {
+                    a.setFechaHora(null);
+                }
 
                 lista.add(a);
             }

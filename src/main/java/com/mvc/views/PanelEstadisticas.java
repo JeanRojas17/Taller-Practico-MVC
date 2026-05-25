@@ -67,16 +67,16 @@ public class PanelEstadisticas extends JPanel {
         String saludo = username != null
             ? "Bienvenido, " +username+ ". Aquí tienes un resumen del sistema."
             : "Resumen general del sistema.";
-        JLabel subtitulo = new JLabel(saludo);
-        subtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        subtitulo.setForeground(new Color(96, 125, 139));
+        lblSubtitulo = new JLabel(saludo);
+        lblSubtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblSubtitulo.setForeground(new Color(96, 125, 139));
 
         JPanel textos = new JPanel();
         textos.setLayout(new BoxLayout(textos, BoxLayout.Y_AXIS));
         textos.setBackground(new Color(236, 240, 241));
         textos.add(titulo);
         textos.add(Box.createVerticalStrut(5));
-        textos.add(subtitulo);
+        textos.add(lblSubtitulo);
         header.add(textos, BorderLayout.WEST);
 
         JPanel cuerpo = new JPanel();
