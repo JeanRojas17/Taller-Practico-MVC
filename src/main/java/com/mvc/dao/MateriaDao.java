@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mvc.config.ConexionPostgresDatabase;
+import com.mvc.config.ConexionPostgreSQLDatabase;
 import com.mvc.models.Materia;
 
 public class MateriaDao {
@@ -16,7 +16,7 @@ public class MateriaDao {
     public void guardarMateria(Materia materia) {
         String sql = "INSERT INTO \"practica-mvc\".materia (nombre_materia, creditos) VALUES (?, ?);";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, materia.getNombreMateria());
             pstmt.setInt(2, materia.getCreditos());
@@ -33,7 +33,7 @@ public class MateriaDao {
 
         String sql = "SELECT id_materia, nombre_materia, creditos FROM \"practica-mvc\".materia ORDER BY id_materia;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
 
             while(rs.next()) {
@@ -58,7 +58,7 @@ public class MateriaDao {
 
         String sql = "SELECT id_materia, nombre_materia, creditos FROM \"practica-mvc\".materia WHERE id_materia = ?;";
 
-        try (Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -81,7 +81,7 @@ public class MateriaDao {
     public void actualizarMateria(Materia materia) {
         String sql = "UPDATE \"practica-mvc\".materia SET nombre_materia = ?, creditos = ? WHERE id_materia = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, materia.getNombreMateria());
             pstmt.setInt(2, materia.getCreditos());
@@ -97,7 +97,7 @@ public class MateriaDao {
     public void eliminarMateria(int id) {
         String sql = "DELETE FROM \"practica-mvc\".materia WHERE id_materia = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
             pstmt.executeUpdate();

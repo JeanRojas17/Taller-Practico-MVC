@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mvc.config.ConexionPostgresDatabase;
+import com.mvc.config.ConexionPostgreSQLDatabase;
 import com.mvc.models.Docente;
 import com.mvc.models.Grupo;
 import com.mvc.models.Materia;
@@ -42,7 +42,7 @@ public class GrupoDao {
     public void guardarGrupo(Grupo grupo) {
         String sql = "INSERT INTO \"practica-mvc\".grupo (id_materia, id_docente, aula, horario) VALUES (?, ?, ?, ?);";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, grupo.getMateria().getId());
             pstmt.setInt(2, grupo.getDocente().getId());
@@ -76,7 +76,7 @@ public class GrupoDao {
                 ORDER BY g.id_grupo;
                 """;
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
 
             while(rs.next()) {
@@ -110,7 +110,7 @@ public class GrupoDao {
                 WHERE g.id_grupo = ?;
                 """;
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -129,7 +129,7 @@ public class GrupoDao {
     public void actualizarGrupo(Grupo grupo) {
         String sql = "UPDATE \"practica-mvc\".grupo SET id_materia = ?, id_docente = ?, aula = ?, horario = ? WHERE id_grupo = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, grupo.getMateria().getId());
             pstmt.setInt(2, grupo.getDocente().getId());
@@ -147,7 +147,7 @@ public class GrupoDao {
     public void eliminarGrupo(int id) {
         String sql = "DELETE FROM \"practica-mvc\".grupo WHERE id_grupo = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
             pstmt.executeUpdate();

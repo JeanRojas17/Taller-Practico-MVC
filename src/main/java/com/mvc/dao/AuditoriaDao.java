@@ -1,6 +1,6 @@
 package com.mvc.dao;
 
-import com.mvc.config.ConexionPostgresDatabase;
+import com.mvc.config.ConexionPostgreSQLDatabase;
 import com.mvc.models.Auditoria;
 
 import java.sql.*;
@@ -16,7 +16,7 @@ public class AuditoriaDao {
     public void registrar(Auditoria auditoria) {
         String sql = "INSERT INTO \"practica-mvc\".auditoria (usuario, accion, entidad, descripcion) VALUES (?, ?, ?, ?);";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, auditoria.getUsuario());
             pstmt.setString(2, auditoria.getAccion());
@@ -34,7 +34,7 @@ public class AuditoriaDao {
         List<Auditoria> lista = new ArrayList<>();
         String sql = "SELECT id_auditoria, usuario, accion, entidad, descripcion, fecha_hora FROM \"practica-mvc\".auditoria ORDER BY fecha_hora DESC;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
 
             while(rs.next()) {

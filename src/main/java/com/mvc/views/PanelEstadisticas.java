@@ -230,7 +230,7 @@ public class PanelEstadisticas extends JPanel {
     private int contar(String tabla) {
         String sql = "SELECT COUNT(*) FROM \"practica-mvc\"." +tabla+ ";";
 
-        try(var conn = com.mvc.config.ConexionPostgresDatabase.getConnection();
+        try(var conn = com.mvc.config.ConexionPostgreSQLDatabase.getConnection();
              var st = conn.prepareStatement(sql);
              var rs = st.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
@@ -244,7 +244,7 @@ public class PanelEstadisticas extends JPanel {
     private double obtenerPromedioNotas() {
         String sql = "SELECT AVG(nota_final) FROM \"practica-mvc\".inscripcion_curso WHERE nota_final IS NOT NULL;";
 
-        try(var conn = com.mvc.config.ConexionPostgresDatabase.getConnection();
+        try(var conn = com.mvc.config.ConexionPostgreSQLDatabase.getConnection();
              var st   = conn.prepareStatement(sql);
              var rs   = st.executeQuery()) {
             if (rs.next()) return rs.getDouble(1);

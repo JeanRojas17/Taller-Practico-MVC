@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mvc.config.ConexionPostgresDatabase;
+import com.mvc.config.ConexionPostgreSQLDatabase;
 import com.mvc.models.Usuario;
 
 public class UsuarioDao {
@@ -16,7 +16,7 @@ public class UsuarioDao {
     public Usuario buscarPorCredenciales(String username, String password) {
         String sql = "SELECT id_usuario, username, password, rol FROM \"practica-mvc\".usuario WHERE username = ? AND password = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, username);
             pstmt.setString(2, password);
@@ -37,7 +37,7 @@ public class UsuarioDao {
     public boolean actualizarUsername(int idUsuario, String nuevoUsername) {
         String sql = "UPDATE \"practica-mvc\".usuario SET username = ? WHERE id_usuario = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, nuevoUsername);
             pstmt.setInt(2, idUsuario);
@@ -54,7 +54,7 @@ public class UsuarioDao {
     public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
         String sql = "UPDATE \"practica-mvc\".usuario SET password = ? WHERE id_usuario = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, nuevaPassword);
             pstmt.setInt(2, idUsuario);
@@ -71,7 +71,7 @@ public class UsuarioDao {
     public boolean existeUsername(String username) {
         String sql = "SELECT 1 FROM \"practica-mvc\".usuario WHERE username = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, username);
 
@@ -89,7 +89,7 @@ public class UsuarioDao {
         String sql = "SELECT id_usuario, username, password, rol FROM \"practica-mvc\".usuario ORDER BY id_usuario;";
         List<Usuario> lista = new ArrayList<>();
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             ResultSet rs = pstmt.executeQuery();
 
@@ -107,7 +107,7 @@ public class UsuarioDao {
     public void crear(Usuario usuario) {
         String sql = "INSERT INTO \"practica-mvc\".usuario (username, password, rol) VALUES (?, ?, ?);";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, usuario.getUsername());
             pstmt.setString(2, usuario.getPassword());
@@ -122,7 +122,7 @@ public class UsuarioDao {
     public void actualizar(Usuario usuario) {
         String sql = "UPDATE \"practica-mvc\".usuario SET username = ?, password = ?, rol = ? WHERE id_usuario = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, usuario.getUsername());
             pstmt.setString(2, usuario.getPassword());
@@ -138,7 +138,7 @@ public class UsuarioDao {
     public void eliminar(int idUsuario) {
         String sql = "DELETE FROM \"practica-mvc\".usuario WHERE id_usuario = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idUsuario);
             pstmt.executeUpdate();

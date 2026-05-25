@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mvc.config.ConexionPostgresDatabase;
+import com.mvc.config.ConexionPostgreSQLDatabase;
 import com.mvc.models.*;
 
 public class InscripcionCursoDao {
@@ -81,7 +81,7 @@ public class InscripcionCursoDao {
     public void guardarInscripcion(InscripcionCurso inscripcion) {
         String sql = "INSERT INTO \"practica-mvc\".inscripcion_curso (id_estudiante, id_grupo, nota_final, estado) VALUES (?, ?, ?, ?);";
 
-        try (Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, inscripcion.getEstudiante().getId());
             pstmt.setInt(2, inscripcion.getGrupo().getId());
@@ -105,7 +105,7 @@ public class InscripcionCursoDao {
 
         String sql = SQL_SELECT + "ORDER BY ic.id_inscripcion;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
 
             while(rs.next()) {
@@ -124,7 +124,7 @@ public class InscripcionCursoDao {
 
         String sql = SQL_SELECT + "WHERE ic.id_inscripcion = ?;";
 
-        try (Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -143,7 +143,7 @@ public class InscripcionCursoDao {
     public void actualizarInscripcion(InscripcionCurso inscripcion) {
         String sql = "UPDATE \"practica-mvc\".inscripcion_curso SET id_estudiante = ?, id_grupo = ?, nota_final = ?, estado = ? WHERE id_inscripcion = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, inscripcion.getEstudiante().getId());
             pstmt.setInt(2, inscripcion.getGrupo().getId());
@@ -167,7 +167,7 @@ public class InscripcionCursoDao {
     public void eliminarInscripcion(int id) {
         String sql = "DELETE FROM \"practica-mvc\".inscripcion_curso WHERE id_inscripcion = ?;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -182,7 +182,7 @@ public class InscripcionCursoDao {
 
         String sql = SQL_SELECT + "WHERE ic.id_estudiante = ? ORDER BY ic.id_inscripcion;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idEstudiante);
             ResultSet rs = pstmt.executeQuery();
@@ -203,7 +203,7 @@ public class InscripcionCursoDao {
 
         String sql = SQL_SELECT + "WHERE ic.id_grupo = ? ORDER BY ic.id_inscripcion;";
 
-        try(Connection conn = ConexionPostgresDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idGrupo);
             ResultSet rs = pstmt.executeQuery();
