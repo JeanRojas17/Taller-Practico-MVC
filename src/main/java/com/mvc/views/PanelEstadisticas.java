@@ -20,13 +20,36 @@ public class PanelEstadisticas extends JPanel {
     private static final Color COLOR_MORADO = new Color(142, 68, 173);
     private static final Color COLOR_ROJO = new Color(192, 57, 43);
 
-    private final String username;
+    private String username;
+
+    private JLabel lblValorEstudiantes;
+    private JLabel lblValorDocentes;
+    private JLabel lblValorMaterias;
+    private JLabel lblValorGrupos;
+    private JLabel lblValorPromedio;
+    private DefaultTableModel modeloAuditoria;
+    private JLabel lblSubtitulo;
 
     public PanelEstadisticas(String username) {
         this.username = username;
         setBackground(FONDO);
         setLayout(new BorderLayout(0, 0));
         construir();
+    }
+
+    public void refrescar() {
+        actualizarTarjetas();
+        actualizarTablaAuditoria();
+    }
+
+    public void actualizarUsername(String nuevoUsername) {
+        this.username = nuevoUsername;
+        if(lblSubtitulo != null) {
+            String saludo = nuevoUsername != null
+                ? "Bienvenido, " +nuevoUsername+ ". Aquí tienes un resumen del sistema."
+                : "Resumen general del sistema.";
+            lblSubtitulo.setText(saludo);
+        }
     }
 
     private void construir() {
@@ -74,27 +97,44 @@ public class PanelEstadisticas extends JPanel {
     }
 
     private JPanel buildFilaTarjetas() {
-        int totalEstudiantes = contar("estudiante");
-        int totalDocentes = contar("docente");
-        int totalMaterias = contar("materia");
-        int totalGrupos = contar("grupo");
-        double promedioNotas = obtenerPromedioNotas();
-
         JPanel fila = new JPanel(new GridLayout(1, 5, 14, 0));
         fila.setBackground(FONDO);
         fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
         fila.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        fila.add(buildTarjeta("Estudiantes", String.valueOf(totalEstudiantes), "👨‍🎓", COLOR_AZUL));
-        fila.add(buildTarjeta("Docentes", String.valueOf(totalDocentes), "👨‍🏫", COLOR_VERDE));
-        fila.add(buildTarjeta("Materias", String.valueOf(totalMaterias), "📚", COLOR_NARANJA));
-        fila.add(buildTarjeta("Grupos", String.valueOf(totalGrupos), "🏫", COLOR_MORADO));
-        fila.add(buildTarjeta("Promedio notas", promedioNotas > 0 ? String.format("%.2f", promedioNotas) : "N/A", "📊", COLOR_ROJO));
+        JPanel[] tarjetas = buildTarjetas();
+        for (JPanel t : tarjetas) fila.add(t);
+
+        actualizarTarjetas();
 
         return fila;
     }
 
-    private JPanel buildTarjeta(String etiqueta, String valor, String icono, Color color) {
+    private JPanel[] buildTarjetas() {
+        lblValorEstudiantes = crearLblValor();
+        lblValorDocentes = crearLblValor();
+        lblValorMaterias = crearLblValor();
+        lblValorGrupos = crearLblValor();
+        lblValorPromedio = crearLblValor();
+
+        return new JPanel[] {
+            buildTarjeta("Estudiantes", "👨‍🎓", COLOR_AZUL, lblValorEstudiantes),
+            buildTarjeta("Docentes", "👨‍🏫", COLOR_VERDE, lblValorDocentes),
+            buildTarjeta("Materias", "📚", COLOR_NARANJA, lblValorMaterias),
+            buildTarjeta("Grupos", "🏫", COLOR_MORADO, lblValorGrupos),
+            buildTarjeta("Promedio notas","📊", COLOR_ROJO, lblValorPromedio)
+        };
+    }
+
+    private JLabel crearLblValor() {
+        JLabel lbl = new JLabel("...");
+        lbl.setFont(new Font("Segoe UI", Font.BOLD, 34));
+        lbl.setForeground(new Color(30, 40, 60));
+        lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return lbl;
+    }
+
+    private JPanel buildTarjeta(String etiqueta, String icono, Color color, JLabel lblValor) {
         JPanel tarjeta = new JPanel();
         tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
         tarjeta.setBackground(Color.WHITE);
@@ -108,16 +148,26 @@ public class PanelEstadisticas extends JPanel {
         lblIcono.setForeground(color);
         lblIcono.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblValor = new JLabel(valor);
-        lblValor.setFont(new Font("Segoe UI", Font.BOLD, 34));
-        lblValor.setForeground(new Color(30, 40, 60));
-        lblValor.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         tarjeta.add(lblIcono);
         tarjeta.add(Box.createVerticalStrut(8));
         tarjeta.add(lblValor);
-
         return tarjeta;
+    }
+
+    private void actualizarTarjetas() {
+        int totalEstudiantes = contar("estudiante");
+        int totalDocentes = contar("docente");
+        int totalMaterias = contar("materia");
+        int totalGrupos = contar("grupo");
+        double promedio = obtenerPromedioNotas();
+
+        SwingUtilities.invokeLater(() -> {
+            lblValorEstudiantes.setText(String.valueOf(totalEstudiantes));
+            lblValorDocentes.setText(String.valueOf(totalDocentes));
+            lblValorMaterias.setText(String.valueOf(totalMaterias));
+            lblValorGrupos.setText(String.valueOf(totalGrupos));
+            lblValorPromedio.setText(promedio > 0 ? String.format("%.2f", promedio) : "N/A");
+        });
     }
 
     private JPanel buildSeccionAuditoria() {
@@ -131,25 +181,14 @@ public class PanelEstadisticas extends JPanel {
         lblTitulo.setForeground(new Color(31, 58, 147));
 
         String[] columnas = {"Fecha y hora", "Usuario", "Acción", "Entidad", "Descripción"};
-        DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
+        modeloAuditoria = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
             }
         };
 
-        List<Auditoria> registros = AuditoriaService.getInstance().listarTodas();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
-        registros.stream().limit(50).forEach(a -> modelo.addRow(new Object[]{
-            a.getFechaHora() != null ? a.getFechaHora().format(fmt) : "-",
-            a.getUsuario(),
-            a.getAccion(),
-            a.getEntidad(),
-            a.getDescripcion()
-        }));
-
-        JTable tabla = new JTable(modelo);
+        JTable tabla = new JTable(modeloAuditoria);
         tabla.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tabla.setRowHeight(24);
@@ -167,7 +206,25 @@ public class PanelEstadisticas extends JPanel {
         seccion.add(lblTitulo, BorderLayout.NORTH);
         seccion.add(scroll, BorderLayout.CENTER);
 
+        actualizarTablaAuditoria();
+
         return seccion;
+    }
+
+    private void actualizarTablaAuditoria() {
+        List<Auditoria> registros = AuditoriaService.getInstance().listarTodas();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+        SwingUtilities.invokeLater(() -> {
+            modeloAuditoria.setRowCount(0);
+            registros.stream().limit(50).forEach(a -> modeloAuditoria.addRow(new Object[]{
+                a.getFechaHora() != null ? a.getFechaHora().format(fmt) : "-",
+                a.getUsuario(),
+                a.getAccion(),
+                a.getEntidad(),
+                a.getDescripcion()
+            }));
+        });
     }
 
     private int contar(String tabla) {
