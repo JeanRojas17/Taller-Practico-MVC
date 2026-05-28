@@ -37,13 +37,7 @@ public class DocenteDao {
             ResultSet rs = pstmt.executeQuery()) {
 
             while(rs.next()) {
-                Docente docente = new Docente();
-
-                docente.setId(rs.getInt("id_docente"));
-                docente.setNombre(rs.getString("nombre"));
-                docente.setEspecialidad(rs.getString("especialidad"));
-
-                docentes.add(docente);
+                docentes.add(mapear(rs));
             }
 
         } catch(SQLException error) {
@@ -54,27 +48,22 @@ public class DocenteDao {
     }
 
     public Docente obtenerDocentePorId(int id) {
-        Docente docente = null;
-
         String sql = "SELECT id_docente, nombre, especialidad FROM \"practica-mvc\".docente WHERE id_docente = ?;";
 
         try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-
-            if(rs.next()) {
-                docente = new Docente();
-
-                docente.setId(rs.getInt("id_docente"));
-                docente.setNombre(rs.getString("nombre"));
-                docente.setEspecialidad(rs.getString("especialidad"));
+            
+            try(ResultSet rs = pstmt.executeQuery()) {
+                if(rs.next()) {
+                    return mapear(rs);
+                }
             }
 
         } catch(SQLException error) {
             error.printStackTrace();
         }
 
-        return docente;
+        return null;
     }
 
     public void actualizarDocente(Docente docente) {
@@ -102,5 +91,15 @@ public class DocenteDao {
         } catch(SQLException error) {
             error.printStackTrace();
         }
+    }
+
+    private Docente mapear(ResultSet rs) throws SQLException {
+        Docente docente = new Docente();
+
+        docente.setId(rs.getInt("id_docente"));
+        docente.setNombre(rs.getString("nombre"));
+        docente.setEspecialidad(rs.getString("especialidad"));
+
+        return docente;
     }
 }

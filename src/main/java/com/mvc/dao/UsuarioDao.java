@@ -21,10 +21,10 @@ public class UsuarioDao {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
 
-            ResultSet rs = pstmt.executeQuery();
-
-            if(rs.next()) {
-                return mapear(rs);
+            try(ResultSet rs = pstmt.executeQuery()) {
+                if(rs.next()) {
+                    return mapear(rs);
+                }
             }
 
         } catch(SQLException error) {
@@ -75,8 +75,9 @@ public class UsuarioDao {
 
             pstmt.setString(1, username);
 
-            ResultSet rs = pstmt.executeQuery();
-            return rs.next();
+            try(ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
 
         } catch(SQLException error) {
             error.printStackTrace();
@@ -89,9 +90,8 @@ public class UsuarioDao {
         String sql = "SELECT id_usuario, username, password, rol FROM \"practica-mvc\".usuario ORDER BY id_usuario;";
         List<Usuario> lista = new ArrayList<>();
 
-        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            ResultSet rs = pstmt.executeQuery();
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()) {
 
             while(rs.next()) {
                 lista.add(mapear(rs));

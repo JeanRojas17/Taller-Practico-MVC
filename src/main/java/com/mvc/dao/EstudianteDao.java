@@ -38,14 +38,7 @@ public class EstudianteDao {
             ResultSet rs = pstmt.executeQuery()) {
 
             while(rs.next()) {
-                Estudiante estudiante = new Estudiante();
-
-                estudiante.setId(rs.getInt("id_estudiante"));
-                estudiante.setNombre(rs.getString("nombre"));
-                estudiante.setApellido(rs.getString("apellido"));
-                estudiante.setCorreo(rs.getString("email"));
-
-                estudiantes.add(estudiante);
+                estudiantes.add(mapear(rs));
             }
 
         } catch(SQLException error) {
@@ -56,28 +49,22 @@ public class EstudianteDao {
     }
 
     public Estudiante obtenerEstudiantePorId(int id) {
-        Estudiante estudiante = null;
-        
         String sql = "SELECT id_estudiante, nombre, apellido, email FROM \"practica-mvc\".estudiante WHERE id_estudiante = ?;";
 
         try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
 
-            if(rs.next()) {
-                estudiante = new Estudiante();
-
-                estudiante.setId(rs.getInt("id_estudiante"));
-                estudiante.setNombre(rs.getString("nombre"));
-                estudiante.setApellido(rs.getString("apellido"));
-                estudiante.setCorreo(rs.getString("email"));
+            try(ResultSet rs = pstmt.executeQuery()) {
+                if(rs.next()) {
+                    return mapear(rs);
+                }
             }
 
         } catch(SQLException error) {
             error.printStackTrace();
         }
 
-        return estudiante;
+        return null;
     }
 
     public void actualizarEstudiante(Estudiante estudiante) {
@@ -106,5 +93,16 @@ public class EstudianteDao {
         } catch(SQLException error) {
             error.printStackTrace();
         }   
+    }
+
+    private Estudiante mapear(ResultSet rs) throws SQLException {
+        Estudiante estudiante = new Estudiante();
+
+        estudiante.setId(rs.getInt("id_estudiante"));
+        estudiante.setNombre(rs.getString("nombre"));
+        estudiante.setApellido(rs.getString("apellido"));
+        estudiante.setCorreo(rs.getString("email"));
+        
+        return estudiante;
     }
 }

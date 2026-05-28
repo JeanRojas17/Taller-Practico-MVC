@@ -37,13 +37,7 @@ public class MateriaDao {
             ResultSet rs = pstmt.executeQuery()) {
 
             while(rs.next()) {
-                Materia materia = new Materia();
-
-                materia.setId(rs.getInt("id_materia"));
-                materia.setNombreMateria(rs.getString("nombre_materia"));
-                materia.setCreditos(rs.getInt("creditos"));
-
-                materias.add(materia);
+                materias.add(mapear(rs));
             }
 
         } catch(SQLException error) {
@@ -54,28 +48,23 @@ public class MateriaDao {
     }
 
     public Materia obtenerMateriaPorId(int id) {
-        Materia materia = null;
-
         String sql = "SELECT id_materia, nombre_materia, creditos FROM \"practica-mvc\".materia WHERE id_materia = ?;";
 
         try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-
-            if(rs.next()) {
-                materia = new Materia();
-
-                materia.setId(rs.getInt("id_materia"));
-                materia.setNombreMateria(rs.getString("nombre_materia"));
-                materia.setCreditos(rs.getInt("creditos"));
+            
+            try(ResultSet rs = pstmt.executeQuery()) {
+                if(rs.next()) {
+                    return mapear(rs);
+                }
             }
 
         } catch(SQLException error) {
             error.printStackTrace();
         }
 
-        return materia;
+        return null;
     }
 
     public void actualizarMateria(Materia materia) {
@@ -105,5 +94,15 @@ public class MateriaDao {
         } catch(SQLException error) {
             error.printStackTrace();
         }
+    }
+
+    private Materia mapear(ResultSet rs) throws SQLException {
+        Materia materia = new Materia();
+
+        materia.setId(rs.getInt("id_materia"));
+        materia.setNombreMateria(rs.getString("nombre_materia"));
+        materia.setCreditos(rs.getInt("creditos"));
+
+        return materia;
     }
 }

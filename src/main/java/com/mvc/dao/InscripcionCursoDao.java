@@ -13,46 +13,6 @@ import com.mvc.models.*;
 
 public class InscripcionCursoDao {
 
-    private InscripcionCurso mapearInscripcion(ResultSet rs) throws SQLException {
-
-        Estudiante estudiante = new Estudiante();
-
-        estudiante.setId(rs.getInt("id_estudiante"));
-        estudiante.setNombre(rs.getString("nombre_estudiante"));
-        estudiante.setApellido(rs.getString("apellido_estudiante"));
-        estudiante.setCorreo(rs.getString("email_estudiante"));
-
-        Materia materia = new Materia();
-
-        materia.setId(rs.getInt("id_materia"));
-        materia.setNombreMateria(rs.getString("nombre_materia"));
-        materia.setCreditos(rs.getInt("creditos"));
-
-        Docente docente = new Docente();
-
-        docente.setId(rs.getInt("id_docente"));
-        docente.setNombre(rs.getString("nombre_docente"));
-        docente.setEspecialidad(rs.getString("especialidad"));
-
-        Grupo grupo = new Grupo();
-
-        grupo.setId(rs.getInt("id_grupo"));
-        grupo.setMateria(materia);
-        grupo.setDocente(docente);
-        grupo.setAula(rs.getString("aula"));
-        grupo.setHorario(rs.getString("horario"));
-
-        InscripcionCurso inscripcion = new InscripcionCurso();
-
-        inscripcion.setId(rs.getInt("id_inscripcion"));
-        inscripcion.setEstudiante(estudiante);
-        inscripcion.setGrupo(grupo);
-        inscripcion.setNotaFinal(rs.getObject("nota_final") != null ? rs.getFloat("nota_final") : null);
-        inscripcion.setEstado(rs.getString("estado"));
-
-        return inscripcion;
-    }
-
     private static final String SQL_SELECT = """
             SELECT
                 ic.id_inscripcion,
@@ -120,24 +80,23 @@ public class InscripcionCursoDao {
     }
 
     public InscripcionCurso obtenerInscripcionPorId(int id) {
-        InscripcionCurso inscripcion = null;
-
         String sql = SQL_SELECT + "WHERE ic.id_inscripcion = ?;";
 
         try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
 
-            if(rs.next()) {
-                inscripcion = mapearInscripcion(rs);
+            try(ResultSet rs = pstmt.executeQuery()) {
+                if(rs.next()) {
+                    return mapearInscripcion(rs);
+                }
             }
 
         } catch(SQLException error) {
             error.printStackTrace();
         }
 
-        return inscripcion;
+        return null;
     }
 
     public void actualizarInscripcion(InscripcionCurso inscripcion) {
@@ -185,10 +144,11 @@ public class InscripcionCursoDao {
         try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idEstudiante);
-            ResultSet rs = pstmt.executeQuery();
 
-            while(rs.next()) {
-                inscripciones.add(mapearInscripcion(rs));
+            try(ResultSet rs = pstmt.executeQuery()) {
+                while(rs.next()) {
+                    inscripciones.add(mapearInscripcion(rs));
+                }
             }
 
         } catch(SQLException error) {
@@ -206,10 +166,11 @@ public class InscripcionCursoDao {
         try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idGrupo);
-            ResultSet rs = pstmt.executeQuery();
-
-            while(rs.next()) {
-                inscripciones.add(mapearInscripcion(rs));
+            
+            try(ResultSet rs = pstmt.executeQuery()) {
+                while(rs.next()) {
+                    inscripciones.add(mapearInscripcion(rs));
+                }
             }
 
         } catch(SQLException error) {
@@ -217,5 +178,40 @@ public class InscripcionCursoDao {
         }
 
         return inscripciones;
+    }
+
+    private InscripcionCurso mapearInscripcion(ResultSet rs) throws SQLException {
+
+        Estudiante estudiante = new Estudiante();
+        estudiante.setId(rs.getInt("id_estudiante"));
+        estudiante.setNombre(rs.getString("nombre_estudiante"));
+        estudiante.setApellido(rs.getString("apellido_estudiante"));
+        estudiante.setCorreo(rs.getString("email_estudiante"));
+
+        Materia materia = new Materia();
+        materia.setId(rs.getInt("id_materia"));
+        materia.setNombreMateria(rs.getString("nombre_materia"));
+        materia.setCreditos(rs.getInt("creditos"));
+
+        Docente docente = new Docente();
+        docente.setId(rs.getInt("id_docente"));
+        docente.setNombre(rs.getString("nombre_docente"));
+        docente.setEspecialidad(rs.getString("especialidad"));
+
+        Grupo grupo = new Grupo();
+        grupo.setId(rs.getInt("id_grupo"));
+        grupo.setMateria(materia);
+        grupo.setDocente(docente);
+        grupo.setAula(rs.getString("aula"));
+        grupo.setHorario(rs.getString("horario"));
+
+        InscripcionCurso inscripcion = new InscripcionCurso();
+        inscripcion.setId(rs.getInt("id_inscripcion"));
+        inscripcion.setEstudiante(estudiante);
+        inscripcion.setGrupo(grupo);
+        inscripcion.setNotaFinal(rs.getObject("nota_final") != null ? rs.getFloat("nota_final") : null);
+        inscripcion.setEstado(rs.getString("estado"));
+
+        return inscripcion;
     }
 }
