@@ -1,37 +1,58 @@
 package com.mvc.config;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import java.util.Properties;
 
 public class ConexionPostgreSQLDatabase {
     
-    private static final Properties properties = new Properties();
+    private static final HikariDataSource dataSource;
 
     static {
-        // Cargamos las propiedades una sola vez al inicio de la aplicación
+        Properties props = new Properties();
+
         try(FileInputStream configuracion = new FileInputStream(new File("config.properties"))) {
-            properties.load(configuracion);
+            props.load(configuracion);
         } catch(IOException e) {
             System.err.println("FALLO CRÍTICO: No se pudo cargar config.properties. " +e.getMessage());
         }
+
+        HikariConfig config = new HikariConfig();
+
+        config.setJdbcUrl(props.getProperty("db.url").trim());
+        config.setUsername(props.getProperty("db.user").trim());
+        config.setPassword(props.getProperty("db.password").trim());
+
+        config.setMaximumPoolSize(3);
+        config.setMinimumIdle(1);
+
+        // Tiempo máximo en ms que se espera para obtener una conexión del pool
+        config.setConnectionTimeout(30000);
+
+        // Tiempo máximo en ms que una conexión puede estar inactiva antes de cerrarse
+        config.setIdleTimeout(600000);
+
+        // Tiempo máximo de vida de una conexión en ms (10 minutos)
+        // Evita usar conexiones que Neon haya cerrado por inactividad
+        config.setMaxLifetime(600000);
+
+        // Query liviana para verificar que la conexión sigue activa
+        config.setConnectionTestQuery("SELECT 1");
+
+        config.setPoolName("NeonPool");
+
+        dataSource = new HikariDataSource(config);
     }
 
     public static Connection getConnection() throws SQLException {
-   
-        // Definir los parámetros de conexión
-        String url = properties.getProperty("db.url");
-        String user = properties.getProperty("db.user");
-        String password = properties.getProperty("db.password");
-    
-        if(url == null || user == null) {
-            throw new IllegalStateException("Base de datos configurada incorrectamente. Verifique que db.url y db.user estén presentes en config.properties.");
-        }
-        
-        return DriverManager.getConnection(url, user, password);         
+        return dataSource.getConnection();         
     }
 }
