@@ -140,7 +140,8 @@ public class DialogConfiguracion extends JDialog {
         panel.setBackground(COLOR_FONDO);
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
-        JPanel seccion = buildSection("Comportamiento al eliminar");
+        // Sección: Comportamiento al eliminar
+        JPanel seccionEliminar = buildSection("Comportamiento al eliminar");
 
         JCheckBox chkConfirmar = new JCheckBox("Solicitar confirmación antes de eliminar un registro");
         chkConfirmar.setSelected(ConfiguracionApp.getInstance().isConfirmarEliminacion());
@@ -148,21 +149,55 @@ public class DialogConfiguracion extends JDialog {
         chkConfirmar.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         chkConfirmar.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblDescripcion = new JLabel(
+        JLabel lblDescEliminar = new JLabel(
             "<html><i style='color:#888'>Cuando está activo, se pedirá confirmación antes de cada eliminación.</i></html>"
         );
-        lblDescripcion.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblDescripcion.setAlignmentX(Component.LEFT_ALIGNMENT);
-        lblDescripcion.setBorder(BorderFactory.createEmptyBorder(4, 22, 0, 0));
+        lblDescEliminar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblDescEliminar.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblDescEliminar.setBorder(BorderFactory.createEmptyBorder(4, 22, 0, 0));
 
         chkConfirmar.addActionListener(e ->
             ConfiguracionApp.getInstance().setConfirmarEliminacion(chkConfirmar.isSelected())
         );
 
-        seccion.add(chkConfirmar);
-        seccion.add(lblDescripcion);
+        seccionEliminar.add(chkConfirmar);
+        seccionEliminar.add(lblDescEliminar);
 
-        panel.add(seccion);
+        // Sección: Paginación de tablas
+        JPanel seccionPaginacion = buildSection("Paginación de tablas");
+
+        JLabel lblRegistros = new JLabel("Registros por página:");
+        lblRegistros.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblRegistros.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        Integer[] opciones = {5, 10, 15, 20, 25};
+        JComboBox<Integer> cmbRegistros = new JComboBox<>(opciones);
+        cmbRegistros.setSelectedItem(ConfiguracionApp.getInstance().getRegistrosPorPagina());
+        cmbRegistros.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        cmbRegistros.setMaximumSize(new Dimension(100, 32));
+        cmbRegistros.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel lblDescPaginacion = new JLabel(
+            "<html><i style='color:#888'>Define cuántos registros se muestran por página en cada gestión.</i></html>"
+        );
+        lblDescPaginacion.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblDescPaginacion.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblDescPaginacion.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
+
+        cmbRegistros.addActionListener(e -> {
+            int seleccion = (int) cmbRegistros.getSelectedItem();
+            ConfiguracionApp.getInstance().setRegistrosPorPagina(seleccion);
+        });
+
+        seccionPaginacion.add(lblRegistros);
+        seccionPaginacion.add(Box.createVerticalStrut(6));
+        seccionPaginacion.add(cmbRegistros);
+        seccionPaginacion.add(Box.createVerticalStrut(6));
+        seccionPaginacion.add(lblDescPaginacion);
+
+        panel.add(seccionEliminar);
+        panel.add(Box.createVerticalStrut(14));
+        panel.add(seccionPaginacion);
         return panel;
     }
 

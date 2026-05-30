@@ -1,5 +1,6 @@
 package com.mvc.views;
 
+import com.mvc.config.ConfiguracionApp;
 import com.mvc.models.Estudiante;
 
 import javax.swing.*;
@@ -14,6 +15,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
 import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VistaEstudianteSwing extends JPanel {
@@ -21,6 +23,12 @@ public class VistaEstudianteSwing extends JPanel {
     private DefaultTableModel modeloTabla;
     private JTable tabla;
     private TableRowSorter<DefaultTableModel> sorter;
+
+    private java.util.List<Estudiante> todosDatos = new ArrayList<>();
+    private int paginaActual = 0;
+    private JButton btnAnterior;
+    private JButton btnSiguiente;
+    private JLabel lblPagina;
 
     private JTextField txtBuscar;
 
@@ -102,7 +110,31 @@ public class VistaEstudianteSwing extends JPanel {
         btnExportarExcel = new JButton("Exportar Excel");
         btnRefrescar = new JButton("Refrescar");
 
+        btnAnterior = new JButton("◀  Anterior");
+        btnSiguiente = new JButton("Siguiente  ▶");
+        lblPagina = new JLabel("", SwingConstants.CENTER);
+
         estilizarBotones();
+
+        btnAnterior.setBackground(new Color(52, 73, 94));
+        btnAnterior.setForeground(Color.WHITE);
+        btnAnterior.setFocusPainted(false);
+        btnAnterior.setBorderPainted(false);
+        btnAnterior.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnAnterior.setPreferredSize(new Dimension(110, 28));
+        btnAnterior.setFont(new Font("SansSerif", Font.BOLD, 11));
+
+        btnSiguiente.setBackground(new Color(52, 73, 94));
+        btnSiguiente.setForeground(Color.WHITE);
+        btnSiguiente.setFocusPainted(false);
+        btnSiguiente.setBorderPainted(false);
+        btnSiguiente.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnSiguiente.setPreferredSize(new Dimension(110, 28));
+        btnSiguiente.setFont(new Font("SansSerif", Font.BOLD, 11));
+
+        lblPagina.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        lblPagina.setForeground(new Color(60, 60, 60));
+        lblPagina.setPreferredSize(new Dimension(140, 28));
 
         JPanel panelPrincipal = new JPanel(new BorderLayout(0, 16));
         panelPrincipal.setBackground(Color.WHITE);
@@ -174,12 +206,15 @@ public class VistaEstudianteSwing extends JPanel {
         return encabezado;
     }
 
-    private JScrollPane buildPanelTabla() {
-        JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setBorder(BorderFactory.createCompoundBorder(
+    private JPanel buildPanelTabla() {
+        JPanel panelTabla = new JPanel(new BorderLayout());
+        panelTabla.setBackground(Color.WHITE);
+        panelTabla.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)));
-        return scroll;
+        panelTabla.add(tabla.getTableHeader(), BorderLayout.NORTH);
+        panelTabla.add(tabla, BorderLayout.CENTER);
+        return panelTabla;
     }
 
     private JPanel buildPanelAcciones() {
@@ -204,11 +239,18 @@ public class VistaEstudianteSwing extends JPanel {
         panelBotones.add(botonesIzq, BorderLayout.WEST);
         panelBotones.add(botonesDer, BorderLayout.EAST);
 
+        JPanel panelPaginacion = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
+        panelPaginacion.setBackground(Color.WHITE);
+        panelPaginacion.add(btnAnterior);
+        panelPaginacion.add(lblPagina);
+        panelPaginacion.add(btnSiguiente);
+
         JSeparator separador = new JSeparator();
         separador.setForeground(new Color(200, 200, 200));
 
         panel.add(separador, BorderLayout.NORTH);
-        panel.add(panelBotones, BorderLayout.CENTER);
+        panel.add(panelPaginacion, BorderLayout.CENTER);
+        panel.add(panelBotones, BorderLayout.SOUTH);
 
         return panel;
     }
@@ -289,6 +331,20 @@ public class VistaEstudianteSwing extends JPanel {
             com.mvc.services.ExportadorService.exportarPDF(tabla, "Estudiantes"));
         btnExportarExcel.addActionListener(e ->
             com.mvc.services.ExportadorService.exportarExcel(tabla, "Estudiantes"));
+
+        btnAnterior.addActionListener(e -> {
+            if(paginaActual > 0) {
+                paginaActual--;
+                mostrarPaginaActual();
+            }
+        });
+
+        btnSiguiente.addActionListener(e -> {
+            if(paginaActual < calcularTotalPaginas() - 1) {
+                paginaActual++;
+                mostrarPaginaActual();
+            }
+        });
     }
 
     public void ocultarBotonEliminar() {
@@ -397,17 +453,36 @@ public class VistaEstudianteSwing extends JPanel {
         txtCorreo.setText((String) modeloTabla.getValueAt(fila, 3));
     }
 
-    public void cargarEstudiantes(List<Estudiante> estudiantes) {
+    private int calcularTotalPaginas() {
+        int porPagina = ConfiguracionApp.getInstance().getRegistrosPorPagina();
+        if(todosDatos.isEmpty()) return 1;
+        return (int) Math.ceil((double) todosDatos.size() / porPagina);
+    }
+
+    private void mostrarPaginaActual() {
+        int porPagina = ConfiguracionApp.getInstance().getRegistrosPorPagina();
+        int totalPaginas = calcularTotalPaginas();
+
+        if (paginaActual >= totalPaginas) paginaActual = totalPaginas - 1;
+
+        int desde = paginaActual * porPagina;
+        int hasta = Math.min(desde + porPagina, todosDatos.size());
         modeloTabla.setRowCount(0);
 
-        for(Estudiante e : estudiantes) {
-            modeloTabla.addRow(new Object[]{
-                    e.getId(),
-                    e.getNombre(),
-                    e.getApellido(),
-                    e.getEmail()
-            });
+        for(int i = desde; i < hasta; i++) {
+            Estudiante item = todosDatos.get(i);
+            modeloTabla.addRow(new Object[]{item.getId(), item.getNombre(), item.getApellido(), item.getEmail()});
         }
+
+        lblPagina.setText("Página " +(paginaActual + 1)+ " de " +totalPaginas);
+        btnAnterior.setEnabled(paginaActual > 0);
+        btnSiguiente.setEnabled(paginaActual < totalPaginas - 1);
+    }
+
+    public void cargarEstudiantes(List<Estudiante> datos) {
+        this.todosDatos = new ArrayList<>(datos);
+        this.paginaActual = 0;
+        mostrarPaginaActual();
     }
 
     public int getIdSeleccionado() {

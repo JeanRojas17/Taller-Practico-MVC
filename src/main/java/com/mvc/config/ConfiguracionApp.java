@@ -5,6 +5,7 @@ public class ConfiguracionApp {
     private static final ConfiguracionApp INSTANCIA = new ConfiguracionApp();
 
     private boolean confirmarEliminacion = true;
+    private int registrosPorPagina = 10;
 
     private ConfiguracionApp() {}
 
@@ -18,5 +19,13 @@ public class ConfiguracionApp {
 
     public void setConfirmarEliminacion(boolean confirmarEliminacion) {
         this.confirmarEliminacion = confirmarEliminacion;
+    }
+
+    public int getRegistrosPorPagina() {
+        return registrosPorPagina;
+    }
+
+    public void setRegistrosPorPagina(int registrosPorPagina) {
+        this.registrosPorPagina = registrosPorPagina;
     }
 }
