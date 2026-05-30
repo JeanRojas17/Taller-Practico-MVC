@@ -1,5 +1,6 @@
 package com.mvc.controllers;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.mvc.config.ConfiguracionApp;
@@ -14,7 +15,7 @@ import com.mvc.views.VistaInscripcionCursoSwing;
 
 public class ControladorInscripcionCurso {
 
-    private static final float NOTA_MINIMA_APROBATORIA = 3.0f;
+    private static final BigDecimal NOTA_MINIMA_APROBATORIA = new BigDecimal("3.0");
 
     private final VistaInscripcionCursoSwing vista;
     private final InscripcionCursoService inscripcionService;
@@ -43,13 +44,12 @@ public class ControladorInscripcionCurso {
         refrescar();
     }
 
-    private String calcularEstado(String notaStr, String estadoElegido) {
-        if(notaStr.isBlank()) {
+    private String calcularEstado(BigDecimal nota, String estadoElegido) {
+        if(nota == null) {
             return estadoElegido;
         }
 
-        float nota = Float.parseFloat(notaStr);
-        return nota >= NOTA_MINIMA_APROBATORIA ? "Aprobado" : "Reprobado";
+        return nota.compareTo(NOTA_MINIMA_APROBATORIA) >= 0 ? "Aprobado" : "Reprobado";
     }
 
     private void registrar() {
@@ -70,8 +70,8 @@ public class ControladorInscripcionCurso {
             Grupo grupo = obtenerGrupo(idGrupoTexto);
             if (grupo == null) return;
 
-            Float notaFinal = notaStr.isBlank() ? null : Float.parseFloat(notaStr);
-            String estado = calcularEstado(notaStr, estadoElegido);
+            BigDecimal notaFinal = notaStr.isBlank() ? null : new BigDecimal(notaStr);
+            String estado = calcularEstado(notaFinal, estadoElegido);
 
             InscripcionCurso nueva = new InscripcionCurso(0, estudiante, grupo, notaFinal, estado);
 
@@ -115,8 +115,8 @@ public class ControladorInscripcionCurso {
             Grupo grupo = obtenerGrupo(idGrupoTexto);
             if (grupo == null) return;
 
-            Float notaFinal = notaStr.isBlank() ? null : Float.parseFloat(notaStr);
-            String estado = calcularEstado(notaStr, estadoElegido);
+            BigDecimal notaFinal = notaStr.isBlank() ? null : new BigDecimal(notaStr);
+            String estado = calcularEstado(notaFinal, estadoElegido);
 
             InscripcionCurso actualizada = new InscripcionCurso(id, estudiante, grupo, notaFinal, estado);
 
@@ -128,6 +128,8 @@ public class ControladorInscripcionCurso {
             if (notificar != null) notificar.run();
         } catch(NumberFormatException ex) {
             vista.mostrarError("Los campos ID Estudiante e ID Grupo deben ser números enteros, y Nota Final debe ser numérica.");
+        } catch(IllegalArgumentException ex) {
+            vista.mostrarError(ex.getMessage());
         } catch(Exception ex) {
             vista.mostrarError("Error al actualizar: " +ex.getMessage());
         }

@@ -50,11 +50,9 @@ public class UsuarioService {
             throw new IllegalArgumentException("La confirmación no coincide con la nueva contraseña.");
         }
 
-        Usuario usuario = usuarioDao.buscarPorCredenciales(
-            usuarioDao.listarTodos().stream().filter(u -> u.getId() == idUsuario).findFirst().map(Usuario::getUsername).orElse(""), passwordActual
-        );
+        Usuario usuario = usuarioDao.buscarPorId(idUsuario);
 
-        if(usuario == null) {
+        if(usuario == null || !usuario.getPassword().equals(passwordActual)) {
             throw new IllegalArgumentException("La contraseña actual es incorrecta.");
         }
 

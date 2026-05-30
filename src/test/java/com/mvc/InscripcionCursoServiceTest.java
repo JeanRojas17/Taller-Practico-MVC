@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,9 +66,37 @@ class InscripcionCursoServiceTest {
     }
 
     @Test
+    @DisplayName("Rechaza nota fuera del rango 0.0 - 5.0")
+    void registrarInscripcion_notaFueraDeRango_lanzaExcepcion() {
+        assertAll(
+                () -> assertThrows(IllegalArgumentException.class, () -> inscripcionCursoService.registrarInscripcion(
+                        new InscripcionCurso(2, estudiante, grupo, new BigDecimal("-0.1"), "Aprobado"))),
+                () -> assertThrows(IllegalArgumentException.class, () -> inscripcionCursoService.registrarInscripcion(
+                        new InscripcionCurso(2, estudiante, grupo, new BigDecimal("5.1"), "Aprobado")))
+        );
+
+        verifyNoInteractions(inscripcionCursoDao);
+    }
+
+    @Test
+    @DisplayName("Rechaza estado invalido segun presencia de nota")
+    void registrarInscripcion_estadoInvalido_lanzaExcepcion() {
+        // Estado manual cuando hay nota no es válido
+        assertThrows(IllegalArgumentException.class, () -> inscripcionCursoService.registrarInscripcion(
+                new InscripcionCurso(2, estudiante, grupo, new BigDecimal("4.0"), "Inscrito")));
+
+        // Estado con nota cuando no hay nota no es válido
+        assertThrows(IllegalArgumentException.class, () -> inscripcionCursoService.registrarInscripcion(
+                new InscripcionCurso(2, estudiante, grupo, null, "Aprobado")));
+
+        verifyNoInteractions(inscripcionCursoDao);
+    }
+
+    @Test
     @DisplayName("Consulta todas las inscripciones desde el DAO")
     void mostrarTodasLasInscripciones_retornaDatosDelDao() {
-        List<InscripcionCurso> inscripcionesEsperadas = List.of(new InscripcionCurso(1, estudiante, grupo, 4.2f, "Aprobado"));
+        List<InscripcionCurso> inscripcionesEsperadas = List.of(
+                new InscripcionCurso(1, estudiante, grupo, new BigDecimal("4.2"), "Aprobado"));
         when(inscripcionCursoDao.obtenerTodasLasInscripciones()).thenReturn(inscripcionesEsperadas);
 
         List<InscripcionCurso> inscripciones = inscripcionCursoService.mostrarTodasLasInscripciones();
@@ -80,8 +109,8 @@ class InscripcionCursoServiceTest {
     @Test
     @DisplayName("Consulta, actualiza y elimina delegando en el DAO")
     void operacionesBasicas_deleganEnDao() {
-        InscripcionCurso encontrada = new InscripcionCurso(1, estudiante, grupo, 4.2f, "Aprobado");
-        InscripcionCurso actualizada = new InscripcionCurso(1, estudiante, grupo, 4.5f, "Aprobado");
+        InscripcionCurso encontrada = new InscripcionCurso(1, estudiante, grupo, new BigDecimal("4.2"), "Aprobado");
+        InscripcionCurso actualizada = new InscripcionCurso(1, estudiante, grupo, new BigDecimal("4.5"), "Aprobado");
         when(inscripcionCursoDao.obtenerInscripcionPorId(1)).thenReturn(encontrada);
 
         InscripcionCurso resultado = inscripcionCursoService.obtenerInscripcionPorId(1);
@@ -98,8 +127,10 @@ class InscripcionCursoServiceTest {
     @Test
     @DisplayName("Filtra inscripciones por estudiante y por grupo delegando en el DAO")
     void filtrosPorEstudianteYGrupo_deleganEnDao() {
-        List<InscripcionCurso> porEstudianteEsperadas = List.of(new InscripcionCurso(1, estudiante, grupo, 4.2f, "Aprobado"));
-        List<InscripcionCurso> porGrupoEsperadas = List.of(new InscripcionCurso(2, estudiante, grupo, null, "Inscrito"));
+        List<InscripcionCurso> porEstudianteEsperadas = List.of(
+                new InscripcionCurso(1, estudiante, grupo, new BigDecimal("4.2"), "Aprobado"));
+        List<InscripcionCurso> porGrupoEsperadas = List.of(
+                new InscripcionCurso(2, estudiante, grupo, null, "Inscrito"));
         when(inscripcionCursoDao.obtenerInscripcionesPorEstudiante(1)).thenReturn(porEstudianteEsperadas);
         when(inscripcionCursoDao.obtenerInscripcionesPorGrupo(1)).thenReturn(porGrupoEsperadas);
 

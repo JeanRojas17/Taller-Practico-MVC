@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgreSQLDatabase;
+import com.mvc.exception.PersistenciaException;
 import com.mvc.models.*;
 
 public class InscripcionCursoDao {
@@ -47,16 +48,16 @@ public class InscripcionCursoDao {
             pstmt.setInt(2, inscripcion.getGrupo().getId());
 
             if(inscripcion.getNotaFinal() != null) {
-                pstmt.setFloat(3, inscripcion.getNotaFinal());
+                pstmt.setBigDecimal(3, inscripcion.getNotaFinal());
             } else {
-                pstmt.setNull(3, java.sql.Types.FLOAT);
+                pstmt.setNull(3, java.sql.Types.NUMERIC);
             }
 
             pstmt.setString(4, inscripcion.getEstado());
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al guardar la inscripción.", error);
         }
     }
 
@@ -73,7 +74,7 @@ public class InscripcionCursoDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener las inscripciones.", error);
         }
 
         return inscripciones;
@@ -93,7 +94,7 @@ public class InscripcionCursoDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener la inscripción con ID " +id+ ".", error);
         }
 
         return null;
@@ -108,9 +109,9 @@ public class InscripcionCursoDao {
             pstmt.setInt(2, inscripcion.getGrupo().getId());
 
             if(inscripcion.getNotaFinal() != null) {
-                pstmt.setFloat(3, inscripcion.getNotaFinal());
+                pstmt.setBigDecimal(3, inscripcion.getNotaFinal());
             } else {
-                pstmt.setNull(3, java.sql.Types.FLOAT);
+                pstmt.setNull(3, java.sql.Types.NUMERIC);
             }
 
             pstmt.setString(4, inscripcion.getEstado());
@@ -119,7 +120,7 @@ public class InscripcionCursoDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al actualizar la inscripción con ID " +inscripcion.getId()+ ".", error);
         }
     }
 
@@ -132,7 +133,7 @@ public class InscripcionCursoDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al eliminar la inscripción con ID " +id+ ".", error);
         }
     }
 
@@ -152,7 +153,7 @@ public class InscripcionCursoDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener inscripciones del estudiante con ID " +idEstudiante+ ".", error);
         }
 
         return inscripciones;
@@ -174,7 +175,7 @@ public class InscripcionCursoDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener inscripciones del grupo con ID " +idGrupo+ ".", error);
         }
 
         return inscripciones;
@@ -186,7 +187,7 @@ public class InscripcionCursoDao {
         estudiante.setId(rs.getInt("id_estudiante"));
         estudiante.setNombre(rs.getString("nombre_estudiante"));
         estudiante.setApellido(rs.getString("apellido_estudiante"));
-        estudiante.setCorreo(rs.getString("email_estudiante"));
+        estudiante.setEmail(rs.getString("email_estudiante"));
 
         Materia materia = new Materia();
         materia.setId(rs.getInt("id_materia"));
@@ -209,7 +210,7 @@ public class InscripcionCursoDao {
         inscripcion.setId(rs.getInt("id_inscripcion"));
         inscripcion.setEstudiante(estudiante);
         inscripcion.setGrupo(grupo);
-        inscripcion.setNotaFinal(rs.getObject("nota_final") != null ? rs.getFloat("nota_final") : null);
+        inscripcion.setNotaFinal(rs.getBigDecimal("nota_final"));
         inscripcion.setEstado(rs.getString("estado"));
 
         return inscripcion;

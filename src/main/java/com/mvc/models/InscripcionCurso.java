@@ -1,17 +1,19 @@
 package com.mvc.models;
 
+import java.math.BigDecimal;
+
 public class InscripcionCurso {
 
     private Integer id;
     private Estudiante estudiante;
     private Grupo grupo;
-    private Float notaFinal;
+    private BigDecimal notaFinal;
     private String estado;
 
     public InscripcionCurso() {
     }
 
-    public InscripcionCurso(Integer id, Estudiante estudiante, Grupo grupo, Float notaFinal, String estado) {
+    public InscripcionCurso(Integer id, Estudiante estudiante, Grupo grupo, BigDecimal notaFinal, String estado) {
         this.id = id;
         this.estudiante = estudiante;
         this.grupo = grupo;
@@ -43,11 +45,11 @@ public class InscripcionCurso {
         this.grupo = grupo;
     }
 
-    public Float getNotaFinal() {
+    public BigDecimal getNotaFinal() {
         return notaFinal;
     }
 
-    public void setNotaFinal(Float notaFinal) {
+    public void setNotaFinal(BigDecimal notaFinal) {
         this.notaFinal = notaFinal;
     }
 

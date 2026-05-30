@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgreSQLDatabase;
+import com.mvc.exception.PersistenciaException;
 import com.mvc.models.Usuario;
 
 public class UsuarioDao {
@@ -28,7 +29,27 @@ public class UsuarioDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al autenticar el usuario.", error);
+        }
+
+        return null;
+    }
+
+    public Usuario buscarPorId(int idUsuario) {
+        String sql = "SELECT id_usuario, username, password, rol FROM \"practica-mvc\".usuario WHERE id_usuario = ?;";
+
+        try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idUsuario);
+
+            try(ResultSet rs = pstmt.executeQuery()) {
+                if(rs.next()) {
+                    return mapear(rs);
+                }
+            }
+
+        } catch(SQLException error) {
+            throw new PersistenciaException("Error al buscar el usuario con ID " +idUsuario+ ".", error);
         }
 
         return null;
@@ -45,10 +66,8 @@ public class UsuarioDao {
             return pstmt.executeUpdate() > 0;
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al actualizar el username del usuario con ID " +idUsuario+ ".", error);
         }
-
-        return false;
     }
 
     public boolean actualizarPassword(int idUsuario, String nuevaPassword) {
@@ -62,10 +81,8 @@ public class UsuarioDao {
             return pstmt.executeUpdate() > 0;
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al actualizar la contraseña del usuario con ID " +idUsuario+ ".", error);
         }
-
-        return false;
     }
 
     public boolean existeUsername(String username) {
@@ -80,10 +97,8 @@ public class UsuarioDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al verificar la existencia del username.", error);
         }
-
-        return false;
     }
 
     public List<Usuario> listarTodos() {
@@ -98,7 +113,7 @@ public class UsuarioDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al listar los usuarios.", error);
         }
 
         return lista;
@@ -115,7 +130,7 @@ public class UsuarioDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al crear el usuario.", error);
         }
     }
 
@@ -131,7 +146,7 @@ public class UsuarioDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al actualizar el usuario con ID " +usuario.getId()+ ".", error);
         }
     }
 
@@ -144,7 +159,7 @@ public class UsuarioDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al eliminar el usuario con ID " +idUsuario+ ".", error);
         }
     }
 
