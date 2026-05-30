@@ -405,7 +405,7 @@ public class VistaEstudianteSwing extends JPanel {
                     e.getId(),
                     e.getNombre(),
                     e.getApellido(),
-                    e.getCorreo()
+                    e.getEmail()
             });
         }
     }
@@ -425,7 +425,7 @@ public class VistaEstudianteSwing extends JPanel {
         return txtApellido.getText().trim();
     }
 
-    public String getCorreo() {
+    public String getEmail() {
         return txtCorreo.getText().trim();
     }
 

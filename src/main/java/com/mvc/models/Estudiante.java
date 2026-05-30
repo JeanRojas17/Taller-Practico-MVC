@@ -5,16 +5,16 @@ public class Estudiante {
     private Integer id;
     private String nombre;
     private String apellido;
-    private String correo;
+    private String email;
     
     public Estudiante() {
     }
 
-    public Estudiante(Integer id, String nombre, String apellido, String correo) {
+    public Estudiante(Integer id, String nombre, String apellido, String email) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
-        this.correo = correo;
+        this.email = email;
     }
 
     public Integer getId() {
@@ -41,11 +41,11 @@ public class Estudiante {
         this.apellido = apellido;
     }
 
-    public String getCorreo() {
-        return correo;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgreSQLDatabase;
+import com.mvc.exception.PersistenciaException;
 import com.mvc.models.Docente;
 
 public class DocenteDao {
@@ -24,7 +25,7 @@ public class DocenteDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al guardar el docente.", error);
         }
     }
 
@@ -41,7 +42,7 @@ public class DocenteDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener los docentes.", error);
         }
 
         return docentes;
@@ -60,7 +61,7 @@ public class DocenteDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener el docente con ID " +id+ ".", error);
         }
 
         return null;
@@ -77,7 +78,7 @@ public class DocenteDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al actualizar el docente con ID " +docente.getId()+ ".", error);
         }
     }
 
@@ -89,7 +90,7 @@ public class DocenteDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al eliminar el docente con ID " +id+ ".", error);
         }
     }
 

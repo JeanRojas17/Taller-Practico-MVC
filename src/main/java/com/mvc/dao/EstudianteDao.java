@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgreSQLDatabase;
+import com.mvc.exception.PersistenciaException;
 import com.mvc.models.Estudiante;
 
 public class EstudianteDao {
@@ -20,17 +21,17 @@ public class EstudianteDao {
 
             pstmt.setString(1, estudiante.getNombre());
             pstmt.setString(2, estudiante.getApellido());
-            pstmt.setString(3, estudiante.getCorreo());
+            pstmt.setString(3, estudiante.getEmail());
             
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al guardar el estudiante.", error);
         }
     }
 
     public List<Estudiante> obtenerTodosLosEstudiantes() {
-        List<Estudiante> estudiantes = new ArrayList<Estudiante>();
+        List<Estudiante> estudiantes = new ArrayList<>();
         
         String sql = "SELECT id_estudiante, nombre, apellido, email FROM \"practica-mvc\".estudiante ORDER BY id_estudiante;";
 
@@ -42,7 +43,7 @@ public class EstudianteDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener los estudiantes.", error);
         }
 
         return estudiantes;
@@ -61,7 +62,7 @@ public class EstudianteDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener el estudiante con ID " +id+ ".", error);
         }
 
         return null;
@@ -73,13 +74,13 @@ public class EstudianteDao {
         try(Connection conn = ConexionPostgreSQLDatabase.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, estudiante.getNombre());
             pstmt.setString(2, estudiante.getApellido());
-            pstmt.setString(3, estudiante.getCorreo());
+            pstmt.setString(3, estudiante.getEmail());
             pstmt.setInt(4, estudiante.getId());
             
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al actualizar el estudiante con ID " +estudiante.getId()+ ".", error);
         }   
     }
     
@@ -91,7 +92,7 @@ public class EstudianteDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al eliminar el estudiante con ID " +id+ ".", error);
         }   
     }
 
@@ -101,7 +102,7 @@ public class EstudianteDao {
         estudiante.setId(rs.getInt("id_estudiante"));
         estudiante.setNombre(rs.getString("nombre"));
         estudiante.setApellido(rs.getString("apellido"));
-        estudiante.setCorreo(rs.getString("email"));
+        estudiante.setEmail(rs.getString("email"));
         
         return estudiante;
     }

@@ -1,6 +1,7 @@
 package com.mvc.dao;
 
 import com.mvc.config.ConexionPostgreSQLDatabase;
+import com.mvc.exception.PersistenciaException;
 import com.mvc.models.Auditoria;
 
 import java.sql.*;
@@ -26,7 +27,7 @@ public class AuditoriaDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al registrar la auditoría.", error);
         }
     }
 
@@ -59,7 +60,7 @@ public class AuditoriaDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al listar los registros de auditoría.", error);
         }
 
         return lista;

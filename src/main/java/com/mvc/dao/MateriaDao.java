@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgreSQLDatabase;
+import com.mvc.exception.PersistenciaException;
 import com.mvc.models.Materia;
 
 public class MateriaDao {
@@ -24,7 +25,7 @@ public class MateriaDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al guardar la materia.", error);
         }
     }
 
@@ -41,7 +42,7 @@ public class MateriaDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener las materias.", error);
         }
 
         return materias;
@@ -61,7 +62,7 @@ public class MateriaDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener la materia con ID " +id+ ".", error);
         }
 
         return null;
@@ -79,7 +80,7 @@ public class MateriaDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al actualizar la materia con ID " +materia.getId()+ ".", error);
         }
     }
 
@@ -92,7 +93,7 @@ public class MateriaDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al eliminar la materia con ID " +id+ ".", error);
         }
     }
 

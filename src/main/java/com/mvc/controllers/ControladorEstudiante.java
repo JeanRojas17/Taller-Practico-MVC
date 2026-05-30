@@ -34,7 +34,7 @@ public class ControladorEstudiante {
     private void registrar() {
         String nombre = vista.getNombre();
         String apellido = vista.getApellido();
-        String correo = vista.getCorreo();
+        String email = vista.getEmail();
 
         if(nombre.isEmpty() || apellido.isEmpty()) {
             vista.mostrarError("Los campos Nombre y Apellido son obligatorios.");
@@ -42,7 +42,7 @@ public class ControladorEstudiante {
         }
 
         try {
-            Estudiante nuevo = new Estudiante(0, nombre, apellido, correo);
+            Estudiante nuevo = new Estudiante(0, nombre, apellido, email);
 
             service.registrarEstudiante(nuevo);
             AuditoriaService.getInstance().registrar("CREAR", "Estudiante", "Estudiante registrado: " +nombre+ " " +apellido);
@@ -67,7 +67,7 @@ public class ControladorEstudiante {
 
         String nombre = vista.getNombre();
         String apellido = vista.getApellido();
-        String correo = vista.getCorreo();
+        String email = vista.getEmail();
 
         if(nombre.isEmpty() || apellido.isEmpty()) {
             vista.mostrarError("Los campos Nombre y Apellido son obligatorios.");
@@ -75,7 +75,7 @@ public class ControladorEstudiante {
         }
 
         try {
-            Estudiante actualizado = new Estudiante(id, nombre, apellido, correo);
+            Estudiante actualizado = new Estudiante(id, nombre, apellido, email);
 
             service.actualizarEstudiante(actualizado);
             AuditoriaService.getInstance().registrar("ACTUALIZAR", "Estudiante", "Estudiante ID " +id+ " actualizado: " +nombre+ " " +apellido);

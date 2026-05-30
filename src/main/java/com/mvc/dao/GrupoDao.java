@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mvc.config.ConexionPostgreSQLDatabase;
+import com.mvc.exception.PersistenciaException;
 import com.mvc.models.Docente;
 import com.mvc.models.Grupo;
 import com.mvc.models.Materia;
@@ -44,7 +45,7 @@ public class GrupoDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al guardar el grupo.", error);
         }
     }
 
@@ -61,7 +62,7 @@ public class GrupoDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener los grupos.", error);
         }
 
         return grupos;
@@ -81,7 +82,7 @@ public class GrupoDao {
             }
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al obtener el grupo con ID " +id+ ".", error);
         }
 
         return null;
@@ -101,7 +102,7 @@ public class GrupoDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al actualizar el grupo con ID " +grupo.getId()+ ".", error);
         }
     }
 
@@ -114,7 +115,7 @@ public class GrupoDao {
             pstmt.executeUpdate();
 
         } catch(SQLException error) {
-            error.printStackTrace();
+            throw new PersistenciaException("Error al eliminar el grupo con ID " +id+ ".", error);
         }
     }
 

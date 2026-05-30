@@ -24,7 +24,7 @@ public class EstudianteService {
             throw new IllegalArgumentException("Los campos nombre y apellido del estudiante son obligatorios.");
         }
 
-        validarEmail(estudiante.getCorreo());
+        validarEmail(estudiante.getEmail());
 
         estudianteDao.guardarEstudiante(estudiante);
     }
@@ -42,7 +42,7 @@ public class EstudianteService {
             throw new IllegalArgumentException("El estudiante no puede ser nulo.");
         }
 
-        validarEmail(estudiante.getCorreo());
+        validarEmail(estudiante.getEmail());
 
         estudianteDao.actualizarEstudiante(estudiante);
     }
