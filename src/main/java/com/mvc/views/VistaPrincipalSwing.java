@@ -141,7 +141,7 @@ public class VistaPrincipalSwing extends JFrame {
         JMenu menuArchivo = createTopMenu("Archivo");
         JMenuItem itemInicio = buildMenuItem("Inicio", CARD_INICIO);
         JMenuItem itemConfiguracion = createMenuItem("Configuración");
-        JMenuItem itemCerrarSesion  = createMenuItem("Cerrar sesión");
+        JMenuItem itemCerrarSesion = createMenuItem("Cerrar sesión");
         JMenuItem itemSalir = createMenuItem("Salir");
 
         itemConfiguracion.addActionListener(e -> {
@@ -329,6 +329,7 @@ public class VistaPrincipalSwing extends JFrame {
         if (opcion != JOptionPane.YES_OPTION) return;
 
         timerReloj.stop();
+        com.mvc.config.ConfiguracionApp.getInstance().clearListenersPaginacion();
         dispose();
 
         SwingUtilities.invokeLater(() -> {

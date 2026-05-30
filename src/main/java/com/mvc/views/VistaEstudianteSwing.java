@@ -54,6 +54,7 @@ public class VistaEstudianteSwing extends JPanel {
 
     public VistaEstudianteSwing() {
         initComponents();
+        ConfiguracionApp.getInstance().addListenerPaginacion(this::mostrarPaginaActual);
     }
 
     private void initComponents() {
@@ -206,15 +207,12 @@ public class VistaEstudianteSwing extends JPanel {
         return encabezado;
     }
 
-    private JPanel buildPanelTabla() {
-        JPanel panelTabla = new JPanel(new BorderLayout());
-        panelTabla.setBackground(Color.WHITE);
-        panelTabla.setBorder(BorderFactory.createCompoundBorder(
+    private JScrollPane buildPanelTabla() {
+        JScrollPane scroll = new JScrollPane(tabla);
+        scroll.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)));
-        panelTabla.add(tabla.getTableHeader(), BorderLayout.NORTH);
-        panelTabla.add(tabla, BorderLayout.CENTER);
-        return panelTabla;
+        return scroll;
     }
 
     private JPanel buildPanelAcciones() {
@@ -455,7 +453,7 @@ public class VistaEstudianteSwing extends JPanel {
 
     private int calcularTotalPaginas() {
         int porPagina = ConfiguracionApp.getInstance().getRegistrosPorPagina();
-        if(todosDatos.isEmpty()) return 1;
+        if (todosDatos.isEmpty()) return 1;
         return (int) Math.ceil((double) todosDatos.size() / porPagina);
     }
 
