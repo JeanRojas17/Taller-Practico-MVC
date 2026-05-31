@@ -1,6 +1,6 @@
 <div align="center">
 
-# TALLER PRÁCTICO MVC + DAO + SERVICE + DB (POSTGRESQL) + JAVA SWING
+# SISTEMA DE GESTIÓN ACADÉMICA UNIAJC MVC + DAO + SERVICE + DB (POSTGRESQL) + JAVA SWING
 
 **Integrantes**  
 Jean Paul Rojas Herrera  
@@ -231,6 +231,8 @@ src/
 │       │   ├── InscripcionCursoDao.java
 │       │   ├── MateriaDao.java
 │       │   └── UsuarioDao.java
+│       ├── exception/                                # Excepciones personalizadas del dominio
+│       │   └── PersistenciaException.java
 │       ├── models/                                # Entidades del dominio (representan tablas de la BD)
 │       │   ├── Auditoria.java
 │       │   ├── Docente.java
