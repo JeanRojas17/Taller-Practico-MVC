@@ -1,8 +1,7 @@
-package com.mvc;
+package com.mvc.services;
 
 import com.mvc.dao.MateriaDao;
 import com.mvc.models.Materia;
-import com.mvc.services.MateriaService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

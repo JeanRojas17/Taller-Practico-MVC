@@ -1,10 +1,9 @@
-package com.mvc;
+package com.mvc.services;
 
 import com.mvc.dao.GrupoDao;
 import com.mvc.models.Docente;
 import com.mvc.models.Grupo;
 import com.mvc.models.Materia;
-import com.mvc.services.GrupoService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

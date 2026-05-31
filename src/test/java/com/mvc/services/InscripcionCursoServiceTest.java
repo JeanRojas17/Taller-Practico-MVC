@@ -1,4 +1,4 @@
-package com.mvc;
+package com.mvc.services;
 
 import com.mvc.dao.InscripcionCursoDao;
 import com.mvc.models.Docente;
@@ -6,7 +6,6 @@ import com.mvc.models.Estudiante;
 import com.mvc.models.Grupo;
 import com.mvc.models.InscripcionCurso;
 import com.mvc.models.Materia;
-import com.mvc.services.InscripcionCursoService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

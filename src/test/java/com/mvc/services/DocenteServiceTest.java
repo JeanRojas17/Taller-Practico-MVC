@@ -1,8 +1,7 @@
-package com.mvc;
+package com.mvc.services;
 
 import com.mvc.dao.DocenteDao;
 import com.mvc.models.Docente;
-import com.mvc.services.DocenteService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
