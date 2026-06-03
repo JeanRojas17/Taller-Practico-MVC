@@ -17,6 +17,8 @@ public class DialogConfiguracion extends JDialog {
     private final UsuarioService usuarioService;
     private final java.util.function.Consumer<String> onUsernameActualizado;
 
+    private DefaultTableModel modeloUsuarios;
+
     private static final Color COLOR_PRIMARIO = new Color(41, 128, 185);
     private static final Color COLOR_FONDO = new Color(242, 245, 249);
     private static final Color COLOR_BORDE = new Color(210, 215, 220);
@@ -47,8 +49,14 @@ public class DialogConfiguracion extends JDialog {
         tabs.addTab("Mi perfil", buildTabPerfil());
         tabs.addTab("Preferencias", buildTabPreferencias());
 
-        if (usuarioActual != null && usuarioActual.esAdministrador()) {
+        if(usuarioActual != null && usuarioActual.esAdministrador()) {
             tabs.addTab("Gestión de usuarios", buildTabGestionUsuarios());
+
+            tabs.addChangeListener(e -> {
+                if(tabs.getSelectedIndex() == 2 && modeloUsuarios != null) {
+                    cargarTablaUsuarios(modeloUsuarios);
+                }
+            });
         }
 
         add(tabs, BorderLayout.CENTER);
@@ -80,6 +88,7 @@ public class DialogConfiguracion extends JDialog {
                 usuarioActual.setUsername(nuevo);
                 txtNuevoUsername.setText("");
                 if (onUsernameActualizado != null) onUsernameActualizado.accept(nuevo);
+                refrescarGestionUsuarios();
                 JOptionPane.showMessageDialog(this,
                     "Nombre de usuario actualizado correctamente.",
                     "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -120,6 +129,7 @@ public class DialogConfiguracion extends JDialog {
                 txtActual.setText("");
                 txtNueva.setText("");
                 txtConfirm.setText("");
+                refrescarGestionUsuarios();
                 JOptionPane.showMessageDialog(this,
                     "Contraseña actualizada correctamente.",
                     "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -213,6 +223,7 @@ public class DialogConfiguracion extends JDialog {
                 return false;
             }
         };
+        this.modeloUsuarios = modelo;
 
         JTable tabla = new JTable(modelo);
         tabla.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -300,11 +311,18 @@ public class DialogConfiguracion extends JDialog {
             }
 
             int id = (int) modelo.getValueAt(fila, 0);
+            String nuevoUsername = txtUsername.getText().trim();
 
             try {
-                usuarioService.actualizarUsuario(new Usuario(id, txtUsername.getText().trim(), txtPassword.getText().trim(), (String) cmbRol.getSelectedItem()));
+                usuarioService.actualizarUsuario(new Usuario(id, nuevoUsername, txtPassword.getText().trim(), (String) cmbRol.getSelectedItem()));
                 cargarTablaUsuarios(modelo);
                 limpiarForm(txtUsername, txtPassword, cmbRol, tabla);
+
+                if(usuarioActual != null && id == usuarioActual.getId() && !nuevoUsername.equals(usuarioActual.getUsername())) {
+                    usuarioActual.setUsername(nuevoUsername);
+                    if (onUsernameActualizado != null) onUsernameActualizado.accept(nuevoUsername);
+                }
+
                 JOptionPane.showMessageDialog(this, "Usuario actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } catch(IllegalArgumentException ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -348,6 +366,12 @@ public class DialogConfiguracion extends JDialog {
         panel.add(sur, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    private void refrescarGestionUsuarios() {
+        if(modeloUsuarios != null) {
+            cargarTablaUsuarios(modeloUsuarios);
+        }
     }
 
     private void cargarTablaUsuarios(DefaultTableModel modelo) {

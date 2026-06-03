@@ -60,7 +60,7 @@ public class PanelEstadisticas extends JPanel {
             new EmptyBorder(18, 22, 18, 22)
         ));
 
-        JLabel titulo = new JLabel("Panel de estadísticas");
+        JLabel titulo = new JLabel("Panel de Estadísticas");
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 26));
         titulo.setForeground(new Color(31, 58, 147));
 
@@ -118,11 +118,11 @@ public class PanelEstadisticas extends JPanel {
         lblValorPromedio = crearLblValor();
 
         return new JPanel[] {
-            buildTarjeta("Estudiantes", "👨‍🎓", COLOR_AZUL, lblValorEstudiantes),
-            buildTarjeta("Docentes", "👨‍🏫", COLOR_VERDE, lblValorDocentes),
-            buildTarjeta("Materias", "📚", COLOR_NARANJA, lblValorMaterias),
-            buildTarjeta("Grupos", "🏫", COLOR_MORADO, lblValorGrupos),
-            buildTarjeta("Promedio notas","📊", COLOR_ROJO, lblValorPromedio)
+            buildTarjeta("Estudiantes", COLOR_AZUL, lblValorEstudiantes),
+            buildTarjeta("Docentes", COLOR_VERDE, lblValorDocentes),
+            buildTarjeta("Materias", COLOR_NARANJA, lblValorMaterias),
+            buildTarjeta("Grupos", COLOR_MORADO, lblValorGrupos),
+            buildTarjeta("Promedio notas", COLOR_ROJO, lblValorPromedio)
         };
     }
 
@@ -134,7 +134,7 @@ public class PanelEstadisticas extends JPanel {
         return lbl;
     }
 
-    private JPanel buildTarjeta(String etiqueta, String icono, Color color, JLabel lblValor) {
+    private JPanel buildTarjeta(String etiqueta, Color color, JLabel lblValor) {
         JPanel tarjeta = new JPanel();
         tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
         tarjeta.setBackground(Color.WHITE);
@@ -143,7 +143,7 @@ public class PanelEstadisticas extends JPanel {
             new EmptyBorder(14, 16, 14, 16)
         ));
 
-        JLabel lblIcono = new JLabel(icono+ "  " +etiqueta);
+        JLabel lblIcono = new JLabel(etiqueta);
         lblIcono.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblIcono.setForeground(color);
         lblIcono.setAlignmentX(Component.LEFT_ALIGNMENT);
