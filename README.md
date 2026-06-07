@@ -263,14 +263,22 @@ src/
 │       └── Main.java                              # Punto de entrada de la aplicación
 │
 └── test/
-    └── java/com/mvc/                              # Pruebas unitarias de servicios
-        ├── views/
-        │   └── VistaPrincipalSwingTest.java       # Prueba de la vista principal
-        ├── DocenteServiceTest.java
-        ├── EstudianteServiceTest.java
-        ├── GrupoServiceTest.java
-        ├── InscripcionCursoServiceTest.java
-        └── MateriaServiceTest.java
+    └── java/com/mvc/
+        ├── controllers/                           # Pruebas unitarias de controladores
+        │   ├── ControladorDocenteTest.java
+        │   ├── ControladorEstudianteTest.java
+        │   ├── ControladorGrupoTest.java
+        │   ├── ControladorInscripcionCursoTest.java
+        │   ├── ControladorLoginTest.java
+        │   └── ControladorMateriaTest.java
+        ├── services/                              # Pruebas unitarias de servicios
+        │   ├── DocenteServiceTest.java
+        │   ├── EstudianteServiceTest.java
+        │   ├── GrupoServiceTest.java
+        │   ├── InscripcionCursoServiceTest.java
+        │   └── MateriaServiceTest.java
+        └── views/                                 # Prueba de la vista principal
+            └── VistaPrincipalTest.java
 
 target/               # Directorio generado automáticamente por Maven (compilación y build)
 .gitignore            # Archivos y carpetas excluidos del control de versiones
